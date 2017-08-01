@@ -1,0 +1,61 @@
+## RunInfo
+AUTHOR=smonzon
+DATE=
+MAIL=sara.monzon.fdz@gmail.com
+
+DATE_RUN=20150902
+LIBRARY=NEXTERA
+SEQUENCING_CENTER=ISCIII
+PLATFORM=ILLUMINA
+MODEL=NEXTSEQ
+RUN_PLATFORM=NS500454
+
+SEQ_TYPE=PE
+TRIMMING=YES
+MAPPING=YES
+DUPLICATE_FILTER=YES
+VARIANT_CALLING=YES
+
+## System variables
+JAVA_RAM=-Xmx32g
+THREADS=10
+SCRIPTS_DIR=/home/smonzon/Documentos/desarrollo/exome_pipeline/lib
+TEMP_DIR=/home/smonzon/Documentos/desarrollo/TMP
+
+## sge variables
+USE_SGE=0
+
+## INPUT VARIABLES
+INPUT_DIR=/home/smonzon/Documentos/desarrollo/exome_pipeline/test/pruebas/RAW/cancer
+
+# Sample info
+SAMPLES=blood_S1:tumor_T1
+
+blood_S1=prueba_S_R1_PE.fastq	prueba_S_R2_PE.fastq 
+tumor_T1=prueba_T_R1_PE.fastq	prueba_T_R2_PE.fastq
+#blood_S2=prueba_S2_R1_PE.fastq	prueba_S2_R2_PE.fastq
+#tumor_T2=prueba_T2_R1_PE.fastq	prueba_T2_R2_PE.fastq
+
+# Output dirs
+OUTPUT_DIR=/home/smonzon/Documentos/desarrollo/test_results
+
+## Reference Variables
+GENOME_REF=/home/smonzon/Documentos/reference/homo_sapiens/1000genomes_b37/genome/human_g1k_v37.fasta
+EXOME_ENRICHMENT=NO
+KNOWN_SNPS=NO
+KNOWN_INDELS=NO
+
+## Software variables
+# Fastqc
+
+# Trimmomatic
+trimmomatic_version=0.32
+TRIMMOMATIC_PATH=/opt/trimmomatic
+TRIM_ARGS=ILLUMINACLIP:/opt/trimmomatic/adapters/TruSeq3-PE.fa:2:30:10_TRAILING:10_SLIDINGWINDOW:4:15_MINLEN:70
+
+# Picard
+PICARD_PATH=/opt/picard
+PICARD_ARGS=ASSUME_SORTED=true VALIDATION_STRINGENCY=LENIENT REMOVE_DUPLICATES=false
+
+# GATK
+GATK_PATH=/opt/gatk
