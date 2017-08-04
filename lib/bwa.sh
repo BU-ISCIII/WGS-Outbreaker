@@ -56,8 +56,7 @@ mkdir -p $OUTPUT_DIR/$SAMPLE
 echo -e "2) Alignment using BWA: $SAMPLE"                                                                                                                                                            
                                                                                                                                                                                                        
 echo "Alignment PE"                                                                                                                                                                            
-bwa aln -t $THREADS $REF_PATH $DIR/$SAMPLE/$FASTQ_R1 > $TEMP/$SAMPLE-align1.sai                                                                                                                                        
-bwa aln -t $THREADS $REF_PATH $DIR/$SAMPLE/$FASTQ_R2 > $TEMP/$SAMPLE-align2.sai                                                                                                                                        
-                                                                                                                                                                                                       
+bwa mem -t $THREADS $REF_PATH $DIR/$SAMPLE/$FASTQ_R1 $DIR/$SAMPLE/$FASTQ_R2 > $OUTPUT_DIR/$SAMPLE/$OUTPUT_SAM_NAME                                                                                                                                                                                                                                                                               
+                                                                                                                 
  # Use sampe with paired end data.                                                                                                                                                                    
-bwa sampe -P $REF_PATH $TEMP/$SAMPLE-align1.sai $TEMP/$SAMPLE-align2.sai $DIR/$SAMPLE/$FASTQ_R1 $DIR/$SAMPLE/$FASTQ_R2 > $OUTPUT_DIR/$SAMPLE/$OUTPUT_SAM_NAME   
+#bwa sampe -P $REF_PATH $TEMP/$SAMPLE-align1.sai $TEMP/$SAMPLE-align2.sai $DIR/$SAMPLE/$FASTQ_R1 $DIR/$SAMPLE/$FASTQ_R2 > $OUTPUT_DIR/$SAMPLE/$OUTPUT_SAM_NAME   
