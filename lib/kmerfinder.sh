@@ -40,11 +40,13 @@ else
 fi
 
 SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | tail -1)
+OUTPUT_NAME=$( echo $OUTPUT_CONCAT_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
+
 
 echo -e "Running kmerfinder for $SAMPLE \n"
 
 python $KMERFINDER_PATH/findytemplate.py \
-	-i $INPUT_DIR/$SAMPLE \
+	-i $OUPUT_DIR/$OUTPUT_NAME \
 	-t $BACT_DB_PATH \
 	-o $OUTPUT_DIR/$OUTPUT_KMERFINDER_NAMES \
 	-x ATGAC

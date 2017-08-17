@@ -4,7 +4,7 @@
 
 #Test whether the script is being used with sge or not.
 
-if [-z $SGE_TASK_ID]; then
+if [ -z $SGE_TASK_ID ]; then
 	use_sge=0
 
 else
@@ -33,7 +33,7 @@ FASTQ_FILES_R1=$4
 FASTQ_FILES_R2=$5
 OUTPUT_CONCAT_NAMES=$6
 
-if [" use_sge" = "1"]; then
+if [ "use_sge" = "1" ]; then
 	sample_number=$SGE_TASK_ID
 else
  	sample_number=$7
@@ -42,9 +42,9 @@ fi
 SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
 FASTQ_R1=$( echo $FASTQ_FILES_R1 | tr ":" "\n" | head -$sample_number | tail -1)
 FASTQ_R2=$( echo $FASTQ_FILES_R2 | tr ":" "\n" | head -$sample_number | tail -1)
-
+OUTPUT_NAME=$( echo $OUTPUT_CONCAT_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
 echo -e "concat files for $SAMPLE \n\n"
 
-zcat $INPUT_DIR/$SAMPLE/FASTQ_R* -o $OUTPUT_CONCAT_NAMES
+cat $INPUT_DIR/$SAMPLE/$FASTQ_R1 $INPUT_DIR/$SAMPLE/$FASTQ_R2 > $OUPUT_DIR/$OUTPUT_NAME
 
 echo -e "Concat $SAMPLE finished \n\n"

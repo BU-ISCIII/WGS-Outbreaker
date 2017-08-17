@@ -156,8 +156,8 @@ else
  		$SCRIPTS_DIR/run_variantCalling_haploid.sh $USE_SGE $VARIANT_CALLING $DUPLICATE_FILTER $OUTPUT_DIR $REF_PATH $THREADS $SAMPLES $mappingArray_sorted_list $vcfArray_list $sample_count $realignedBamArray_list $recalibratedBamArray_list $GATK_PATH $vcfsnpsArray_list $vcfsnpsfilArray_list $vcfindelsArray_list $vcfindelsfilArray_list $vcffilArray_list $KNOWN_SNPS $KNOWN_INDELS
 fi
 
-#Execute kmerfinder
-if [$TRIMMING == "YES"]; then
+# Execute kmerfinder
+if [ $TRIMMING == "YES" ]; then
 	$SCRIPTS_DIR/run_identification_ST.sh $USE_SGE $KMERFINDER $OUTPUT_DIR $BACT_DB_PATH $KMERFINDER_PATH $THREADS $trimmedFastqArray_paired_R1_list $trimmedFastqArray_paired_R2_list $sample_count $SAMPLES $concatFastq_list $kmerfinderST_list
 else 
 	$SCRIPTS_DIR/run_identification_ST.sh $USE_SGE $KMERFINDER $OUTPUT_DIR $BACT_DB_PATH $KMERFINDER_PATH $THREADS $fastq_R1_list $fastq_R2_list $sample_count $SAMPLES $concatFastq_list $kmerfinderST_list 
