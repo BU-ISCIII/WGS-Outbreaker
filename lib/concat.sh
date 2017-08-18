@@ -45,6 +45,6 @@ FASTQ_R2=$( echo $FASTQ_FILES_R2 | tr ":" "\n" | head -$sample_number | tail -1)
 OUTPUT_NAME=$( echo $OUTPUT_CONCAT_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
 echo -e "concat files for $SAMPLE \n\n"
 
-cat $INPUT_DIR/$SAMPLE/$FASTQ_R1 $INPUT_DIR/$SAMPLE/$FASTQ_R2 > $OUTPUT_DIR/$OUTPUT_NAME
+zcat $INPUT_DIR/$SAMPLE/$FASTQ_R1 $INPUT_DIR/$SAMPLE/$FASTQ_R2 > $OUTPUT_DIR/$OUTPUT_NAME
 
 echo -e "Concat $SAMPLE finished \n\n"

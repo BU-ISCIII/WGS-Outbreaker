@@ -27,6 +27,10 @@ trimmedFastqArray_paired_R1_list=${13}
 trimmedFastqArray_paired_R2_list=${14}
 trimmedFastqArray_unpaired_R1_list=${15}
 trimmedFastqArray_unpaired_R2_list=${16}
+compress_paired_R1_list=${17}
+compress_paired_R2_list=${18}
+compress_unpaired_R1_list=${19}
+compress_unpaired_R2_list=${20}
 
 ## Create directories
 date                            
@@ -55,16 +59,22 @@ if [ $TRIMMING == "YES" ]; then
 fi
 
 ## FASTQC
-FASTQC_PRETRIMMING="$SCRIPTS_DIR/fastqc.sh $OUTPUT_DIR/raw $OUTPUT_DIR $sample_names $fastq_R1_list $fastq_R2_list $THREADS"
-FASTQC_POSTRIMMING="$SCRIPTS_DIR/fastqc.sh $OUTPUT_DIR/QC/trimmomatic $OUTPUT_DIR $sample_names $trimmedFastqArray_paired_R1_list $trimmedFastqArray_paired_R2_list $THREADS" 
+FASTQC_PRETRIMMING_CMD="$SCRIPTS_DIR/fastqc.sh $OUTPUT_DIR/raw $OUTPUT_DIR $sample_names $fastq_R1_list $fastq_R2_list $THREADS"
+FASTQC_POSTRIMMING_CMD="$SCRIPTS_DIR/fastqc.sh $OUTPUT_DIR/QC/trimmomatic $OUTPUT_DIR $sample_names $trimmedFastqArray_paired_R1_list $trimmedFastqArray_paired_R2_list $THREADS" 
+
+##COMPRESSING FILES
+COMPRESS_FILE_CMD="$SCRIPTS_DIR/compress.sh $OUTPUT_DIR/QC/trimmomatic $OUTPUT_DIR/CQ/trimmomatic $sample_names $trimmedFastqArray_paired_R1_list $trimmedFastqArray_paired_R2_list $trimmedFastqArray_unpaired_R1_list $trimmedFastqArray_unpaired_R2_list"
+
+
 
 if [ "$USE_SGE" = "1" ]; then
-	FASTQC_PRE=$( qsub $SGE_ARGS -pe orte $THREADS -t 1-$sample_number -N $JOBNAME.FASTQ_PRE $FASTQC_PRETRIMMING)
+	FASTQC_PRE=$( qsub $SGE_ARGS -pe orte $THREADS -t 1-$sample_number -N $JOBNAME.FASTQ_PRE $FASTQC_PRETRIMMING_CMD)
     jobid_fastqc_pre=$( echo $FASTQC_PRE | cut -d ' ' -f3 | cut -d '.' -f1 )
 	echo -e "FASTQC_PRE:$jobid_fastqc_pre\n" >> $OUTPUT_DIR/logs/jobids.txt 
 	if [ $TRIMMING == "YES" ]; then
 		FASTQC_ARGS="${SGE_ARGS} -pe orte $THREADS -hold_jid $jobid_trimmomatic"
-		FASTQC_POST=$( qsub $FASTQC_ARGS -t 1-$sample_number -N $JOBNAME.FASTQ_POST $FASTQC_POSTRIMMING)
+		FASTQC_POST=$( qsub $FASTQC_ARGS -t 1-$sample_number -N $JOBNAME.FASTQ_POST $FASTQC_POSTRIMMING_CMD)
+		COMPRESS_FILE=$(qsub $FASTQC_ARGS -t 1-$sample_number -N $JOBNAME.COMPRESS_FILE $COMPRESS_FILE_CMD) 
 		jobid_fastqc_post=$( echo $FASTQC_POST | cut -d ' ' -f3 | cut -d '.' -f1 ) 
  		echo -e "FASTQC_POST:$jobid_fastqc_post\n" >> $OUTPUT_DIR/logs/jobids.txt  
 	fi
@@ -72,9 +82,10 @@ else
     for count in `seq 1 $sample_number`
     do 
     	echo "Running fastqc on sample $count"
-    	FASTQC_PRE=$($FASTQC_PRETRIMMING $count)
+    	FASTQC_PRE=$($FASTQC_PRETRIMMING_CMD $count)
 		if [ $TRIMMING == "YES" ]; then
-			FASTQC_POST=$( $FASTQC_POSTRIMMING $count)
+			FASTQC_POST=$( $FASTQC_POSTRIMMING_CMD $count)
+			COMPRESS_FILE=$( $COMPRESS_FILE_CMD $count)
 		fi
     done
 fi

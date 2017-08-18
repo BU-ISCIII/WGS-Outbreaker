@@ -87,6 +87,13 @@ do
     trimmedFastqArray_unpaired_R1[$i]=$sample.trimmed_unpaired_R1.fastq
     trimmedFastqArray_unpaired_R2[$i]=$sample.trimmed_unpaired_R2.fastq
 
+	#create compress name
+	compress_paired_R1[$i]=$sample.trimmed_R1.fastq.gz
+	compress_paired_R2[$i]=$sample.trimmed_R2.fastq.gz
+	compress_unpaired_R1[$i]=$sample.trimmed_unpaired__R1.fastq.gz
+	compress_unpaired_R2[$i]=$sample.trimmed_unpaired_R2.fastq.gz
+
+
 	# Create mapping names
 	mappingArray_sam[$i]=$sample.align.sam
 	mappingArray_bam[$i]=$sample.align.bam
@@ -127,6 +134,10 @@ trimmedFastqArray_paired_R1_list=$( echo ${trimmedFastqArray_paired_R1[@]} | tr 
 trimmedFastqArray_paired_R2_list=$( echo ${trimmedFastqArray_paired_R2[@]} | tr " " ":" )
 trimmedFastqArray_unpaired_R1_list=$( echo ${trimmedFastqArray_unpaired_R1[@]} | tr " " ":" )
 trimmedFastqArray_unpaired_R2_list=$( echo ${trimmedFastqArray_unpaired_R2[@]} | tr " " ":" )
+compress_paired_R1_list=$( echo ${compress_paired_R1[@]} | tr " " ":" ) 
+compress_paired_R2_list=$( echo ${compress_paired_R2[@]} | tr " " ":" )
+compress_unpaired_R1_list=$( echo ${compress_unpaired_R1[@]} | tr " " ":" )
+compress_unpaired_R2_list=$( echo ${compress_unpaired_R2[@]} | tr " " ":" )
 mappingArray_sam_list=$( echo ${mappingArray_sam[@]} | tr " " ":" )
 mappingArray_bam_list=$( echo ${mappingArray_bam[@]} | tr " " ":" )
 mappingArray_sorted_list=$( echo ${mappingArray_sorted[@]} | tr " " ":" )
@@ -140,14 +151,25 @@ concatFastq_list=$( echo ${concatFastq[@]} | tr " " ":")
 kmerfinderST_list=$( echo ${kmerfinderST[@]} | tr " " ":")
 
 # Execute preprocessing
-$SCRIPTS_DIR/run_preprocessing.sh $TRIMMING $USE_SGE $INPUT_DIR $OUTPUT_DIR $THREADS $fastq_R1_list $fastq_R2_list $sample_count $SAMPLES $TRIM_ARGS $trimmomatic_version $TRIMMOMATIC_PATH $trimmedFastqArray_paired_R1_list $trimmedFastqArray_paired_R2_list $trimmedFastqArray_unpaired_R1_list $trimmedFastqArray_unpaired_R2_list
+$SCRIPTS_DIR/run_preprocessing.sh $TRIMMING $USE_SGE $INPUT_DIR $OUTPUT_DIR $THREADS $fastq_R1_list $fastq_R2_list $sample_count $SAMPLES $TRIM_ARGS $trimmomatic_version $TRIMMOMATIC_PATH $trimmedFastqArray_paired_R1_list $trimmedFastqArray_paired_R2_list $trimmedFastqArray_unpaired_R1_list $trimmedFastqArray_unpaired_R2_list $compress_paired_R1_list $compress_paired_R2_list $compress_unpaired_R1_list $compress_unpaired_R2_list
 
-# Execute MAPPING
+# Execute MAPPING OLD
+#if [ $TRIMMING == "YES" ]; then
+   # $SCRIPTS_DIR/run_mapping.sh $MAPPING $USE_SGE $OUTPUT_DIR $REF_PATH $THREADS $trimmedFastqArray_paired_R1_list $trimmedFastqArray_paired_R2_list $sample_count $SAMPLES $mappingArray_sam_list $mappingArray_bam_list $mappingArray_sorted_list $bamstatArray_pre_list $bamstatArray_post_list $duplicateBamArray_list $DUPLICATE_FILTER $PICARD_PATH $EXOME_ENRICHMENT $PLATFORM $MODEL $DATE_RUN $LIBRARY $SEQUENCING_CENTER $RUN_PLATFORM $mappingArray_rg_list
+#else
+	#$SCRIPTS_DIR/run_mapping.sh $MAPPING $USE_SGE $OUTPUT_DIR $REF_PATH $THREADS $fastq_R1_list $fastq_R2_list $sample_count $SAMPLES $mappingArray_sam_list $mappingArray_bam_list $mappingArray_sorted_list $bamstatArray_pre_list $bamstatArray_post_list $duplicateBamArray_list $DUPLICATE_FILTER $PICARD_PATH $EXOME_ENRICHMENT $PLATFORM $MODEL $DATE_RUN $LIBRARY $SEQUENCING_CENTER $RUN_PLATFORM $mappingArray_rg_list
+#fi
+
+## Execute MAPPING COMPRESS FILE
 if [ $TRIMMING == "YES" ]; then
-    $SCRIPTS_DIR/run_mapping.sh $MAPPING $USE_SGE $OUTPUT_DIR $REF_PATH $THREADS $trimmedFastqArray_paired_R1_list $trimmedFastqArray_paired_R2_list $sample_count $SAMPLES $mappingArray_sam_list $mappingArray_bam_list $mappingArray_sorted_list $bamstatArray_pre_list $bamstatArray_post_list $duplicateBamArray_list $DUPLICATE_FILTER $PICARD_PATH $EXOME_ENRICHMENT $PLATFORM $MODEL $DATE_RUN $LIBRARY $SEQUENCING_CENTER $RUN_PLATFORM $mappingArray_rg_list
+    $SCRIPTS_DIR/run_mapping.sh $MAPPING $USE_SGE $OUTPUT_DIR $REF_PATH $THREADS $compress_paired_R1_list $compress_paired_R2_list $sample_count $SAMPLES $mappingArray_sam_list $mappingArray_bam_list $mappingArray_sorted_list $bamstatArray_pre_list $bamstatArray_post_list $duplicateBamArray_list $DUPLICATE_FILTER $PICARD_PATH $EXOME_ENRICHMENT $PLATFORM $MODEL $DATE_RUN $LIBRARY $SEQUENCING_CENTER $RUN_PLATFORM $mappingArray_rg_list
 else
-	$SCRIPTS_DIR/run_mapping.sh $MAPPING $USE_SGE $OUTPUT_DIR $REF_PATH $THREADS $fastq_R1_list $fastq_R2_list $sample_count $SAMPLES $mappingArray_sam_list $mappingArray_bam_list $mappingArray_sorted_list $bamstatArray_pre_list $bamstatArray_post_list $duplicateBamArray_list $DUPLICATE_FILTER $PICARD_PATH $EXOME_ENRICHMENT $PLATFORM $MODEL $DATE_RUN $LIBRARY $SEQUENCING_CENTER $RUN_PLATFORM $mappingArray_rg_list
+        $SCRIPTS_DIR/run_mapping.sh $MAPPING $USE_SGE $OUTPUT_DIR $REF_PATH $THREADS $fastq_R1_list $fastq_R2_list $sample_count $SAMPLES $mappingArray_sam_list $mappingArray_bam_list $mappingArray_sorted_list $bamstatArray_pre_list $bamstatArray_post_list $duplicateBamArray_list $DUPLICATE_FILTER $PICARD_PATH $EXOME_ENRICHMENT $PLATFORM $MODEL $DATE_RUN $LIBRARY $SEQUENCING_CENTER $RUN_PLATFORM $mappingArray_rg_list
 fi
+
+
+
+
 
 # Execute variant Calling
 if [ $DUPLICATE_FILTER == "YES" ]; then
