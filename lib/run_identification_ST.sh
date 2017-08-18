@@ -45,13 +45,12 @@ if [ $KMERFINDER == "YES" ]; then
 	jobid_kmerfinder=$( echo $KMERFINDER | cut -d ' ' -f3 | cut -d '.' -f1 )
 	echo -e "KMERFINDER:$jobif_kmerfinder\n" >> $OUTPUT_DIR/logs/jobsids.txt
 	else
-	for count in  `seq 1 $sample_number`
-	do
-		echo "Running concat files on sample $count"
-		CONCATFILES=$($CONCAT_CMD $count)
-		echo "Running kmerfinder on sample $count"
-		KMERFINDER=$($KMERFINDER_CMD $count)
-	done
+		for count in  `seq 1 $sample_number`; do
+			echo "Running concat files on sample $count"
+			CONCATFILES=$($CONCAT_CMD $count)
+			echo "Running kmerfinder on sample $count"
+			KMERFINDER=$($KMERFINDER_CMD $count)
+		done
 	fi	
 fi
 

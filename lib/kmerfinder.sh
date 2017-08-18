@@ -8,7 +8,7 @@ else
 fi
 
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status 
-set -e  
+#set -e  
 # Treat unset variables and parameters other than the special parameters ‘@’ or ‘*’ as an error when performing parameter expansion. An error message will be written to the standard error, and a non-interactive shell will exit
 set -u 
 
@@ -39,20 +39,21 @@ else
 	sample_number=$9
 fi
 
-SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | tail -1)
-OUTPUT_NAME=$( echo $OUTPUT_CONCAT_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
+SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
+INPUT_NAME=$( echo $OUTPUT_CONCAT_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
+OUTPUT_NAME=$( echo $OUTPUT_KMERFINDER_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
 
 
 echo -e "Running kmerfinder for $SAMPLE \n"
 
-python $KMERFINDER_PATH/findytemplate.py \
-	-i $OUPUT_DIR/$OUTPUT_NAME \
+python $KMERFINDER_PATH/findtemplate.py \
+	-i $OUTPUT_DIR/$INPUT_NAME \
 	-t $BACT_DB_PATH \
-	-o $OUTPUT_DIR/$OUTPUT_KMERFINDER_NAMES \
-	-x ATGAC
+	-o $OUTPUT_DIR/$OUTPUT_NAME \
+	-x ATGAC \
 	-w
 
-echo -e " kmerfinder for $SAMPLE finished \n\n"
+echo -e "kmerfinder for $SAMPLE finished \n"
 
 
 
