@@ -55,5 +55,8 @@ python $KMERFINDER_PATH/findtemplate.py \
 
 echo -e "kmerfinder for $SAMPLE finished \n"
 
+echo -e "Remove concat file for $SAMPLE \n"
 
+rm $OUTPUT_DIR/$INPUT_NAME
 
+echo -e "Concat file for $SAMPLE deleted"
