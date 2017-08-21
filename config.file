@@ -15,8 +15,8 @@ TRIMMING=YES
 MAPPING=YES
 DUPLICATE_FILTER=YES
 VARIANT_CALLING=NO
-KMERFINDER=YES
-
+KMERFINDER=NO
+SRST2=YES
 
 ## System variables
 JAVA_RAM=-Xmx28g
@@ -46,6 +46,7 @@ EXOME_ENRICHMENT=NO
 KNOWN_SNPS=NO
 KNOWN_INDELS=NO
 BACT_DB_PATH=/home/ahernandez/software/kmerFinder/all_bacteria_db
+SRST2_DB_PATH=/home/ahernandez/Documents/desarrollo/reference/reference_srst2
 
 ## Software variables
 # Fastqc

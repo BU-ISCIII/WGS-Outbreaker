@@ -42,6 +42,7 @@ MAPPING=$( cat $CONFIG_FILE | grep -w 'MAPPING' | cut -d '=' -f2 )
 DUPLICATE_FILTER=$( cat $CONFIG_FILE | grep -w 'DUPLICATE_FILTER' | cut -d '=' -f2 )
 VARIANT_CALLING=$( cat $CONFIG_FILE | grep -w 'VARIANT_CALLING' | cut -d '=' -f2 )
 KMERFINDER=$( cat $CONFIG_FILE | grep -w 'KMERFINDER' | cut -d '=' -f2 )
+SRST2=$( cat $CONFIG_FILE | grep -w 'SRST2' | cut -d '=' -f2 )
 
 # REFERENCES
 EXOME_ENRICHMENT=$( cat $CONFIG_FILE | grep -w 'EXOME_ENRICHMENT' | cut -d '=' -f2 ) 
@@ -49,6 +50,8 @@ REF_PATH=$( cat $CONFIG_FILE | grep -w 'GENOME_REF' | cut -d '=' -f2 )
 KNOWN_SNPS=$( cat $CONFIG_FILE | grep -w 'KNOWN_SNPS' | cut -d '=' -f2 )
 KNOWN_INDELS=$( cat $CONFIG_FILE | grep -w 'KNOWN_INDELS' | cut -d '=' -f2 )
 BACT_DB_PATH=$( cat $CONFIG_FILE | grep -w 'BACT_DB_PATH' | cut -d '=' -f2 )
+SRST2_DB_PATH=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH' | cut -d '=' -f2)
+
 
 # Arguments
 trimmomatic_version=$( cat $CONFIG_FILE | grep -w 'trimmomatic_version' | cut -d '=' -f2 )
@@ -81,11 +84,11 @@ do
 	ln -fs $INPUT_DIR/${fastqArray_R1[$i]} $OUTPUT_DIR/raw/$sample/${fastqArray_R1[$i]}
  	ln -fs $INPUT_DIR/${fastqArray_R2[$i]} $OUTPUT_DIR/raw/$sample/${fastqArray_R2[$i]}
 
-    # Create trimming names
-    trimmedFastqArray_paired_R1[$i]=$sample.trimmed_R1.fastq
-    trimmedFastqArray_paired_R2[$i]=$sample.trimmed_R2.fastq
-    trimmedFastqArray_unpaired_R1[$i]=$sample.trimmed_unpaired_R1.fastq
-    trimmedFastqArray_unpaired_R2[$i]=$sample.trimmed_unpaired_R2.fastq
+	# Create trimming names
+	trimmedFastqArray_paired_R1[$i]=$sample.trimmed_R1.fastq
+	trimmedFastqArray_paired_R2[$i]=$sample.trimmed_R2.fastq
+	trimmedFastqArray_unpaired_R1[$i]=$sample.trimmed_unpaired_R1.fastq
+	trimmedFastqArray_unpaired_R2[$i]=$sample.trimmed_unpaired_R2.fastq
 
 	#create compress name
 	compress_paired_R1[$i]=$sample.trimmed_R1.fastq.gz
@@ -98,7 +101,7 @@ do
 	mappingArray_sam[$i]=$sample.align.sam
 	mappingArray_bam[$i]=$sample.align.bam
 	mappingArray_sorted[$i]=$sample.align.sorted.bam
-    mappingArray_rg[$i]=$sample.align.sorted.rg.bam
+	mappingArray_rg[$i]=$sample.align.sorted.rg.bam
 
 	# Create bamstat names
 	bamstatArray_pre[$i]=$sample.pre.bamstat.txt
@@ -116,7 +119,12 @@ do
 
 	#create kmerfinder output names
 	kmerfinderST[$i]=$sample.kmerfinder.txt
-
+	
+	#create srst2 output names
+	resistance[$i]=$sample.resistance
+	plasmid[$i]=$sample.plasmid
+	mlst[$i]=$sample.mlst
+	summary[$i]=$sample.summary
 	
 	let i=i+1
 done
@@ -149,6 +157,10 @@ recalibratedBamArray_list=$( echo ${recalibratedBamArray[@]} | tr " " ":" )
 realignedBamArray_list=$( echo ${realignedBamArray[@]} | tr " " ":" )
 concatFastq_list=$( echo ${concatFastq[@]} | tr " " ":")
 kmerfinderST_list=$( echo ${kmerfinderST[@]} | tr " " ":")
+resistance_list=$( echo ${resistance[@]} | tr " " ":")
+plasmid_list=$( echo ${plasmid[@]} | tr " " ":")
+mlst2_list=$( echo ${plasmid[@]} | tr " " ":")
+
 
 # Execute preprocessing
 $SCRIPTS_DIR/run_preprocessing.sh $TRIMMING $USE_SGE $INPUT_DIR $OUTPUT_DIR $THREADS $fastq_R1_list $fastq_R2_list $sample_count $SAMPLES $TRIM_ARGS $trimmomatic_version $TRIMMOMATIC_PATH $trimmedFastqArray_paired_R1_list $trimmedFastqArray_paired_R2_list $trimmedFastqArray_unpaired_R1_list $trimmedFastqArray_unpaired_R2_list $compress_paired_R1_list $compress_paired_R2_list $compress_unpaired_R1_list $compress_unpaired_R2_list
@@ -180,7 +192,14 @@ fi
 
 # Execute kmerfinder
 if [ $TRIMMING == "YES" ]; then
-	$SCRIPTS_DIR/run_identification_ST.sh $USE_SGE $KMERFINDER $OUTPUT_DIR $BACT_DB_PATH $KMERFINDER_PATH $THREADS $trimmedFastqArray_paired_R1_list $trimmedFastqArray_paired_R2_list $sample_count $SAMPLES $concatFastq_list $kmerfinderST_list
+	$SCRIPTS_DIR/run_identification_ST.sh $USE_SGE $KMERFINDER $OUTPUT_DIR $BACT_DB_PATH $KMERFINDER_PATH $THREADS $compress_paired_R1_list $compress_paired_R2_list $sample_count $SAMPLES $concatFastq_list $kmerfinderST_list
 else 
 	$SCRIPTS_DIR/run_identification_ST.sh $USE_SGE $KMERFINDER $OUTPUT_DIR $BACT_DB_PATH $KMERFINDER_PATH $THREADS $fastq_R1_list $fastq_R2_list $sample_count $SAMPLES $concatFastq_list $kmerfinderST_list 
+fi
+
+# Execure srst2
+if [ $TRIMMING =="YES" ]; then
+	$SCRIPTS_DIR/run_srst2.sh $USE_SGE $SRST2 $OUTPUT_DIR $SRST2_DB_PATH $THREADS $compress_paired_R1_list $compress_paired_R2_list $sample_count $SAMPLES $resistance_list $plasmid_list $mlst2_list
+else 
+	$SCRIPTS_DIR/run_srst2.sh $USE_SGE $SRST2 $OUTPUT_DIR $SRST2_DB_PATH $THREADS $fastq_R1_list $fastq_R2_list $sample_count $SAMPLES $resistance_list $plasmid_list $mlst2_list
 fi
