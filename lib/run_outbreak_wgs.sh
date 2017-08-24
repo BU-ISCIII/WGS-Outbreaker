@@ -50,7 +50,10 @@ REF_PATH=$( cat $CONFIG_FILE | grep -w 'GENOME_REF' | cut -d '=' -f2 )
 KNOWN_SNPS=$( cat $CONFIG_FILE | grep -w 'KNOWN_SNPS' | cut -d '=' -f2 )
 KNOWN_INDELS=$( cat $CONFIG_FILE | grep -w 'KNOWN_INDELS' | cut -d '=' -f2 )
 BACT_DB_PATH=$( cat $CONFIG_FILE | grep -w 'BACT_DB_PATH' | cut -d '=' -f2 )
-SRST2_DB_PATH=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH' | cut -d '=' -f2)
+SRST2_DB_PATH_ARGannot=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH_ARGannot' | cut -d '=' -f2)
+SRST2_DB_PATH_PlasmidFinder=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH_PlasmidFinder' | cut -d '=' -f2)
+SRST2_DB_PATH_mlst_db=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH_mlst_db' | cut -d '=' -f2)
+SRST2_DB_PATH_mlst_definitions=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH_mlst_definitions' | cut -d '=' -f2)
 
 
 # Arguments
@@ -60,6 +63,7 @@ TRIM_ARGS=$( cat $CONFIG_FILE | grep -w 'TRIM_ARGS' | cut -d '=' -f2 )
 PICARD_PATH=$( cat $CONFIG_FILE | grep -w 'PICARD_PATH' | cut -d '=' -f2 )
 GATK_PATH=$( cat $CONFIG_FILE | grep -w 'GATK_PATH' | cut -d '=' -f2 )
 KMERFINDER_PATH=$( cat $CONFIG_FILE | grep -w 'KMERFINDER_PATH' | cut -d '=' -f2 )
+SRST2_DELIMITER=$( cat $CONFIG_FILE | grep -w 'SRST2_DELIMITER' | cut -d '=' -f2 )
 
 ## Extract fastq and names for samples.
 sample_count=$(echo $SAMPLES | tr ":" "\n" | wc -l)
@@ -159,7 +163,7 @@ concatFastq_list=$( echo ${concatFastq[@]} | tr " " ":")
 kmerfinderST_list=$( echo ${kmerfinderST[@]} | tr " " ":")
 resistance_list=$( echo ${resistance[@]} | tr " " ":")
 plasmid_list=$( echo ${plasmid[@]} | tr " " ":")
-mlst2_list=$( echo ${plasmid[@]} | tr " " ":")
+mlst2_list=$( echo ${mlst[@]} | tr " " ":")
 
 
 # Execute preprocessing
@@ -198,8 +202,8 @@ else
 fi
 
 # Execure srst2
-if [ $TRIMMING =="YES" ]; then
-	$SCRIPTS_DIR/run_srst2.sh $USE_SGE $SRST2 $OUTPUT_DIR $SRST2_DB_PATH $THREADS $compress_paired_R1_list $compress_paired_R2_list $sample_count $SAMPLES $resistance_list $plasmid_list $mlst2_list
+if [ $TRIMMING == "YES" ]; then
+	$SCRIPTS_DIR/run_srst2.sh $USE_SGE $SRST2 $OUTPUT_DIR $SRST2_DB_PATH_ARGannot $SRST2_DB_PATH_PlasmidFinder $SRST2_DB_PATH_mlst_db $SRST2_DB_PATH_mlst_definitions $THREADS $compress_paired_R1_list $compress_paired_R2_list $sample_count $SAMPLES $resistance_list $plasmid_list $mlst2_list $SRST2_DELIMITER
 else 
-	$SCRIPTS_DIR/run_srst2.sh $USE_SGE $SRST2 $OUTPUT_DIR $SRST2_DB_PATH $THREADS $fastq_R1_list $fastq_R2_list $sample_count $SAMPLES $resistance_list $plasmid_list $mlst2_list
+	$SCRIPTS_DIR/run_srst2.sh $USE_SGE $SRST2 $OUTPUT_DIR $SRST2_DB_PATH_ARGannot $SRST2_DB_PATH_PlasmidFinder $SRST2_DB_PATH_mlst_db $SRST2_DB_PATH_mlst_definitions $THREADS $THREADS $fastq_R1_list $fastq_R2_list $sample_count $SAMPLES $resistance_list $plasmid_list $mlst2_list $SRST2_DELIMITER
 fi

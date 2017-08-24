@@ -14,8 +14,8 @@ SEQ_TYPE=PE
 TRIMMING=YES
 MAPPING=YES
 DUPLICATE_FILTER=YES
-VARIANT_CALLING=NO
-KMERFINDER=NO
+VARIANT_CALLING=YES
+KMERFINDER=YES
 SRST2=YES
 
 ## System variables
@@ -46,7 +46,10 @@ EXOME_ENRICHMENT=NO
 KNOWN_SNPS=NO
 KNOWN_INDELS=NO
 BACT_DB_PATH=/home/ahernandez/software/kmerFinder/all_bacteria_db
-SRST2_DB_PATH=/home/ahernandez/Documents/desarrollo/reference/reference_srst2
+SRST2_DB_PATH_ARGannot=/home/ahernandez/Documents/desarrollo/reference/reference_srst2/ARGannot.r1.fasta
+SRST2_DB_PATH_PlasmidFinder=/home/ahernandez/Documents/desarrollo/reference/reference_srst2/PlasmidFinder.fasta
+SRST2_DB_PATH_mlst_db=/home/ahernandez/Documents/desarrollo/reference/reference_srst2/Salmonella_enterica.fasta
+SRST2_DB_PATH_mlst_definitions=/home/ahernandez/Documents/desarrollo/reference/reference_srst2/senterica.txt
 
 ## Software variables
 # Fastqc
@@ -66,3 +69,5 @@ GATK_PATH=/opt/gatk
 #Kmerfinder
 KMERFINDER_PATH=/home/ahernandez/software/kmerFinder/genomicepidemiology-kmerdb-077ba38a546a
 
+#srst2
+SRST2_DELIMITER='-'
