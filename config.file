@@ -14,8 +14,8 @@ SEQ_TYPE=PE
 TRIMMING=YES
 MAPPING=YES
 DUPLICATE_FILTER=YES
-VARIANT_CALLING=YES
-KMERFINDER=YES
+VARIANT_CALLING=NO
+KMERFINDER=NO
 SRST2=YES
 
 ## System variables
@@ -70,4 +70,10 @@ GATK_PATH=/opt/gatk
 KMERFINDER_PATH=/home/ahernandez/software/kmerFinder/genomicepidemiology-kmerdb-077ba38a546a
 
 #srst2
-SRST2_DELIMITER='-'
+SRST2_DELIMITER=-
+# '-' don't work
+# \- don't work
+# - don't work (--mlst_delimiter -)
+# \'-' don't work
+# `-` don't work
+# '\-' dont work

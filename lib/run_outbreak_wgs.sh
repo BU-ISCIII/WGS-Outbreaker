@@ -63,7 +63,7 @@ TRIM_ARGS=$( cat $CONFIG_FILE | grep -w 'TRIM_ARGS' | cut -d '=' -f2 )
 PICARD_PATH=$( cat $CONFIG_FILE | grep -w 'PICARD_PATH' | cut -d '=' -f2 )
 GATK_PATH=$( cat $CONFIG_FILE | grep -w 'GATK_PATH' | cut -d '=' -f2 )
 KMERFINDER_PATH=$( cat $CONFIG_FILE | grep -w 'KMERFINDER_PATH' | cut -d '=' -f2 )
-SRST2_DELIMITER=$( cat $CONFIG_FILE | grep -w 'SRST2_DELIMITER' | cut -d '=' -f2 )
+#SRST2_DELIMITER=$( cat $CONFIG_FILE | grep -w 'SRST2_DELIMITER' | cut -d '=' -f2 )
 
 ## Extract fastq and names for samples.
 sample_count=$(echo $SAMPLES | tr ":" "\n" | wc -l)
@@ -128,7 +128,7 @@ do
 	resistance[$i]=$sample.resistance
 	plasmid[$i]=$sample.plasmid
 	mlst[$i]=$sample.mlst
-	summary[$i]=$sample.summary
+	summary_results[$i]=$sample.mlst_resistance_summary__compiledResults.txt
 	
 	let i=i+1
 done
@@ -164,7 +164,7 @@ kmerfinderST_list=$( echo ${kmerfinderST[@]} | tr " " ":")
 resistance_list=$( echo ${resistance[@]} | tr " " ":")
 plasmid_list=$( echo ${plasmid[@]} | tr " " ":")
 mlst2_list=$( echo ${mlst[@]} | tr " " ":")
-
+summary_results_list=$( echo ${summary_results[@]} | tr " " ":")
 
 # Execute preprocessing
 $SCRIPTS_DIR/run_preprocessing.sh $TRIMMING $USE_SGE $INPUT_DIR $OUTPUT_DIR $THREADS $fastq_R1_list $fastq_R2_list $sample_count $SAMPLES $TRIM_ARGS $trimmomatic_version $TRIMMOMATIC_PATH $trimmedFastqArray_paired_R1_list $trimmedFastqArray_paired_R2_list $trimmedFastqArray_unpaired_R1_list $trimmedFastqArray_unpaired_R2_list $compress_paired_R1_list $compress_paired_R2_list $compress_unpaired_R1_list $compress_unpaired_R2_list
@@ -203,7 +203,7 @@ fi
 
 # Execure srst2
 if [ $TRIMMING == "YES" ]; then
-	$SCRIPTS_DIR/run_srst2.sh $USE_SGE $SRST2 $OUTPUT_DIR $SRST2_DB_PATH_ARGannot $SRST2_DB_PATH_PlasmidFinder $SRST2_DB_PATH_mlst_db $SRST2_DB_PATH_mlst_definitions $THREADS $compress_paired_R1_list $compress_paired_R2_list $sample_count $SAMPLES $resistance_list $plasmid_list $mlst2_list $SRST2_DELIMITER
+	$SCRIPTS_DIR/run_srst2.sh $USE_SGE $SRST2 $OUTPUT_DIR $SRST2_DB_PATH_ARGannot $SRST2_DB_PATH_PlasmidFinder $SRST2_DB_PATH_mlst_db $SRST2_DB_PATH_mlst_definitions $THREADS $compress_paired_R1_list $compress_paired_R2_list $sample_count $SAMPLES $resistance_list $plasmid_list $mlst2_list $summary_results_list
 else 
-	$SCRIPTS_DIR/run_srst2.sh $USE_SGE $SRST2 $OUTPUT_DIR $SRST2_DB_PATH_ARGannot $SRST2_DB_PATH_PlasmidFinder $SRST2_DB_PATH_mlst_db $SRST2_DB_PATH_mlst_definitions $THREADS $THREADS $fastq_R1_list $fastq_R2_list $sample_count $SAMPLES $resistance_list $plasmid_list $mlst2_list $SRST2_DELIMITER
+	$SCRIPTS_DIR/run_srst2.sh $USE_SGE $SRST2 $OUTPUT_DIR $SRST2_DB_PATH_ARGannot $SRST2_DB_PATH_PlasmidFinder $SRST2_DB_PATH_mlst_db $SRST2_DB_PATH_mlst_definitions $THREADS $THREADS $fastq_R1_list $fastq_R2_list $sample_count $SAMPLES $resistance_list $plasmid_list $mlst2_list $summary_results_list
 fi

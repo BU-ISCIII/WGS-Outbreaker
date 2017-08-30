@@ -20,8 +20,13 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
-INPUR_DIR=
-OUTPUT_DIR=
-SUMMARY_RESULTS=
+INPUT_DIR=$1
+OUTPUT_DIR=$2
+SUMMARY_RESULTS=$3
+SAMPLE_NAMES=$4
 
-srst2 --prev_output $INPUT_DIR/"*__genes__ARGannot.r1__results.txt" $INPUT_DIR/"*__mlst__mlst*__results.txt" --output $OUTPUT_DIR/$SUMMARY_RESULTS
+SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
+SAMPLE_RESULTS=$( echo $SUMMARY_RESULTS | tr ":" "\n" | head -$sample_number | tail -1)
+
+
+srst2 --prev_output $INPUT_DIR/*__genes__ARGannot.r1__results.txt $INPUT_DIR/*__mlst__mlst*__results.txt --output $OUTPUT_DIR/$SAMPLE_RESULTS

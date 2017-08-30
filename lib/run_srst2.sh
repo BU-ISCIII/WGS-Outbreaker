@@ -27,11 +27,15 @@ sample_names=${12}
 resistance_list=${13}
 plasmid_list=${14}
 mlst_list=${15}
-SRST2_DELIMITER=${16}
+#SRST2_DELIMITER=${16}
+SUMMARY_RESULTS=${16}
+
+SAMPLE=$( echo $sample_names | tr ":" "\n" | head -$sample_number | tail -1)
 
 
 #create directories
-mkdir -p $OUTPUT_DIR/srst2
+mkdir -p $OUTPUT_DIR/srst2/$SAMPLE/summary
+
 
 jobid_trimmomatic=$( cat $OUTPUT_DIR/logs/jobids.txt | grep -w "TRIMMOMATIC" | cut -d ':' -f2 )
 
@@ -42,10 +46,10 @@ else
         DIR=$OUTPUT_DIR/raw
 fi
 
-RESISTANCE_CMD="$SCRIPTS_DIR/resistance.sh $DIR $OUTPUT_DIR/srst2 $SRST2_DB_PATH_ARGannot $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $resistance_list"
-PLASMID_CMD="$SCRIPTS_DIR/plasmid.sh $DIR $OUTPUT_DIR/srst2 $SRST2_DB_PATH_PlasmidFinder $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $plasmid_list"
-MLST_CMD="$SCRIPTS_DIR/mlst.sh $DIR $OUTPUT_DIR/srst2 $SRST2_DB_PATH_mlst $SRST2_DB_PATH_mlst_definitions $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $mlst_list $SRST2_DELIMITER"
-
+RESISTANCE_CMD="$SCRIPTS_DIR/resistance.sh $DIR $OUTPUT_DIR/srst2/$SAMPLE $SRST2_DB_PATH_ARGannot $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $resistance_list"
+PLASMID_CMD="$SCRIPTS_DIR/plasmid.sh $DIR $OUTPUT_DIR/srst2/$SAMPLE $SRST2_DB_PATH_PlasmidFinder $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $plasmid_list"
+MLST_CMD="$SCRIPTS_DIR/mlst.sh $DIR $OUTPUT_DIR/srst2/$SAMPLE $SRST2_DB_PATH_mlst $SRST2_DB_PATH_mlst_definitions $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $mlst_list"
+SUMMARY_CMD="$SCRIPTS_DIR/summary_srst2.sh $OUTPUT_DIR/srst2/$SAMPLE $OUTPUT_DIR/srst2/summary $SUMMARY_RESULTS $sample_names" 
 
 if [ $SRST2 == "YES" ];then
 	if [ "$USE_SGE" = "1" ]; then
@@ -61,14 +65,21 @@ if [ $SRST2 == "YES" ];then
                 jobid_mlst=$( echo $MLST | cut -d ' ' -f3 | cut -d '.' -f1 )
                 echo -e "MLST FILES:$jobid_mlst\n" >> $OUTPUT_DIR/logs/jobids.txt
 		
+		SUMMARY=$( qsub $SRST2_ARG -N $JOBNAME.SUMMARY $SUMMARY_CMD )
+                jobid_mlst=$( echo $SUMMARY | cut -d ' ' -f3 | cut -d '.' -f1 )
+                echo -e "SUMAMRY FILES:$jobid_summary\n" >> $OUTPUT_DIR/logs/jobids.txt
+
+		
 	else
-		for count in `seq 1 $sample_number`;do
+		for count in `seq 1 $sample_number`; do
 			echo "Running resistance on sample $count"
 			RESISTANCE=$($RESISTANCE_CMD $count)
 			echo "Running plasmid on sample $count"
                		PLASMIDS=$($PLASMID_CMD $count)
 			echo "Running mlst on sample $count"
         		MLST=$($MLST_CMD $count)
+			echo "Running summary on sample $count"
+			SUMMARY=$($SUMMARY_CMD $count)
 		done
 	fi
 fi
