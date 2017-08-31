@@ -42,6 +42,6 @@ OUTPUT_NAME=$( echo $OUTPUT_FILE | tr ":" "\n" | head -$sample_number | tail -1)
 
 echo -e "Running resistance.sh for $SAMPLE \n\n"
 
-srst2 --input_pe $INPUT_DIR/$SAMPLE/$FASTQ_R1_COMPRESS_NAME $INPUT_DIR/$SAMPLE/$FASTQ_R2_COMPRESS_NAME --forward trimmed_R1 --reverse trimmed_R2 --log --output $OUTPUT_DIR/$OUTPUT_NAME --gene_db $SRST2_DB_PATH_ARGannot
+srst2 --input_pe $INPUT_DIR/$SAMPLE/$FASTQ_R1_COMPRESS_NAME $INPUT_DIR/$SAMPLE/$FASTQ_R2_COMPRESS_NAME --forward trimmed_R1 --reverse trimmed_R2 --log --output $OUTPUT_DIR/$SAMPLE/$OUTPUT_NAME --gene_db $SRST2_DB_PATH_ARGannot
 
 echo -e "Resistance.sh for $SAMPLE finished \n\n"

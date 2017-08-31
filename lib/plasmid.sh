@@ -41,7 +41,7 @@ OUTPUT_NAME=$( echo $OUTPUT_FILE | tr ":" "\n" | head -$sample_number | tail -1)
 
 echo -e "Running plasmid.sh for $SAMPLE \n\n"
 
-srst2 --input_pe $INPUT_DIR/$SAMPLE/$FASTQ_R1_NAME $INPUT_DIR/$SAMPLE/$FASTQ_R2_NAME --forward trimmed_R1 --reverse trimmed_R2 --log --output $OUTPUT_DIR/$OUTPUT_NAME --gene_db $SRST2_DB_PATH_PlasmidFinder
+srst2 --input_pe $INPUT_DIR/$SAMPLE/$FASTQ_R1_NAME $INPUT_DIR/$SAMPLE/$FASTQ_R2_NAME --forward trimmed_R1 --reverse trimmed_R2 --log --output $OUTPUT_DIR/$SAMPLE/$OUTPUT_NAME --gene_db $SRST2_DB_PATH_PlasmidFinder
 
 echo -e "plasmid.sh for $SAMPLE finished \n\n"
 

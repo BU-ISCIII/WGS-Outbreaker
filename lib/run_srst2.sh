@@ -28,13 +28,15 @@ resistance_list=${13}
 plasmid_list=${14}
 mlst_list=${15}
 #SRST2_DELIMITER=${16}
-SUMMARY_RESULTS=${16}
 
 SAMPLE=$( echo $sample_names | tr ":" "\n" | head -$sample_number | tail -1)
 
 
 #create directories
-mkdir -p $OUTPUT_DIR/srst2/$SAMPLE/summary
+for count in $SAMPLE; do
+	mkdir -p $OUTPUT_DIR/srst2/$SAMPLE
+	echo "Directory for $SAMPLE created"
+	done
 
 
 jobid_trimmomatic=$( cat $OUTPUT_DIR/logs/jobids.txt | grep -w "TRIMMOMATIC" | cut -d ':' -f2 )
@@ -46,10 +48,10 @@ else
         DIR=$OUTPUT_DIR/raw
 fi
 
-RESISTANCE_CMD="$SCRIPTS_DIR/resistance.sh $DIR $OUTPUT_DIR/srst2/$SAMPLE $SRST2_DB_PATH_ARGannot $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $resistance_list"
-PLASMID_CMD="$SCRIPTS_DIR/plasmid.sh $DIR $OUTPUT_DIR/srst2/$SAMPLE $SRST2_DB_PATH_PlasmidFinder $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $plasmid_list"
-MLST_CMD="$SCRIPTS_DIR/mlst.sh $DIR $OUTPUT_DIR/srst2/$SAMPLE $SRST2_DB_PATH_mlst $SRST2_DB_PATH_mlst_definitions $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $mlst_list"
-SUMMARY_CMD="$SCRIPTS_DIR/summary_srst2.sh $OUTPUT_DIR/srst2/$SAMPLE $OUTPUT_DIR/srst2/summary $SUMMARY_RESULTS $sample_names" 
+RESISTANCE_CMD="$SCRIPTS_DIR/resistance.sh $DIR $OUTPUT_DIR/srst2 $SRST2_DB_PATH_ARGannot $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $resistance_list"
+PLASMID_CMD="$SCRIPTS_DIR/plasmid.sh $DIR $OUTPUT_DIR/srst2 $SRST2_DB_PATH_PlasmidFinder $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $plasmid_list"
+MLST_CMD="$SCRIPTS_DIR/mlst.sh $DIR $OUTPUT_DIR/srst2 $SRST2_DB_PATH_mlst $SRST2_DB_PATH_mlst_definitions $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $mlst_list"
+SUMMARY_CMD="$SCRIPTS_DIR/summary_srst2.sh $OUTPUT_DIR/srst2 $OUTPUT_DIR/srst2" 
 
 if [ $SRST2 == "YES" ];then
 	if [ "$USE_SGE" = "1" ]; then
@@ -78,9 +80,11 @@ if [ $SRST2 == "YES" ];then
                		PLASMIDS=$($PLASMID_CMD $count)
 			echo "Running mlst on sample $count"
         		MLST=$($MLST_CMD $count)
-			echo "Running summary on sample $count"
-			SUMMARY=$($SUMMARY_CMD $count)
 		done
+			
+		echo "Running summary"
+		SUMMARY=$($SUMMARY_CMD)
+		
 	fi
 fi
 

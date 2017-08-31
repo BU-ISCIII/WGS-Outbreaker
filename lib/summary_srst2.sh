@@ -22,11 +22,15 @@ set -x
 
 INPUT_DIR=$1
 OUTPUT_DIR=$2
-SUMMARY_RESULTS=$3
-SAMPLE_NAMES=$4
-
-SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
-SAMPLE_RESULTS=$( echo $SUMMARY_RESULTS | tr ":" "\n" | head -$sample_number | tail -1)
 
 
-srst2 --prev_output $INPUT_DIR/*__genes__ARGannot.r1__results.txt $INPUT_DIR/*__mlst__mlst*__results.txt --output $OUTPUT_DIR/$SAMPLE_RESULTS
+echo -e "Finding resistence results"
+find $INPUT_DIR -name "*__genes__ARGannot.r1__results.txt" |xargs -I % echo "ln -s % ."
+echo -e "Finding mlst results"
+find $INPUT_DIR -name  "*mlst__mlst__*__results.txt" |xargs -I % echo "ln -s % ."
+
+echo -e "Running summary_srst2.sh"
+
+srst2 --prev_output *.txt --output $OUTPUT_DIR/srst2
+
+echo -e "summary_srst2.sh finished"
