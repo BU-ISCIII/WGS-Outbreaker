@@ -4,13 +4,17 @@
 
 # Help
 # usage: run_variantCalling.sh ....
-#
 
+# Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
+# Treat unset variables and parameters other than the special parameters ‘@’ or ‘*’ as an error when performing parameter expansion. An error message will be written to the standard error, and a non-interactive shell will exit
 set -u
+#Print commands and their arguments as they are executed.
 set -x
 
-# Variables
+
+# VARIABLES
+
 USE_SGE=$1
 VARIANT_CALLING=$2
 DUPLICATES=$3
@@ -42,7 +46,6 @@ if [ "$USE_SGE" = "1" -a $DUPLICATES == "YES" ]; then
 else
  	jobid=$(cat $OUTPUT_DIR/logs/jobids.txt | grep -w "TRIMMOMATIC" | cut -d ':' -f2 )
  	PRECALLING_ARGS="${SGE_ARGS} -pe orte $THREADS -hold_jid $jobid"
-                                                                                                                                                                                                                                                                                                                                                                                                  
 fi
 
 mkdir -p $OUTPUT_DIR/variant_calling/variants_gatk

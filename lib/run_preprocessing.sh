@@ -4,12 +4,16 @@
                                                       
  # Help
  # usage: run_preprocessing.sh <INPUT_DIR> <RESULTS_DIR> <SAMPLES> 
- # 
 
- ## VARIABLES
+
+# Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
+# Treat unset variables and parameters other than the special parameters ‘@’ or ‘*’ as an error when performing parameter expansion. An error message will be written to the standard error, and a non-interactive shell will exit
 set -u
+#Print commands and their arguments as they are executed.
 set -x
+
+# VARIABLES
 
 TRIMMING=$1
 USE_SGE=$2 

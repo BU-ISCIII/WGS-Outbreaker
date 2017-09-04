@@ -1,8 +1,6 @@
 #!/bin/bash
-
-#usage
-
-
+## Author: A.Hernandez
+## Usage: compress.sh
 
 
 # Test whether the script is being executed with sge or not.
@@ -19,6 +17,8 @@ set -e
 set -u
 #Print commands and their arguments as they are executed.
 set -x
+
+# VARIABLES
 
 INPUT_DIR=$1
 OUTPUT_DIR=$2

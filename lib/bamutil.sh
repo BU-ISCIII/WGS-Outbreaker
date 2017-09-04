@@ -14,6 +14,9 @@ fi
 set -e
 # Treat unset variables and parameters other than the special parameters ‘@’ or ‘*’ as an error when performing parameter expansion. An error message will be written to the standard error, and a non-interactive shell will exit
 set -u
+#Print commands and their arguments as they are executed.
+set -x
+
 
 ## Usage
 
@@ -25,11 +28,10 @@ elif [ $# != 6 -a "$use_sge" == "0" ]; then
    	exit
 fi
 
-#Print a trace of simple commands, for commands, case commands, select commands, and arithmetic for commands and their arguments or associated word lists after they are expanded and before they are executed
-set -x
+
 echo `date`
 
-# Variables
+# VARIABLES
 
 DIR_BAM=$1
 SAMPLE_NAMES=$2

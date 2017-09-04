@@ -1,35 +1,31 @@
-#!/bin/bash                                                                                                                                                                                                                        
-## Author S. Monzon                                                                                                                                                                                                                
-## version v2.0                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                    
-# Test whether the script is being executed with sge or not.                                                                                                                                                                       
+#!/bin/bash
+## Author A. Hernandez
+## version v2.0                                                                                                                                                                                                                                   
+# Test whether the script is being executed with sge or not.
 if [ -z $SGE_TASK_ID ]; then                                                                                                                                                                                                       
  	use_sge=0                                                                                                                                                                                                                      
 else                                                                                                                                                                                                                               
  	use_sge=1                                                                                                                                                                                                                      
-fi                                                                                                                                                                                                                                 
-                                                                                                                                                                                                                                    
-# Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status                                                                                            
-set -e                                                                                                                                                                                                                             
-# Treat unset variables and parameters other than the special parameters ‘@’ or ‘*’ as an error when performing parameter expansion. An error message will be written to the standard error, and a non-interactive shell will exit 
-set -u                                                                                                                                                                                                                             
+fi                                                                                                                   
 
-## Usage                                                                                                                                                                                                                           
-                                                                                                                                                                                                                                    
+# Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
+set -e
+# Treat unset variables and parameters other than the special parameters ‘@’ or ‘*’ as an error when performing parameter expansion. An error message will be written to the standard error, and a non-interactive shell will exit
+set -u
+#Print commands and their arguments as they are executed.
+set -x 
+
+## Usage
 if [ $# != 8 -a "$use_sge" == "1" ]; then                                                                                                                                                                                          
  	echo "usage: ............"                                                                                      
  	exit                                                                                                                                                                                                                           
 elif [ $# != 9 -a "$use_sge" == "0" ]; then                                                                                                                                                                                        
  	echo "usage: ............"                                                                             
   	exit                                                                                                                                                                                                                           
-fi                                                                                                                                                                                                                                 
-                                                                                                                                                                                                                                    
-#Print a trace of simple commands, for commands, case commands, select commands, and arithmetic for commands and their arguments or associated word lists after they are expanded and before they are executed                     
-set -x                                                                                                                                                                                                                             
+fi                                                                                                                                                                                                                             
 echo `date` 
 
-# Variables
+# VARIABLES
 
 DIR=$1
 THREADS=$2
@@ -53,10 +49,8 @@ OUTPUT_SAM_NAME=$( echo $OUTPUT_SAM_NAMES | tr ":" "\n" | head -$sample_number |
 
 mkdir -p $OUTPUT_DIR/$SAMPLE
 
-echo -e "2) Alignment using BWA: $SAMPLE"                                                                                                                                                            
-                                                                                                                                                                                                       
-echo "Alignment PE"                                                                                                                                                                            
-bwa mem -t $THREADS $REF_PATH $DIR/$SAMPLE/$FASTQ_R1 $DIR/$SAMPLE/$FASTQ_R2 > $OUTPUT_DIR/$SAMPLE/$OUTPUT_SAM_NAME                                                                                                                                                                                                                                                                               
-                                                                                                                 
- # Use sampe with paired end data.                                                                                                                                                                    
-#bwa sampe -P $REF_PATH $TEMP/$SAMPLE-align1.sai $TEMP/$SAMPLE-align2.sai $DIR/$SAMPLE/$FASTQ_R1 $DIR/$SAMPLE/$FASTQ_R2 > $OUTPUT_DIR/$SAMPLE/$OUTPUT_SAM_NAME   
+echo -e "2) Alignment using BWA: $SAMPLE"                                                                                                                                                                                                                                                                             
+echo "Alignment PE"
+# Use bwa mem with pair end data align 70bp-1Mbp query sequences
+
+bwa mem -t $THREADS $REF_PATH $DIR/$SAMPLE/$FASTQ_R1 $DIR/$SAMPLE/$FASTQ_R2 > $OUTPUT_DIR/$SAMPLE/$OUTPUT_SAM_NAME     

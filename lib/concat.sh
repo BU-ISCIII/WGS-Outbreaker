@@ -1,6 +1,6 @@
 #!/bin/bash
-
-#usage: concat.sh
+## Author: A.Hernandez
+## Usage: concat.sh
 
 #Test whether the script is being used with sge or not.
 
@@ -16,16 +16,12 @@ fi
 set -e  
 # Treat unset variables and parameters other than the special parameters ‘@’ or ‘*’ as an error when performing parameter expansion. An error message will be written to the standard error, and a non-interactive shell will exit
 set -u 
-
-## Usage
-
-
-
 #Print a trace of simple commands, for commands, case commands, select commands, and arithmetic for commands and their arguments or associated word lists after they are expanded and before they are executed
 set -x
 echo `date`
 
-# Variables
+# VARIABLES
+
 INPUT_DIR=$1
 OUTPUT_DIR=$2
 SAMPLE_NAMES=$3

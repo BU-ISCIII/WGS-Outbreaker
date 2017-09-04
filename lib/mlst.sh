@@ -1,9 +1,6 @@
 #!/bin/bash
-
-#usage
-
-
-
+## Author: A.Hernandez
+## Usage: mlst.sh ..
 
 # Test whether the script is being executed with sge or not.
 
@@ -19,6 +16,9 @@ set -e
 set -u
 #Print commands and their arguments as they are executed.
 set -x
+
+
+# VARAIBLES
 
 INPUT_DIR=$1
 OUTPUT_DIR=$2

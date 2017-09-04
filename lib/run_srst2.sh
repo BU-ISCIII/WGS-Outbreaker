@@ -1,9 +1,6 @@
 #!/bin/bash
-
-#usage
-
-
-
+##Author:A.Hernandez
+##Usage: run_srst2.sh ...
 
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
@@ -12,6 +9,8 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
+
+#VARIABLES
 USE_SGE=$1
 SRST2=$2
 OUTPUT_DIR=$3
