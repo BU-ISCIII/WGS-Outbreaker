@@ -36,29 +36,29 @@ echo `date`
 
 ## VARIABLES
 
-DIR=$1
-OUTPUT_DIR=$2
-THREADS=$6      
-SAMPLE_NAMES=$3
-FASTQ_FILES_R1=$4
-FASTQ_FILES_R2=$5
+threads=$1
+input_dir=$2
+output_dir=$3
+samples=$4
+fastq_R1_list=$5
+fastq_R2_list=$6
 
 if [ "$use_sge" = "1" ]; then
-	sample_number=$SGE_TASK_ID
+	sample_count=$sge_task_id
 else
-	sample_number=$7
+	sample_count=$7
 fi
 
 
-SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
-FASTQ_R1=$( echo $FASTQ_FILES_R1 | tr ":" "\n" | head -$sample_number | tail -1) 
-FASTQ_R2=$( echo $FASTQ_FILES_R2 | tr ":" "\n" | head -$sample_number | tail -1)  
+sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
+fastq_R1=$( echo $fastq_R1_list | tr ":" "\n" | head -$sample_count | tail -1) 
+fastq_R2=$( echo $fastq_R2_list | tr ":" "\n" | head -$sample_count | tail -1)  
 
-echo -e "Running FastQC for $SAMPLE....\n"
+echo -e "Running FastQC for $sample....\n"
 
 # Results folder per sample creation
-mkdir -p $OUTPUT_DIR/QC/fastqc/$SAMPLE
+mkdir -p $output_dir/QC/fastqc/$sample
 
-fastqc --noextract -o $OUTPUT_DIR/QC/fastqc/$SAMPLE -t $THREADS $DIR/$SAMPLE/$FASTQ_R1 $DIR/$SAMPLE/$FASTQ_R2	 
+fastqc --noextract -o $output_dir/QC/fastqc/$sample -t $threads $input_dir/$sample/$fastq_R1 $input_dir/$sample/$fastq_R2	 
 
-echo -e "Preprocessing for $SAMPLE finished \n\n"
+echo -e "Preprocessing for $sample finished \n\n"

@@ -3,7 +3,7 @@
 ## version v2.0 
 
 # Test whether the script is being executed with sge or not.                                                                                                                                                                        
-if [ -z $SGE_TASK_ID ]; then                                                                                                                                                                                                        
+if [ -z $sge_task_id ]; then                                                                                                                                                                                                        
   	use_sge=0                                                                                                                                                                                                                        
 else                                                                                                                                                                                                                                
   	use_sge=1                                                                                                                                                                                                                        
@@ -27,41 +27,42 @@ set -x
 echo `date`                                                                                                                                                                                                                         
                                                                                                                                                                                                                                       
 # VARIABLES
-                                                                                                                     DIR_SAM=$1
-DIR_BAM=$2
-SAMPLE_NAMES=$3
-OUTPUT_SAM_NAMES=$4
-OUTPUT_BAM_NAMES=$5
-OUTPUT_BAM_SORTED_NAMES=$6
-OUTPUT_BAM_SORTED_RG_NAMES=$7
-PLATFORM=$8
-MODEL=$9
-DATE_RUN=${10}
-LIBRARY=${11}
-SEQUENCING_CENTER=${12}
-RUN_PLATFORM=${13}
-PICARD_PATH=${14}
+             
+input_dir=$1
+output_dir=$2
+samples=$3
+mappingArray_sam_list=$4
+mappingArray_bam_list=$5
+mappingArray_sorted_list=$6
+mappingArray_rg_list=$7
+picard_path=$8
+platform=$9
+model=${10}
+date_run=${11}
+library=${12}
+sequencing_center=${13}
+run_platform=${14}
+
+
 
 if [ "$use_sge" = "1" ]; then                                                                                                                                                                                                        
-  	sample_number=$SGE_TASK_ID                                                                                                                                                                                                       
+  	sample_count=$sge_task_id                                                                                                                                                                                                       
 else                                                                                                                                                                                                                                 
-  	sample_number=${15}                                                                                                                                                                                                                 
-fi                                                                                                                                                                                                                                   
-                                                                                                                                                                                                                                      
-SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | head -$sample_number | tail -1)                                                                                                                                                        
-OUTPUT_SAM_NAME=$( echo $OUTPUT_SAM_NAMES | tr ":" "\n" | head -$sample_number | tail -1)                                                                                                                                                         
-OUTPUT_BAM_NAME=$( echo $OUTPUT_BAM_NAMES | tr ":" "\n" | head -$sample_number | tail -1)                                                                                                                                                          
-OUTPUT_BAM_SORTED_NAME=$( echo $OUTPUT_BAM_SORTED_NAMES | tr ":" "\n" | head -$sample_number | tail -1)                                                                                                                                                          
-OUTPUT_BAM_SORTED_RG_NAME=$( echo $OUTPUT_BAM_SORTED_RG_NAMES | tr ":" "\n" | head -$sample_number | tail -1)                                                                                                                                                           
+  	sample_count=${15}                                                                                                                                                                                                                 
+fi                                                                                                                                                                                                                                                                                                                                                  
+sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
+mappingArray_sam=$( echo $mappingArray_sam_list | tr ":" "\n" | head -$sample_count | tail -1)
+mappingArray_bam=$( echo $mappingArray_bam_list | tr ":" "\n" | head -$sample_count | tail -1)
+mappingArray_sorted=$( echo $mappingArray_sorted_list | tr ":" "\n" | head -$sample_count | tail -1)
+mappingArray_rg=$( echo $mappingArray_rg_list | tr ":" "\n" | head -$sample_count | tail -1)  
 
-mkdir -p $DIR_BAM/$SAMPLE
+mkdir -p $output_dir/$sample
 
-samtools view -bS $DIR_SAM/$SAMPLE/$OUTPUT_SAM_NAME -o $DIR_BAM/$SAMPLE/$OUTPUT_BAM_NAME                         
-samtools sort -o $DIR_BAM/$SAMPLE/$OUTPUT_BAM_SORTED_NAME -T $DIR_BAM/$SAMPLE/$OUTPUT_BAM_SORTED_NAME $DIR_BAM/$SAMPLE/$OUTPUT_BAM_NAME                           
-                                                                                                                                                     
-java $JAVA_RAM -jar $PICARD_PATH/picard.jar AddOrReplaceReadGroups VALIDATION_STRINGENCY=LENIENT INPUT=$DIR_BAM/$SAMPLE/$OUTPUT_BAM_SORTED_NAME OUTPUT=$DIR_BAM/$SAMPLE/$OUTPUT_BAM_SORTED_RG_NAME RGID=$DATE_RUN-$LIBRARY-$MODEL-$PLATFORM-$SEQUENCING_CENTER RGLB=$LIBRARY RGPL=$PLATFORM RGSM=$SAMPLE RGPU=$RUN_PLATFORM RGDT=$DATE_RUN RGCN=$SEQUENCING_CENTER
+samtools view -bS $input_dir/$sample/$mappingArray_sam -o $output_dir/$sample/$mappingArray_bam
+samtools sort -o $output_dir/$sample/$mappingArray_sorted -T $output_dir/$sample/$mappingArray_sorted $output_dir/$sample/$mappingArray_bam
+          
+java $JAVA_RAM -jar $picard_path/picard.jar AddOrReplaceReadGroups VALIDATION_STRINGENCY=LENIENT INPUT=$output_dir/$sample/$mappingArray_sorted OUTPUT=$output_dir/$sample/$mappingArray_rg RGID=$date_run-$library-$model-$platform-$sequencing_center RGLB=$library RGPL=$platform RGSM=$sample RGPU=$run_platform RGDT=$date_run RGCN=$sequencing_center
 
-rm -r $DIR_SAM/$SAMPLE                                                                                                           
-                                                                                                                                                     
+rm -r $input_dir/$sample                                                                                                                             
 # Se indexa el fichero BAM con samtools.                                                                                                           
-samtools index $DIR_BAM/$SAMPLE/$OUTPUT_BAM_SORTED_RG_NAME                                                                
+samtools index $output_dir/$sample/$mappingArray_rg

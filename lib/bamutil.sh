@@ -4,7 +4,7 @@
 
 
 # Test whether the script is being executed with sge or not.
-if [ -z $SGE_TASK_ID ]; then
+if [ -z $sge_task_id ]; then
   	use_sge=0
 else
   	use_sge=1
@@ -33,25 +33,25 @@ echo `date`
 
 # VARIABLES
 
-DIR_BAM=$1
-SAMPLE_NAMES=$2
-OUTPUT_BAM_SORTED_NAMES=$3
-OUTPUT_BAMSTAT_NAMES=$4
-EXOME_ENRICHMENT=$5
+output_dir=$1
+samples=$2
+mappingArray_rg_list=$3
+bamstatArray_pre_list=$4
+exome_enrichement=$5
 
 if [ "$use_sge" = "1" ]; then
-  	sample_number=$SGE_TASK_ID
+  	sample_count=$sge_task_id
 else
-  	sample_number=$6
+  	sample_count=$6
 fi
 
-SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
-OUTPUT_BAM_SORTED_NAME=$( echo $OUTPUT_BAM_SORTED_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
-OUTPUT_BAMSTAT_NAME=$( echo $OUTPUT_BAMSTAT_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
+sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
+mappingArray_rg=$( echo $mappingArray_rg_list | tr ":" "\n" | head -$sample_count | tail -1)
+bamstatArray_pre=$( echo $bamstatArray_pre_list | tr ":" "\n" | head -$sample_count | tail -1)
 
-echo "- BAMUtil Analysis: $SAMPLE"
-if [ $EXOME_ENRICHMENT == "NO" ];then
-	bam stats --in $DIR_BAM/$SAMPLE/$OUTPUT_BAM_SORTED_NAME --basic --baseSum 2> $DIR_BAM/$SAMPLE/$OUTPUT_BAMSTAT_NAME
+echo "- BAMUtil Analysis: $sample"
+if [ $exome_enrichement == "NO" ];then
+	bam stats --in $output_dir/$sample/$mappingArray_rg --basic --baseSum 2> $output_dir/$sample/$bamstatArray_pre
 else
-	bam stats --in $DIR_BAM/$SAMPLE/$OUTPUT_BAM_SORTED_NAME --regionList $EXOME_ENRICHMENT --basic --baseSum 2> $DIR_BAM/$SAMPLE/$OUTPUT_BAMSTAT_NAMES
+	bam stats --in $output_dir/$sample/$mappingArray_rg --regionList $exome_enrichement --basic --baseSum 2> $output_dir/$sample/$bamstatArray_pre
 fi

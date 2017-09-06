@@ -36,33 +36,50 @@ echo `date`
                                                                                                                                                                                                                                     
 ## VARIABLES
                                                                                                  
-INPUT_DIR=$1                                                                                                         OUTPUT_DIR=$2                                                                                                        THREADS=${10}                                                                                                        SAMPLE_NAMES=$3
-FASTQ_FILES_R1=$4
-FASTQ_FILES_R2=$5                                                                                                    TRIM_ARGS=${11}
-TRIM_FILES_PAIRED_R1=$6
-TRIM_FILES_PAIRED_R2=$7
-TRIM_FILES_UNPAIRED_R1=$8 
-TRIM_FILES_UNPAIRED_R2=$9
+threads=$1
+input_dir=$2
+output_dir=$3
+samples=$4
+fastq_R1_list=$5
+fastq_R2_list=$6
+trimmedFastqArray_paired_R1_list=$7
+trimmedFastqArray_paired_R2_list=$8
+trimmedFastqArray_unpaired_R1_list=$9
+trimmedFastqArray_unpaired_R2_list=${10}
+trim_args=${11}
 trimmomatic_version=${12}
-TRIMMOMATIC_PATH=${13}
+trimmomatic_path=${13}
+
+#INPUT_DIR=$1                                                                                                         OUTPUT_DIR=$2                                                                                                        THREADS=${10}                                                                                                        SAMPLE_NAMES=$3
+#FASTQ_FILES_R1=$4
+#FASTQ_FILES_R2=$5                                                                                                    TRIM_ARGS=${11}
+#TRIM_FILES_PAIRED_R1=$6
+#TRIM_FILES_PAIRED_R2=$7
+#TRIM_FILES_UNPAIRED_R1=$8 
+#TRIM_FILES_UNPAIRED_R2=$9
+#trimmomatic_version=${12}
+#TRIMMOMATIC_PATH=${13}
 
 if [ "$use_sge" = "1" ]; then                                                                                                                                                                                                      
- 	sample_number=$SGE_TASK_ID                                                                                                                                                                                                     
+ 	sample_count=$sge_task_id                                                                                                                                                                                                   
 else                                                                                                                                                                                                                               
- 	sample_number=${14}                                                                                                                                                                                                               
+ 	sample_count=${14}                                                                                                                                                                                                               
 fi                                                                                                                                                                                                                                 
                                                                                                                                                                                                                                     
-SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | head -$sample_number | tail -1)                                         FASTQ_R1=$( echo $FASTQ_FILES_R1 | tr ":" "\n" | head -$sample_number | tail -1) 
-FASTQ_R2=$( echo $FASTQ_FILES_R2 | tr ":" "\n" | head -$sample_number | tail -1)                                                                                                                                                          trimmedFastqArray_paired_R1=$( echo $TRIM_FILES_PAIRED_R1 | tr ":" "\n" | head -$sample_number | tail -1)
-trimmedFastqArray_paired_R2=$( echo $TRIM_FILES_PAIRED_R2 | tr ":" "\n" | head -$sample_number | tail -1)                                                                                                                                 trimmedFastqArray_unpaired_R1=$( echo $TRIM_FILES_UNPAIRED_R1 | tr ":" "\n" | head -$sample_number | tail -1)
-trimmedFastqArray_unpaired_R2=$( echo $TRIM_FILES_UNPAIRED_R2 | tr ":" "\n" | head -$sample_number | tail -1)   
-TRIM_ARGS=$(echo $TRIM_ARGS | tr "_" " ")
+sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
+fastq_R1=$( echo $fastq_R1_list | tr ":" "\n" | head -$sample_count | tail -1) 
+fastq_R2=$( echo $fastq_R2_list | tr ":" "\n" | head -$sample_count | tail -1)
+trimmedFastqArray_paired_R1=$( echo $trimmedFastqArray_paired_R1_list | tr ":" "\n" | head -$sample_count | tail -1)
+trimmedFastqArray_paired_R2=$( echo $trimmedFastqArray_paired_R2_list | tr ":" "\n" | head -$sample_count | tail -1)
+trimmedFastqArray_unpaired_R1=$( echo $trimmedFastqArray_unpaired_R1_list | tr ":" "\n" | head -$sample_count | tail -1)
+trimmedFastqArray_unpaired_R2=$( echo $trimmedFastqArray_unpaired_R2_list | tr ":" "\n" | head -$sample_count | tail -1)   
+trim_args=$(echo $trim_args | tr "_" " ")
 
-echo -e "Running Trimmomatic for $SAMPLE....\n"                                                                                                                                                                                         
+echo -e "Running Trimmomatic for $sample....\n"                                                                                                                                                                                         
                                                                                                                                                                                                                                     
 # Results folder per sample creation                                                                                                                                                                                               
-mkdir -p $OUTPUT_DIR/QC/trimmomatic/$SAMPLE                                                                                                                                                                                             
+mkdir -p $output_dir/QC/trimmomatic/$sample                                                                                                                                                                                         
 
-java -jar $TRIMMOMATIC_PATH/trimmomatic-$trimmomatic_version.jar PE -phred33 $INPUT_DIR/$FASTQ_R1 $INPUT_DIR/$FASTQ_R2 $OUTPUT_DIR/QC/trimmomatic/$SAMPLE/$trimmedFastqArray_paired_R1 $OUTPUT_DIR/QC/trimmomatic/$SAMPLE/$trimmedFastqArray_unpaired_R1 $OUTPUT_DIR/QC/trimmomatic/$SAMPLE/$trimmedFastqArray_paired_R2 $OUTPUT_DIR/QC/trimmomatic/$SAMPLE/$trimmedFastqArray_unpaired_R2 $TRIM_ARGS
+java -jar $trimmomatic_path/trimmomatic-$trimmomatic_version.jar PE -phred33 $input_dir/$fastq_R1 $input_dir/$fastq_R2 $output_dir/QC/trimmomatic/$sample/$trimmedFastqArray_paired_R1 $output_dir/QC/trimmomatic/$sample/$trimmedFastqArray_unpaired_R1 $output_dir/QC/trimmomatic/$sample/$trimmedFastqArray_paired_R2 $output_dir/QC/trimmomatic/$sample/$trimmedFastqArray_unpaired_R2 $trim_args
 	                                                                                                                                                                                                                                                                                                                                                           
-echo -e "Trimmomatic for $SAMPLE finished \n\n"                                                                                                                                                                                  
+echo -e "Trimmomatic for $sample finished \n\n"                                                                                                                                                                                  

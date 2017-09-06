@@ -2,7 +2,7 @@
 ## Author A. Hernandez
 ## version v2.0                                                                                                                                                                                                                                   
 # Test whether the script is being executed with sge or not.
-if [ -z $SGE_TASK_ID ]; then                                                                                                                                                                                                       
+if [ -z $sge_task_id ]; then                                                                                                                                                                                                       
  	use_sge=0                                                                                                                                                                                                                      
 else                                                                                                                                                                                                                               
  	use_sge=1                                                                                                                                                                                                                      
@@ -27,30 +27,30 @@ echo `date`
 
 # VARIABLES
 
-DIR=$1
-THREADS=$2
-REF_PATH=$3
-OUTPUT_DIR=$4
-FASTQ_FILES_R1=$5
-FASTQ_FILES_R2=$6
-SAMPLE_NAMES=$7
-OUTPUT_SAM_NAMES=$8
+threads=$1
+input_dir=$2
+output_dir=$3
+samples=$4
+fastq_R1_list=$5
+fastq_R2_list=$6
+mappingArray_sam_list=$7
+ref_path=$8
 
 if [ "$use_sge" = "1" ]; then                                                      
- 	sample_number=$SGE_TASK_ID                                                     
+ 	sample_count=$sge_task_id                                                  
 else                                                                               
- 	sample_number=${9}                                                               
+ 	sample_count=${9}                                                               
 fi                                                                                 
                                                                                                                                                                         
-SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | head -$sample_number | tail -1)       
-FASTQ_R1=$( echo $FASTQ_FILES_R1 | tr ":" "\n" | head -$sample_number | tail -1)   
-FASTQ_R2=$( echo $FASTQ_FILES_R2 | tr ":" "\n" | head -$sample_number | tail -1)   
-OUTPUT_SAM_NAME=$( echo $OUTPUT_SAM_NAMES | tr ":" "\n" | head -$sample_number | tail -1)    
+sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)       
+fastq_R1=$( echo $fastq_R1_list | tr ":" "\n" | head -$sample_count | tail -1)   
+fastq_R2=$( echo $fastq_R2_list | tr ":" "\n" | head -$sample_count | tail -1)   
+mappingArray_sam=$( echo $mappingArray_sam_list | tr ":" "\n" | head -$sample_count | tail -1)    
 
-mkdir -p $OUTPUT_DIR/$SAMPLE
+mkdir -p $output_dir/$sample
 
-echo -e "2) Alignment using BWA: $SAMPLE"                                                                                                                                                                                                                                                                             
+echo -e "2) Alignment using BWA: $sample"                                                                                                                                                                                                                                                                             
 echo "Alignment PE"
 # Use bwa mem with pair end data align 70bp-1Mbp query sequences
 
-bwa mem -t $THREADS $REF_PATH $DIR/$SAMPLE/$FASTQ_R1 $DIR/$SAMPLE/$FASTQ_R2 > $OUTPUT_DIR/$SAMPLE/$OUTPUT_SAM_NAME     
+bwa mem -t $threads $ref_path $input_dir/$sample/$fastq_R1 $input_dir/$sample/$fastq_R2 > $output_dir/$sample/$mappingArray_sam     
