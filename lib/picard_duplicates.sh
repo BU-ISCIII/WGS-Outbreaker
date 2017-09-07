@@ -37,7 +37,8 @@ sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
 mappingArray_rg=$( echo $mappingArray_rg_list | tr ":" "\n" | head -$sample_count | tail -1) 
 duplicateBamArray=$( echo $duplicateBamArray_list | tr ":" "\n" | head -$sample_count | tail -1) 
 
-echo -e "- Duplicate Filter: $sample"                                                                                                                                                                                                                                                                                       
-java $JAVA_RAM -jar $picard_path/picard.jar MarkDuplicates ASSUME_SORTED=true VALIDATION_STRINGENCY=LENIENT REMOVE_DUPLICATES=false INPUT="$input_dir/$sample/$mappingArray_rg=" OUTPUT="$input_dir/$sample/$duplicateBamArray" METRICS_FILE="$input_dir/$sample/$sample.duplicates.stats" TMP_DIR="$TEMP"
+echo -e "- Duplicate Filter: $sample"
+
+java $JAVA_RAM -jar $picard_path/picard.jar MarkDuplicates ASSUME_SORTED=true VALIDATION_STRINGENCY=LENIENT REMOVE_DUPLICATES=false INPUT="$input_dir/$sample/$mappingArray_rg" OUTPUT="$input_dir/$sample/$duplicateBamArray" METRICS_FILE="$input_dir/$sample/$sample.duplicates.stats" TMP_DIR="$TEMP"
 
 samtools index $input_dir/$sample/$duplicateBamArray                                                      

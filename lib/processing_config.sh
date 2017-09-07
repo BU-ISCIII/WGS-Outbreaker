@@ -33,7 +33,7 @@ threads=$( cat $CONFIG_FILE | grep -w 'THREADS' | cut -d '=' -f2 )
 trimming=$( cat $CONFIG_FILE | grep -w 'TRIMMING' | cut -d '=' -f2 )
 mapping=$( cat $CONFIG_FILE | grep -w 'MAPPING' | cut -d '=' -f2 )
 duplicate_filter=$( cat $CONFIG_FILE | grep -w 'DUPLICATE_FILTER' | cut -d '=' -f2 )
-cariant_calling=$( cat $CONFIG_FILE | grep -w 'VARIANT_CALLING' | cut -d '=' -f2 )
+variant_calling=$( cat $CONFIG_FILE | grep -w 'VARIANT_CALLING' | cut -d '=' -f2 )
 kmerfinder=$( cat $CONFIG_FILE | grep -w 'KMERFINDER' | cut -d '=' -f2 )
 srst2=$( cat $CONFIG_FILE | grep -w 'SRST2' | cut -d '=' -f2 )
 
