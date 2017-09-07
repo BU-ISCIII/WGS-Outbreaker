@@ -5,7 +5,7 @@
 
 # Test whether the script is being executed with sge or not.
 
-if [ -z $SGE_TASK_ID ]; then
+if [ -z $ste_task_id ]; then
         use_sge=0
 else
         use_sge=1
@@ -20,33 +20,33 @@ set -x
 
 # VARIABLES
 
-INPUT_DIR=$1
-OUTPUT_DIR=$2
-SAMPLE_NAMES=$3
-FASTQ_PAIRED_R1=$4
-FASTQ_PAIRED_R2=$5
-FASTQ_UNPAIRED_R1=$6
-FASTQ_UNPAIRED_R2=$7
+input_dir=$1
+output_dir=$2
+samples=$3
+trimmedFastqArray_paired_R1_list=$4
+trimmedFastqArray_paired_R2_list=$5
+trimmedFastqArray_unpaired_R1_list=$6
+trimmedFastqArray_unpaired_R2_list=$7
 
 
 if [ "$use_sge" = "1" ]; then
-        sample_number=$SGE_TASK_ID
+        sample_count=$sge_task_id
 else
-        sample_number=$8
+        sample_count=$8
 fi
 
-SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
-FASTQ_PA_R1_NAME=$( echo $FASTQ_PAIRED_R1 | tr ":" "\n" | head -$sample_number | tail -1)
-FASTQ_PA_R2_NAME=$( echo $FASTQ_PAIRED_R2 | tr ":" "\n" | head -$sample_number | tail -1)
-FASTQ_UNPA_R1_NAME=$( echo $FASTQ_UNPAIRED_R1 | tr ":" "\n" | head -$sample_number | tail -1)
-FASTQ_UNPA_R2_NAME=$( echo $FASTQ_UNPAIRED_R2 | tr ":" "\n" | head -$sample_number | tail -1)
+sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
+trimmedFastqArray_paired_R1=$( echo $trimmedFastqArray_paired_R1_list | tr ":" "\n" | head -$sample_count | tail -1)
+trimmedFastqArray_paired_R2=$( echo $trimmedFastqArray_paired_R2_list | tr ":" "\n" | head -$sample_count | tail -1)
+trimmedFastqArray_unpaired_R1=$( echo $trimmedFastqArray_unpaired_R1_list | tr ":" "\n" | head -$sample_count | tail -1)
+trimmedFastqArray_unpaired_R2=$( echo $trimmedFastqArray_unpaired_R2_list | tr ":" "\n" | head -$sample_count | tail -1)
 
-echo -e "compressing $SAMPLE \n"
+echo -e "compressing $sample \n"
 
-gzip $INPUT_DIR/$SAMPLE/$FASTQ_PA_R1_NAME
-gzip $INPUT_DIR/$SAMPLE/$FASTQ_PA_R2_NAME
-gzip $INPUT_DIR/$SAMPLE/$FASTQ_UNPA_R1_NAME
-gzip $INPUT_DIR/$SAMPLE/$FASTQ_UNPA_R2_NAME
+gzip $input_dir/$sample/$trimmedFastqArray_paired_R1
+gzip $input_dir/$sample/$trimmedFastqArray_paired_R2
+gzip $input_dir/$sample/$trimmedFastqArray_unpaired_R1
+gzip $input_dir/$sample/$trimmedFastqArray_unpaired_R2
 
-echo -e "compressging $SAMPLE finished \n"
+echo -e "compressging $sample finished \n"
 
