@@ -2,7 +2,7 @@
 ## Author S. Monzon                                                                                                  ## version v2.0                                                                                                      
 
 # Test whether the script is being executed with sge or not.
-if [ -z $SGE_TASK_ID ]; then
+if [ -z $sge_task_id ]; then
 	use_sge=0
 else
 	use_sge=1
@@ -28,125 +28,128 @@ echo `date`
 
 # VARIABLES
 
-DIR_BAM=$1 
-THREADS=$2
-REF_PATH=$3
-SAMPLE_NAMES=$4
-KNOWN_SNPS=$5
-KNOWN_INDELS=$6
-OUTPUT_BAM_NAMES=$7                                                                                                  OUTPUT_DIR=$8
-OUTPUT_BAM_REALIGNED_NAMES=$9
-OUTPUT_BAM_RECALIBRATED_NAMES=${10}
-GATK_PATH=${11}
+threads=$1
+input_dir=$2
+output_dir=$3
+samples=$4
+know_snps=$5
+know_indels=$6
+input_list=$7
+realignedBamArray_list=$8
+recalibratedBamArray_list=$9 
+ref_path=${10}
+gatk_path=${11}
+
+
 
 if [ "$use_sge" = "1" ]; then
-	sample_number=$SGE_TASK_ID
+	sample_count=$sge_task_id
 else
-	sample_number=${12}
+	sample_count=${12}
 fi
 
-SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
-BAM_NAME=$( echo $OUTPUT_BAM_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
-BAM_REALIGNED_NAME=$( echo $OUTPUT_BAM_REALIGNED_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
-BAM_RECALIBRATED_NAME=$( echo $OUTPUT_BAM_RECALIBRATED_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
+sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
+input=$( echo $input_list | tr ":" "\n" | head -$sample_count | tail -1)
+realignedBamArray=$( echo $realignedBamArray_list | tr ":" "\n" | head -$sample_count | tail -1)
+recalibratedBamArray=$( echo $recalibratedBamArray_list | tr ":" "\n" | head -$sample_count | tail -1)
 
-mkdir -p $OUTPUT_DIR/realignment
+mkdir -p $output_dir/realignment
 
-if [ $KNOWN_INDELS == "NO" ]; then
+if [ $know_indels == "NO" ]; then
 
-	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
+	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
  		-T RealignerTargetCreator \
-		-I $DIR_BAM/$SAMPLE/$BAM_NAME \
- 		-R $REF_PATH \
- 		-o $OUTPUT_DIR/realignment/$BAM_NAME-IndelRealigner.intervals \
- 		-nt $THREADS \
+		-I $input_dir/$sample/$input \
+ 		-R $ref_path \
+ 		-o $output_dir/realignment/$input-IndelRealigner.intervals \
+ 		-nt $threads \
  		-S LENIENT \
- 		-log $OUTPUT_DIR/realignment/$BAM_NAME-targetCreator.log
+ 		-log $output_dir/realignment/$input-targetCreator.log
                                                                                        
-	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
+	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
  		-T IndelRealigner \
-		-I $DIR_BAM/$SAMPLE/$BAM_NAME \
- 		-R $REF_PATH \
- 		-targetIntervals $OUTPUT_DIR/realignment/$BAM_NAME-IndelRealigner.intervals \
- 		-o $OUTPUT_DIR/realignment/$BAM_REALIGNED_NAME \
+		-I $input_dir/$sample/$input \
+ 		-R $ref_path \
+ 		-targetIntervals $output_dir/realignment/$input-IndelRealigner.intervals \
+ 		-o $output_dir/realignment/$realignedBamArray \
  		-S LENIENT \
- 		-log $OUTPUT_DIR/$BAM_NAME-realigner.log
+ 		-log $output_dir/$input-realigner.log
 
 else
     
-   	 java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
+   	 java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
     		-T RealignerTargetCreator \
-    		-I $DIR_BAM/$SAMPLE/$BAM_NAME \
-    		-known $KNOWN_INDELS \
-    		-R $REF_PATH \
-    		-o $OUTPUT_DIR/realignment/$BAM_NAME-IndelRealigner.intervals \
-    		-nt $THREADS \
+    		-I $input/$sample/$input \
+    		-known $know_indels \
+    		-R $ref_path \
+    		-o $output_dir/realignment/$input-IndelRealigner.intervals \
+    		-nt $threads \
     		-S LENIENT \
-    		-log $OUTPUT_DIR/realignment/$BAM_NAME-targetCreator.log
+    		-log $output_dir/realignment/$input-targetCreator.log
                                                                                         
-    	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
+    	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
     		-T IndelRealigner \
-    		-I $DIR_BAM/$SAMPLE/$BAM_NAME \
-    		-known $KNOWN_INDELS \
-    		-R $REF_PATH \
-    		-targetIntervals $OUTPUT_DIR/realignment/$BAM_NAME-IndelRealigner.intervals \
-    		-o $OUTPUT_DIR/realignment/$BAM_REALIGNED_NAME \
+    		-I $input_dir/$sample/$input \
+    		-known $know_indels \
+    		-R $ref_path \
+    		-targetIntervals $output_dir/realignment/$input-IndelRealigner.intervals \
+    		-o $output_dir/realignment/$realignedBamArray \
     		-S LENIENT \
-    		-log $OUTPUT_DIR/$BAM_NAME-realigner.log                                        
+    		-log $output_dir/$input-realigner.log                                        
 
 fi
 
 
-if [ $KNOWN_SNPS != "NO" ]; then
+if [ $know_snps != "NO" ]; then
 	echo -e "2) Base Quality Recalibration"                                               
                                                                                        
-	mkdir -p $OUTPUT_DIR/recalibration
+	mkdir -p $output_dir/recalibration
 	
-	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
+	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
       		-T BaseRecalibrator \
-      		-R $REF_PATH \
- 		-I $OUTPUT_DIR/realignment/$BAM_REALIGNED_NAME \
- 		-knownSites $KNOWN_SNPS \
+      		-R $ref_path \
+ 		-I $output_dir/realignment/$realignedBamArray \
+ 		-knownSites $know_snps \
  		-cov ReadGroupCovariate \
  		-cov QualityScoreCovariate \
  		-cov CycleCovariate \
  		-cov ContextCovariate \
-      		-o $OUTPUT_DIR/recalibration/$BAM_NAME-recal1_data.grp \
- 		-nct $THREADS \
+      		-o $output_dir/recalibration/$input-recal1_data.grp \
+ 		-nct $threads \
  		-S LENIENT \
- 		-log $OUTPUT_DIR/gatk_trio/$BAM_NAME-recal.log
+ 		-log $output_dir/gatk_trio/$input-recal.log
                                                                                        
-	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
+	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
     		-T BaseRecalibrator \
-    		-BQSR $OUTPUT_DIR/recalibration/$BAM_NAME-recal1_data.grp \
-    		-R $REF_PATH \
-    		-I $OUTPUT_DIR/realignment/$BAM_REALIGNED_NAME \
-    		-knownSites $KNOWN_SNPS \
+    		-BQSR $output_dir/recalibration/$input-recal1_data.grp \
+    		-R $ref_path \
+    		-I $output_dir/realignment/$realignedBamArray \
+    		-knownSites $know_snps \
    		-cov ReadGroupCovariate \
     		-cov QualityScoreCovariate \
     		-cov CycleCovariate \
     		-cov ContextCovariate \
-    		-o $OUTPUT_DIR/recalibration/$BAM_NAME-recal2_data.grp \
-    		-nct $THREADS \
+    		-o $output_dir/recalibration/$input-recal2_data.grp \
+    		-nct $threads \
     		-S LENIENT \
-    		-log $OUTPUT_DIR/$BAM_NAME-recal.log                                        
+    		-log $output_dir/$input-recal.log                                        
                                                                                        
-	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
+	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
     		-T AnalyzeCovariates \
-    		-R $REF_PATH \
-    		-before $OUTPUT_DIR/recalibration/$BAM_NAME-recal1_data.grp \
-    		-after $OUTPUT_DIR/recalibration/$BAM_NAME-recal2_data.grp \
-    		-csv $OUTPUT_DIR/recalibration/$BAM_NAME-BQSR.csv \
-    		-plots $OUTPUT_DIR/recalibration/$BAM_NAME-BQSR.pdf \
-    		-log $OUTPUT_DIR/$BAM_NAME-analyzecovariates.log                       
+    		-R $ref_path \
+    		-before $output_dir/recalibration/$input-recal1_data.grp \
+    		-after $output_dir/recalibration/$input-recal2_data.grp \
+    		-csv $output_dir/recalibration/$input-BQSR.csv \
+    		-plots $output_dir/recalibration/$input-BQSR.pdf \
+    		-log $output_dir/$input-analyzecovariates.log                       
                                                                                        
-	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
+	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
     		-T PrintReads \
-    		-R $REF_PATH \
-    		-I $OUTPUT_DIR/realignment/$BAM_REALIGNED_NAME \
-    		-BQSR $OUTPUT_DIR/recalibration/$BAM_NAME-recal1_data.grp \
-    		-o $OUTPUT_DIR/recalibration/$BAM_RECALIBRATED_NAME \
-    		-nct $THREADS \
+    		-R $ref_path \
+    		-I $output_dir/realignment/$realignedBamArray \
+    		-BQSR $output_dir/recalibration/$input-recal1_data.grp \
+    		-o $output_dir/recalibration/$recalibratedBamArray \
+    		-nct $threds \
     		-S LENIENT \
-    		-log $OUTPUT_DIR/$BAM_NAME-print_recal.log
+    		-log $output_dir/$input-print_recal.log
 fi

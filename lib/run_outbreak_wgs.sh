@@ -254,48 +254,48 @@ fi
 # Execute variant Calling
 if [ $duplicate_filter == "YES" ]; then
 	$SCRIPTS_DIR/run_variantCalling_haploid.sh \
-	$use_sge \
-	$threads \
-	$output_dir \
-	$samples \
-	$sample_count \
-	$variant_calling \
-   	$duplicateBamArray_list \
-	$vcfArray_list \
-	$realignedBamArray_list \
-	$recalibratedBamArray_list \
-	$vcfsnpsArray_list \
-	$vcfsnpsfilArray_list \
-	$vcfindelsArray_list \
-	$vcfindelsfilArray_list \
-	$vcffilArray_list \
-	$ref_path \
-	$gatk_path \
-	$duplicate_filter \
-	$know_snsp \
-	$know_indels 
+#	$use_sge \
+#	$threads \
+#	$output_dir \
+#	$samples \
+#	$sample_count \
+#	$variant_calling \
+#  	$duplicateBamArray_list \
+#	$vcfArray_list \
+#	$realignedBamArray_list \
+#	$recalibratedBamArray_list \
+#	$vcfsnpsArray_list \
+#	$vcfsnpsfilArray_list \
+#	$vcfindelsArray_list \
+#	$vcfindelsfilArray_list \
+#	$vcffilArray_list \
+#	$ref_path \
+#	$gatk_path \
+#	$duplicate_filter \
+#	$know_snsp \
+#	$know_indels 
 else
  	$SCRIPTS_DIR/run_variantCalling_haploid.sh \
-	$use_sge \
-	$threads \
-	$output_dir \
- 	$samples \
-	$sample_count \
-	$variant_calling \
-	$mappingArray_sorted_list \
-	$vcfArray_list \
-	$realignedBamArray_list \
-	$recalibratedBamArray_list \
-	$vcfsnpsArray_list \
-	$vcfsnpsfilArray_list \
-	$vcfindelsArray_list \
-	$vcfindelsfilArray_list \
-	$vcffilArray_list \
-	$ref_path \
-	$gatk_path \
-	$duplicate_filter \
-	$know_snps \
-	$know_indels
+#	$use_sge \
+#	$threads \
+#	$output_dir \
+#	$samples \
+#	$sample_count \
+#	$variant_calling \
+#	$mappingArray_sorted_list \
+#	$vcfArray_list \
+#	$realignedBamArray_list \
+#	$recalibratedBamArray_list \
+#	$vcfsnpsArray_list \
+#	$vcfsnpsfilArray_list \
+#	$vcfindelsArray_list \
+#	$vcfindelsfilArray_list \
+#	$vcffilArray_list \
+#	$ref_path \
+#	$gatk_path \
+#	$duplicate_filter \
+#	$know_snps \
+#	$know_indels
 fi
 
 # Execute kmerfinder

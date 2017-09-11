@@ -4,7 +4,7 @@
 
 
 # Test whether the script is being executed with sge or not.
-if [ -z $SGE_TASK_ID ]; then
+if [ -z $sge_task_id ]; then
    	use_sge=0
 else
    	use_sge=1
@@ -29,51 +29,51 @@ echo `date`
 
 # VARIABLES
 
-DIR_BAM=$1
-THREADS=$2
-REF_PATH=$3
-OUTPUT_DIR=$4
-SAMPLE_NAMES=$5
-BAM_NAMES=$6
-OUTPUT_VCF_NAME=$7
-OUTPUT_SNPS_NAME=$8
-OUTPUT_SNPS_NAME_FIL=$9
-OUTPUT_INDELS_NAME=${10}
-OUTPUT_INDELS_NAME_FIL=${11}
-OUTPUT_VCF_FIL_NAME=${12}
-GATK_PATH=${13}
+threads=$1
+input_dir=$2
+output_dir=$3
+samples=$4
+BamArray_list=$5
+vcfArray_list=$6
+vcffilArray_list=$7
+vcfsnpsArray_list=$8
+vcfsnpsfilArray_list=$9
+vcfindelsArray_list=${10}
+vcfindelsfilArray_list=${11}
+ref_path=${12}
+gatk_path=${13}
 
 
-mkdir -p $OUTPUT_DIR/variants
-echo $BAM_NAMES | tr ":" "\n" | awk -v prefix=$DIR_BAM '{print prefix "/" $0}' > $OUTPUT_DIR/bam.list
+mkdir -p $output_dir/variants
+echo $BamArray_list | tr ":" "\n" | awk -v prefix=$input_dir '{print prefix "/" $0}' > $output_dir/bam.list
 
-java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
+java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
       -T HaplotypeCaller \
-      -R $REF_PATH \
-      -I $OUTPUT_DIR/bam.list \
-      -o $OUTPUT_DIR/variants/$OUTPUT_VCF_NAME \
+      -R $ref_path \
+      -I $output_dir/bam.list \
+      -o $output_dir/variants/$vcfArray_list \
       -stand_call_conf 30.0 \
       -stand_emit_conf 10.0 \
       -ploidy 1 \
       -S LENIENT \
-      -log $OUTPUT_DIR/$OUTPUT_VCF_NAME-HaplotypeCaller.log
+      -log $output_dir/$vcfArray_list-HaplotypeCaller.log
 
-java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
-      -R $REF_PATH \
+java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
+      -R $ref_path \
       -T SelectVariants \
-      -V $OUTPUT_DIR/variants/$OUTPUT_VCF_NAME \
-      -o $OUTPUT_DIR/variants/$OUTPUT_SNPS_NAME \
+      -V $output_dir/variants/$vcfArray_list \
+      -o $output_dir/variants/$vcfsnpsArray_list \
       -selectType SNP \
-      -nt $THREADS \
+      -nt $threads \
       -S LENIENT \
-      -log $OUTPUT_DIR/$OUTPUT_VCF_NAME-selectSNP.log
+      -log $output_dir/$vcfArray_list-selectSNP.log
 
 
-java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
-	-R $REF_PATH \
+java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
+	-R $ref_path \
 	-T VariantFiltration \
-	-V $OUTPUT_DIR/variants/$OUTPUT_SNPS_NAME \
-	-o $OUTPUT_DIR/variants/$OUTPUT_SNPS_NAME_FIL \
+	-V $output_dir/variants/$vcfsnpsArray_list \
+	-o $output_dir/variants/$vcfsnpsfilArray_list \
 	--clusterWindowSize 10 \
 	--filterExpression "MQ < 40" \
 	--filterName "RMSMappingQuality" \
@@ -90,35 +90,35 @@ java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
 	--filterExpression "SOR > 4.0" \
 	--filterName "StrandOddRank" \
 	-S LENIENT \
-	-log $OUTPUT_DIR/$OUTPUT_VCF_NAME-filterSNPs.log
+	-log $output_dir/$vcfArray_list-filterSNPs.log
 
 echo -e "Select and Filter Indels"
-java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
-	-R $REF_PATH \
+java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
+	-R $ref_path \
 	-T SelectVariants \
-	-V $OUTPUT_DIR/variants/$OUTPUT_VCF_NAME \
-	-o $OUTPUT_DIR/variants/$OUTPUT_INDELS_NAME \
+	-V $output_dir/variants/$vcfArray_list \
+	-o $output_dir/variants/$vcfindelsArray_list \
 	-selectType INDEL \
-	-nt $THREADS \
+	-nt $threads \
 	-S LENIENT \
-	-log $OUTPUT_DIR/$OUTPUT_VCF_NAME-selectIndels.log
+	-log $output_dir/$vcfArray_list-selectIndels.log
 
-java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
+java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
 	-T VariantFiltration \
-	-R $REF_PATH \
-	-V $OUTPUT_DIR/variants/$OUTPUT_INDELS_NAME \
-	-o $OUTPUT_DIR/variants/$OUTPUT_INDELS_NAME_FIL \
+	-R $ref_path \
+	-V $output_dir/variants/$vcfindelsArray_list \
+	-o $output_dir/variants/$vcfindelsfilArray_list \
 	--filterExpression "QD < 2.0 || FS > 200.0 || ReadPosRankSum < -20.0 || SOR > 10.0" \
     --filterName "IndelFilters" \
 	-S LENIENT \
-	-log $OUTPUT_DIR/$OUTPUT_VCF_NAME-filterIndels.log
+	-log $output_dir/$vcfArray_list-filterIndels.log
 
 echo -e "Combine snps and indels vcf"
-java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $GATK_PATH/GenomeAnalysisTK.jar \
-    -R $REF_PATH \
+java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
+    -R $ref_path \
     -T  CombineVariants \
     --genotypemergeoption UNSORTED \
-    --variant $OUTPUT_DIR/variants/$OUTPUT_SNPS_NAME_FIL \
-    --variant $OUTPUT_DIR/variants/$OUTPUT_INDELS_NAME_FIL \
-    -o $OUTPUT_DIR/variants/$OUTPUT_VCF_FIL_NAME \
-    -log $OUTPUT_DIR/$OUTPUT_VCF_NAME-CombineVCF.log
+    --variant $output_dir/variants/$vcfsnpsfilArray_list \
+    --variant $output_dir/variants/$vcfindelsfilArray_list \
+    -o $output_dir/variants/$vcffilArray_list \
+    -log $output_dir/$vcfArray_list-CombineVCF.log
