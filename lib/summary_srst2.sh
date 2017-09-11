@@ -4,7 +4,7 @@
 
 # Test whether the script is being executed with sge or not.
 
-if [ -z $SGE_TASK_ID ]; then
+if [ -z $sge_task_id ]; then
         use_sge=0
 else
         use_sge=1
@@ -18,20 +18,20 @@ set -u
 set -x
 
 
-# VARIABLES 
+# VARIABLES
 
-INPUT_DIR=$1
-OUTPUT_DIR=$2
+dir=$1
+output_dir=$2
 
 
 echo -e "Finding resistence results"
-find $INPUT_DIR -name "*__genes__ARGannot.r1__results.txt" |xargs -I % echo "ln -s % ."| bash
+find $dir -name "*__genes__ARGannot.r1__results.txt" |xargs -I % echo "ln -s % ."| bash
 
 echo -e "Finding mlst results"
-find $INPUT_DIR -name  "*mlst__mlst__*__results.txt" |xargs -I % echo "ln -s % ."| bash
+find $dir -name  "*mlst__mlst__*__results.txt" |xargs -I % echo "ln -s % ."| bash
 
 echo -e "Running summary_srst2.sh"
-srst2 --prev_output *.txt --output $OUTPUT_DIR/srst2
+srst2 --prev_output *.txt --output $output_dir/srst2
 
 echo -e "Delete ln"
 rm *results.txt

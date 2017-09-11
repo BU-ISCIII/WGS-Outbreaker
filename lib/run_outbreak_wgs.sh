@@ -334,38 +334,38 @@ fi
 # Execure srst2
 if [ $trimming == "YES" ]; then
 	$SCRIPTS_DIR/run_srst2.sh \
-	$use_sge \
-	$threads \
-	$output_dir \
-	$samples \
-	$sample_count \
-	$srst2  \
-	$compress_paired_R1_list \
-	$compress_paired_R2_list \
-	$resistance_list \
-	$plasmid_list \
-	$mlst_list \
-	$srst2_db_path_argannot \
-        $srst2_db_path_plasmidfinder \
-        $srst2_db_path_mlst_db \
-        $srst2_db_path_mlst_definitions 
+#	$use_sge \
+#	$threads \
+#	$output_dir \
+#	$samples \
+#	$sample_count \
+#	$srst2  \
+#	$compress_paired_R1_list \
+#	$compress_paired_R2_list \
+#	$resistance_list \
+#	$plasmid_list \
+#	$mlst_list \
+#	$srst2_db_path_argannot \
+#        $srst2_db_path_plasmidfinder \
+#        $srst2_db_path_mlst_db \
+ #       $srst2_db_path_mlst_definitions 
 
 else 
 	$SCRIPTS_DIR/run_srst2.sh \
-	$use_sge \
-	$threads \
-	$output_dir \
-	$samples \
-	$sample_count \
-	$srst2 \
-	$fastq_R1_list \
-	$fastq_R2_list \
-	$resistance_list \
-	$plasmid_list \
-	$mlst_list \
-	$srst2_db_path_argannot \
-        $srst2_db_path_plasmidfinder \
-        $srst2_db_path_mlst_db \
-        $srst2_db_path_mlst_definitions 
+#	$use_sge \
+#	$threads \
+#	$output_dir \
+#	$samples \
+#	$sample_count \
+#	$srst2 \
+#	$fastq_R1_list \
+#	$fastq_R2_list \
+#	$resistance_list \
+#	$plasmid_list \
+#	$mlst_list \
+#	$srst2_db_path_argannot \
+#       $srst2_db_path_plasmidfinder \
+#        $srst2_db_path_mlst_db \
+#        $srst2_db_path_mlst_definitions 
 
 fi

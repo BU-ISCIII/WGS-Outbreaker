@@ -10,79 +10,123 @@ set -u
 set -x
 
 
+#Execure processing_config.sh
+source $SCRIPTS_DIR/processing_config.sh
+
+
 #VARIABLES
-USE_SGE=$1
-SRST2=$2
-OUTPUT_DIR=$3
-SRST2_DB_PATH_ARGannot=$4
-SRST2_DB_PATH_PlasmidFinder=$5
-SRST2_DB_PATH_mlst=$6
-SRST2_DB_PATH_mlst_definitions=$7
-THREADS=$8
-FASTQ_compress_R1_list=$9
-FASTQ_compress_R2_list=${10}
-sample_number=${11}
-sample_names=${12}
-resistance_list=${13}
-plasmid_list=${14}
-mlst_list=${15}
+
+
+#USE_SGE=$1
+#SRST2=$2
+#OUTPUT_DIR=$3
+#SRST2_DB_PATH_ARGannot=$4
+#SRST2_DB_PATH_PlasmidFinder=$5
+#SRST2_DB_PATH_mlst=$6
+#SRST2_DB_PATH_mlst_definitions=$7
+#THREADS=$8
+#FASTQ_compress_R1_list=$9
+#FASTQ_compress_R2_list=${10}
+#sample_number=${11}
+#sample_names=${12}
+#resistance_list=${13}
+#plasmid_list=${14}
+#mlst_list=${15}
 #SRST2_DELIMITER=${16}
 
-SAMPLE=$( echo $sample_names | tr ":" "\n" | head -$sample_number | tail -1)
+sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
 
 
 #create directories
-for count in $SAMPLE; do
-	mkdir -p $OUTPUT_DIR/srst2/$SAMPLE
-	echo "Directory for $SAMPLE created"
+for count in $sample; do
+	mkdir -p $output_dir/srst2/$sample
+	echo "Directory for $sample created"
 	done
 
 
-jobid_trimmomatic=$( cat $OUTPUT_DIR/logs/jobids.txt | grep -w "TRIMMOMATIC" | cut -d ':' -f2 )
+jobid_trimmomatic=$( cat $output_dir/logs/jobids.txt | grep -w "TRIMMOMATIC" | cut -d ':' -f2 )
 
-if [ -d $OUTPUT_DIR/QC/trimmomatic ]; then
-        DIR=$OUTPUT_DIR/QC/trimmomatic
-        SRST2_ARGS="${SGE_ARGS} -hold_jid ${jobid_trimmomatic}"
+if [ -d $output_dir/QC/trimmomatic ]; then
+        dir=$output_dir/QC/trimmomatic
+        srst2_arg="${SGE_ARGS} -hold_jid ${jobid_trimmomatic}"
 else
-        DIR=$OUTPUT_DIR/raw
+        dir=$output_dir/raw
 fi
 
-RESISTANCE_CMD="$SCRIPTS_DIR/resistance.sh $DIR $OUTPUT_DIR/srst2 $SRST2_DB_PATH_ARGannot $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $resistance_list"
-PLASMID_CMD="$SCRIPTS_DIR/plasmid.sh $DIR $OUTPUT_DIR/srst2 $SRST2_DB_PATH_PlasmidFinder $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $plasmid_list"
-MLST_CMD="$SCRIPTS_DIR/mlst.sh $DIR $OUTPUT_DIR/srst2 $SRST2_DB_PATH_mlst $SRST2_DB_PATH_mlst_definitions $sample_names $FASTQ_compress_R1_list $FASTQ_compress_R2_list $mlst_list"
-SUMMARY_CMD="$SCRIPTS_DIR/summary_srst2.sh $OUTPUT_DIR/srst2 $OUTPUT_DIR/srst2" 
+if [ $trimming == "YES" ];then
+	fastq_files_R1_list=$compress_paired_R1_list
+	fastq_files_R2_list=$compress_paired_R2_list
+else
+	fastq_files_R1_list=$fastq_R1_list
+        fastq_files_R2_list=$fastq_R2_list
+fi
 
-if [ $SRST2 == "YES" ];then
-	if [ "$USE_SGE" = "1" ]; then
-		RESISTANCE=$( qsub $SRST2_ARG -N $JOBNAME.RESISTANCE $RESISTANCE_CMD )
-		jobid_resistance=$( echo $RESISTANCE | cut -d ' ' -f3 | cut -d '.' -f1 )
-		echo -e "RESISTANCE FILES:$jobid_resistance\n" >> $OUTPUT_DIR/logs/jobids.txt
+resistance_cmd="$SCRIPTS_DIR/resistance.sh \
+	$dir \
+	$output_dir/srst2 \
+	$samples \
+	$fastq_files_R1_list \
+	$fastq_files_R2_list \
+	$resistance_list \
+	$srst2_db_path_argannot"
 
-		PLASMIDS=$( qsub $SRST2_ARG -N $JOBNAME.PLASMIDS $PLASMID_CMD )
-                jobid_plasmid=$( echo $PLASMIDS | cut -d ' ' -f3 | cut -d '.' -f1 )
-                echo -e "PLASMID FILES:$jobid_plasmid\n" >> $OUTPUT_DIR/logs/jobids.txt
+
+plasmid_cmd="$SCRIPTS_DIR/plasmid.sh \
+	$dir \
+	$output_dir/srst2 \
+	$samples \
+	$fastq_files_R1_list \
+	$fastq_files_R2_list \
+	$plasmid_list \
+	$srst2_db_path_plasmidfinder"
+
+
+mlst_cmd="$SCRIPTS_DIR/mlst.sh \
+	$dir \
+	$output_dir/srst2 \
+	$srst2_db_path_mlst_db \
+	$srst2_db_path_mlst_definitions \
+	$samples \
+	$fastq_files_R1_list \
+        $fastq_files_R2_list \
+	$mlst_list"
+
+
+summary_cmd="$SCRIPTS_DIR/summary_srst2.sh \
+$output_dir/srst2 
+$output_dir/srst2" 
+
+if [ $srst2 == "YES" ];then
+	if [ "$use_sge" = "1" ]; then
+		resistance_qsub=$( qsub $Ssrst2_arg -N $JOBNAME.RESISTANCE $resistance_cmd )
+		jobid_resistance=$( echo $resistance_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+		echo -e "RESISTANCE FILES:$jobid_resistance\n" >> $output_dir/logs/jobids.txt
+
+		plasmids_qsub=$( qsub $srst2_arg -N $JOBNAME.PLASMIDS $plasmid_cmd )
+                jobid_plasmid=$( echo $plasmids_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+                echo -e "PLASMID FILES:$jobid_plasmid\n" >> $output_dir/logs/jobids.txt
 	
-		MLST=$( qsub $SRST2_ARG -N $JOBNAME.MLST $MLST_CMD )
-                jobid_mlst=$( echo $MLST | cut -d ' ' -f3 | cut -d '.' -f1 )
-                echo -e "MLST FILES:$jobid_mlst\n" >> $OUTPUT_DIR/logs/jobids.txt
+		mlst_qsub=$( qsub $srst2_arg -N $JOBNAME.MLST $mlst_cmd )
+                jobid_mlst=$( echo $mlst_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+                echo -e "MLST FILES:$jobid_mlst\n" >> $output_dir/logs/jobids.txt
 		
-		SUMMARY=$( qsub $SRST2_ARG -N $JOBNAME.SUMMARY $SUMMARY_CMD )
-                jobid_mlst=$( echo $SUMMARY | cut -d ' ' -f3 | cut -d '.' -f1 )
-                echo -e "SUMAMRY FILES:$jobid_summary\n" >> $OUTPUT_DIR/logs/jobids.txt
+		summary_qsub=$( qsub $srst2_arg -N $JOBNAME.SUMMARY $summary_cmd )
+                jobid_mlst=$( echo $summary | cut -d ' ' -f3 | cut -d '.' -f1 )
+                echo -e "SUMAMRY FILES:$jobid_summary\n" >> $output_dir/logs/jobids.txt
 
 		
 	else
-		for count in `seq 1 $sample_number`; do
+		for count in `seq 1 $sample_count`; do
 			echo "Running resistance on sample $count"
-			RESISTANCE=$($RESISTANCE_CMD $count)
+			resistance_run=$($resistance_cmd $count)
 			echo "Running plasmid on sample $count"
-               		PLASMIDS=$($PLASMID_CMD $count)
+               		plasmid_run=$($plasmid_cmd $count)
 			echo "Running mlst on sample $count"
-        		MLST=$($MLST_CMD $count)
+        		mlst_run=$($mlst_cmd $count)
 		done
 			
 		echo "Running summary"
-		SUMMARY=$($SUMMARY_CMD)
+		summary_run=$($summary_cmd)
 		
 	fi
 fi

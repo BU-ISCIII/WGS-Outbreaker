@@ -21,35 +21,30 @@ set -x
 
 # VARIABLES
 
-INPUT_DIR=$1
-OUTPUT_DIR=$2
-SRST2_DB_PATH_PlasmidFinder=$3
-SAMPLE_NAMES=$4
-FASTQ_R1_LIST=$5
-FASTQ_R2_LIST=$6
-OUTPUT_FILE=$7
+dir=$1
+output_dir=$2
+samples=$3
+fastq_files_R1_list=$4
+fastq_files_R2_list=$5
+plasmid_list=$6
+srst2_db_path_plasmidfinder=$7
+
+
 
 if [ "$use_sge" = "1" ]; then
-        sample_number=$SGE_TASK_ID
+        sample_count=$sge_task_id
 else
-        sample_number=$8
+        sample_count=$8
 fi
 
-SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
-FASTQ_R1_NAME=$( echo $FASTQ_R1_LIST | tr ":" "\n" | head -$sample_number | tail -1)
-FASTQ_R2_NAME=$( echo $FASTQ_R2_LIST | tr ":" "\n" | head -$sample_number | tail -1)
-OUTPUT_NAME=$( echo $OUTPUT_FILE | tr ":" "\n" | head -$sample_number | tail -1)
+sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
+fastq_files_R1=$( echo $fastq_files_R1_list | tr ":" "\n" | head -$sample_count | tail -1)
+fastq_files_R2=$( echo $fastq_files_R2_list | tr ":" "\n" | head -$sample_count | tail -1)
+plasmid_name=$( echo $plasmid_list | tr ":" "\n" | head -$sample_count | tail -1)
 
-echo -e "Running plasmid.sh for $SAMPLE \n\n"
+echo -e "Running plasmid.sh for $sample \n\n"
 
-srst2 --input_pe $INPUT_DIR/$SAMPLE/$FASTQ_R1_NAME $INPUT_DIR/$SAMPLE/$FASTQ_R2_NAME --forward trimmed_R1 --reverse trimmed_R2 --log --output $OUTPUT_DIR/$SAMPLE/$OUTPUT_NAME --gene_db $SRST2_DB_PATH_PlasmidFinder
+srst2 --input_pe $dir/$sample/$fastq_files_R1 $dir/$sample/$fastq_files_R2 --forward trimmed_R1 --reverse trimmed_R2 --log --output $output_dir/$sample/$plasmid_name --gene_db $srst2_db_path_plasmidfinder
 
-echo -e "plasmid.sh for $SAMPLE finished \n\n"
-
-
-
-
-
-
-
+echo -e "plasmid.sh for $sample finished \n\n"
 
