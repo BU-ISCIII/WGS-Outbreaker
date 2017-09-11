@@ -9,53 +9,86 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
+#Execure processing_config.sh
+source $SCRIPTS_DIR/processing_config.sh
+
 
 #VARIABLES
-USE_SGE=$1
-KMERFINDER=$2
-OUTPUT_DIR=$3
-BACT_DB_PATH=$4
-KMERFINDER_PATH=$5
-THREADS=$6
-FASTQ_R1_list=$7
-FASTQ_R2_list=$8
-sample_number=$9
-SAMPLE_NAMES=${10}
-OUTPUT_CONCAT_NAMES=${11}
-OUTPUT_KMERFINDER_NAMES=${12}
+
+
+
+#USE_SGE=$1
+#KMERFINDER=$2
+#OUTPUT_DIR=$3
+#BACT_DB_PATH=$4
+#KMERFINDER_PATH=$5
+#THREADS=$6
+#FASTQ_R1_list=$7
+#FASTQ_R2_list=$8
+#sample_number=$9
+#SAMPLE_NAMES=${10}
+#OUTPUT_CONCAT_NAMES=${11}
+#OUTPUT_KMERFINDER_NAMES=${12}
 
 ##create directories
-mkdir -p $OUTPUT_DIR/kmerfinder
+mkdir -p $output_dir/kmerfinder
 
-jobid_trimmomatic=$( cat $OUTPUT_DIR/logs/jobids.txt | grep -w "TRIMMOMATIC" | cut -d ':' -f2 )
+jobid_trimmomatic=$( cat $output_dir/logs/jobids.txt | grep -w "TRIMMOMATIC" | cut -d ':' -f2 )
 
-if [ -d $OUTPUT_DIR/QC/trimmomatic ]; then
-	DIR=$OUTPUT_DIR/QC/trimmomatic
-	CONCAT_ARGS="${SGE_ARGS} -hold_jid ${jobid_trimmomatic}"
+if [ -d $output_dir/QC/trimmomatic ]; then
+	dir=$output_dir/QC/trimmomatic
+	concat_arg="${SGE_ARGS} -hold_jid ${jobid_trimmomatic}"
 else
-	DIR=$OUTPUT_DIR/raw
+	dir=$output_dir/raw
 fi
 
 
-CONCAT_CMD="$SCRIPTS_DIR/concat.sh $DIR $OUTPUT_DIR/kmerfinder $SAMPLE_NAMES $FASTQ_R1_list $FASTQ_R2_list $OUTPUT_CONCAT_NAMES "
-KMERFINDER_CMD="$SCRIPTS_DIR/kmerfinder.sh $OUTPUT_DIR/kmerfinder $OUTPUT_DIR/kmerfinder $THREADS $SAMPLE_NAMES $KMERFINDER_PATH $BACT_DB_PATH $OUTPUT_CONCAT_NAMES $OUTPUT_KMERFINDER_NAMES "
+if [ $trimming == "YES" ]; then
 
-if [ $KMERFINDER == "YES" ]; then
-	if [ "$USE_SGE" = "1" ]; then
-		CONCATFILES=$( qsub $CONCAT_ARGS -N $JOBNAME.CONCATFILES $CONCAT_CMD)
-	jobid_concat=$( echo $CONCATFILES | cut -d ' ' -f3 | cut -d '.' -f1 )
-	echo -e "CONCAT FILES:$jobid_concat\n" >> $OUTPUT_DIR/logs/jobsids.txt 
+	concat_cmd="$SCRIPTS_DIR/concat.sh \
+	$dir \
+	$output_dir/kmerfinder \
+	$samples \
+	$compress_paired_R1_list \
+        $compress_paired_R2_list \
+	$concatFastq_list"
+
+else
+	concat_cmd="$SCRIPTS_DIR/concat.sh \
+        $dir \
+        $output_dir/kmerfinder \
+        $samples \
+	$fastq_R1_list \
+	$fastq_R2_list \
+        $concatFastq_list"
+fi
+
+kmerfinder_cmd="$SCRIPTS_DIR/kmerfinder.sh \
+	$threads \
+	$output_dir/kmerfinder \
+	$output_dir/kmerfinder \
+	$samples \
+	$concatFastq_list \
+        $kmerfinderST_list \
+	$kmerfinder_path \
+	$bact_db_path"
+
+if [ $kmerfinder == "YES" ]; then
+	if [ "$use_sge" = "1" ]; then
+		concat_files=$( qsub $concat_arg -N $JOBNAME.CONCATFILES $concat_cmd)
+		jobid_concat=$( echo $concat_files | cut -d ' ' -f3 | cut -d '.' -f1 )
+		echo -e "CONCAT FILES:$jobid_concat\n" >> $output_dir/logs/jobsids.txt 
 			
-		KMERFINDER_ARG="{$SGE_ARGS -pe openmp $THREADS -hold_jib $jobid_concat}"
-		KMERFINDER=$( qsub $KMERFINDER_ARG -t1-$sample_number -N $JOBNAME.KMERFINDER $KMERFINDER_CMD)
-	jobid_kmerfinder=$( echo $KMERFINDER | cut -d ' ' -f3 | cut -d '.' -f1 )
-	echo -e "KMERFINDER:$jobif_kmerfinder\n" >> $OUTPUT_DIR/logs/jobsids.txt
+		kmerfinder_arg="{$SGE_ARGS -pe openmp $threads -hold_jib $jobid_concat}"
+		kmerfinder_qsub=$( qsub $kmerfinder_arg -t1-$sample_count -N $JOBNAME.KMERFINDER $kmerfinder_cmd)
+		jobid_kmerfinder=$( echo $kmerfinder_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+		echo -e "KMERFINDER:$jobif_kmerfinder\n" >> $output_dir/logs/jobsids.txt
 	else
-		for count in  `seq 1 $sample_number`; do
+		for count in  `seq 1 $sample_count`; do
 			echo "Running concat files on sample $count"
-			CONCATFILES=$($CONCAT_CMD $count)
+			concat_files=$($concat_cmd $count)
 			echo "Running kmerfinder on sample $count"
-			KMERFINDER=$($KMERFINDER_CMD $count)
+			kmerfinder_run=$($kmerfinder_cmd $count)
 		done
 	fi	
 fi

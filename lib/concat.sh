@@ -4,7 +4,7 @@
 
 #Test whether the script is being used with sge or not.
 
-if [ -z $SGE_TASK_ID ]; then
+if [ -z $sge_task_id ]; then
 	use_sge=0
 
 else
@@ -22,25 +22,26 @@ echo `date`
 
 # VARIABLES
 
-INPUT_DIR=$1
-OUTPUT_DIR=$2
-SAMPLE_NAMES=$3
-FASTQ_FILES_R1=$4
-FASTQ_FILES_R2=$5
-OUTPUT_CONCAT_NAMES=$6
+dir=$1
+output_dir=$2
+samples=$3
+fastq_files_R1=$4
+fastq_files_R2=$5
+concatFastq_list=$6
 
 if [ "use_sge" = "1" ]; then
-	sample_number=$SGE_TASK_ID
+	sample_count=$sge_task_id
 else
- 	sample_number=$7
+ 	sample_count=$7
 fi
 
-SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
-FASTQ_R1=$( echo $FASTQ_FILES_R1 | tr ":" "\n" | head -$sample_number | tail -1)
-FASTQ_R2=$( echo $FASTQ_FILES_R2 | tr ":" "\n" | head -$sample_number | tail -1)
-OUTPUT_NAME=$( echo $OUTPUT_CONCAT_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
-echo -e "concat files for $SAMPLE \n\n"
+sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
+fastq_R1=$( echo $fastq_files_R1 | tr ":" "\n" | head -$sample_count | tail -1)
+fastq_R2=$( echo $fastq_files_R2 | tr ":" "\n" | head -$sample_count | tail -1)
+concatFastq=$( echo $concatFastq_list | tr ":" "\n" | head -$sample_count | tail -1)
 
-zcat $INPUT_DIR/$SAMPLE/$FASTQ_R1 $INPUT_DIR/$SAMPLE/$FASTQ_R2 > $OUTPUT_DIR/$OUTPUT_NAME
+echo -e "concat files for $sample \n\n"
 
-echo -e "Concat $SAMPLE finished \n\n"
+zcat $dir/$sample/$fastq_R1 $dir/$sample/$fastq_R2 > $output_dir/$concatFastq
+
+echo -e "Concat $sample finished \n\n"

@@ -301,33 +301,33 @@ fi
 # Execute kmerfinder
 if [ $trimming == "YES" ]; then
 	$SCRIPTS_DIR/run_identification_ST.sh \
-	$use_sge \
-	$threads \
-	$output_dir \
-	$samples \
-	$sample_count \
-	$kmerfinder \
-	$compress_paired_R1_list \
-	$compress_paired_R2_list \
-	$concatFastq_list \
-	$kmerfinderST_list \
-	$bact_db_path \
-        $kmerfinder_path
+#	$use_sge \
+#	$threads \
+#	$output_dir \
+#	$samples \
+#	$sample_count \
+#	$kmerfinder \
+#	$compress_paired_R1_list \
+#	$compress_paired_R2_list \
+#	$concatFastq_list \
+#	$kmerfinderST_list \
+#	$bact_db_path \
+#        $kmerfinder_path
 
 else 
 	$SCRIPTS_DIR/run_identification_ST.sh \
-	$use_sge \
-	$threads \
-	$output_dir \
-	$samples \
-	$sample_count \
-	$kmerfinder \
-	$fastq_R1_list \
-	$fastq_R2_list \
-	$concatFastq_list \
-	$kmerfinderST_list \
-	$bact_db_path \
-        $kmerfinder_path
+#	$use_sge \
+#	$threads \
+#	$output_dir \
+#	$samples \
+#	$sample_count \
+#	$kmerfinder \
+#	$fastq_R1_list \
+#	$fastq_R2_list \
+#	$concatFastq_list \
+#	$kmerfinderST_list \
+#	$bact_db_path \
+#       $kmerfinder_path
  
 fi
 

@@ -22,40 +22,40 @@ echo `date`
 
 # VARIABLES
 
-INPUT_DIR=$1
-OUTPUT_DIR=$2
-THREADS=$3
-SAMPLE_NAMES=$4
-KMERFINDER_PATH=$5
-BACT_DB_PATH=$6
-OUTPUT_CONCAT_NAMES=$7
-OUTPUT_KMERFINDER_NAMES=$8 
+threads=$1
+dir=$2
+output_dir=$3
+samples=$4
+concatFastq_list=$5
+kmerfinderST_list=$6
+kmerfinder_path=$7
+bact_db_path=$8
 
 
 if [ "$use_sge" = "1" ]; then
-	sample_number=$SGE_TASK_ID
+	sample_count=$sge_task_id
 else
-	sample_number=$9
+	sample_count=$9
 fi
 
-SAMPLE=$( echo $SAMPLE_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
-INPUT_NAME=$( echo $OUTPUT_CONCAT_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
-OUTPUT_NAME=$( echo $OUTPUT_KMERFINDER_NAMES | tr ":" "\n" | head -$sample_number | tail -1)
+sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
+concatFastq=$( echo $concatFastq_list | tr ":" "\n" | head -$sample_count | tail -1)
+kmerfinderST=$( echo $kmerfinderST_list | tr ":" "\n" | head -$sample_count | tail -1)
 
 
-echo -e "Running kmerfinder for $SAMPLE \n"
+echo -e "Running kmerfinder for $sample \n"
 
-python $KMERFINDER_PATH/findtemplate.py \
-	-i $OUTPUT_DIR/$INPUT_NAME \
-	-t $BACT_DB_PATH \
-	-o $OUTPUT_DIR/$OUTPUT_NAME \
+python $kmerfinder_path/findtemplate.py \
+	-i $dir/$concatFastq \
+	-t $bact_db_path \
+	-o $output_dir/$kmerfinderST \
 	-x ATGAC \
 	-w
 
-echo -e "kmerfinder for $SAMPLE finished \n"
+echo -e "kmerfinder for $sample finished \n"
 
-echo -e "Remove concat file for $SAMPLE \n"
+echo -e "Remove concat file for $sample \n"
 
-rm $OUTPUT_DIR/$INPUT_NAME
+rm $output_dir/$concatFastq
 
-echo -e "Concat file for $SAMPLE deleted"
+echo -e "Concat file for $sample deleted"
