@@ -13,28 +13,6 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
-# VARIABLES
-
-#use_sge=$1
-#threads=$2
-#input_dir=$3
-#output_dir=$4
-#samples=$5
-#sample_count=$6
-#fastq_R1_list=$7
-#fastq_R2_list=$8
-#trimming=$9
-#trim_args=${10}
-#trimmomatic_version=${11}
-#trimmomatic_path=${12}
-#trimmedFastqArray_paired_R1_list=${13}
-#trimmedFastqArray_paired_R2_list=${14}
-#trimmedFastqArray_unpaired_R1_list=${15}
-#trimmedFastqArray_unpaired_R2_list=${16}
-#compress_paired_R1_list=${17}
-#compress_paired_R2_list=${18}
-#compress_unpaired_R1_list=${19}
-#compress_unpaired_R2_list=${20}
 
 #Execute processing_config.sh
 source $SCRIPTS_DIR/processing_config.sh

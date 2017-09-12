@@ -12,24 +12,6 @@ set -x
 #Execure processing_config.sh
 source $SCRIPTS_DIR/processing_config.sh
 
-
-#VARIABLES
-
-
-
-#USE_SGE=$1
-#KMERFINDER=$2
-#OUTPUT_DIR=$3
-#BACT_DB_PATH=$4
-#KMERFINDER_PATH=$5
-#THREADS=$6
-#FASTQ_R1_list=$7
-#FASTQ_R2_list=$8
-#sample_number=$9
-#SAMPLE_NAMES=${10}
-#OUTPUT_CONCAT_NAMES=${11}
-#OUTPUT_KMERFINDER_NAMES=${12}
-
 ##create directories
 mkdir -p $output_dir/kmerfinder
 

@@ -15,28 +15,6 @@ set -x
 #Execute processing_config.sh
 source $SCRIPTS_DIR/processing_config.sh
 
-# VARIABLES
-
-#USE_SGE=$1
-#VARIANT_CALLING=$2
-#DUPLICATES=$3
-#OUTPUT_DIR=$4
-#REF_PATH=$5
-#THREADS=$6
-#SAMPLE_NAMES=$7
-#OUTPUT_BAM_NAMES=$8
-#VCF_NAMES=$9
-#sample_number=${10}
-#OUTPUT_BAM_REALIGNED_NAMES=${11}
-#OUTPUT_BAM_RECALIBRATED_NAMES=${12}
-#GATK_PATH=${13}
-#SNPS_NAME=${14}
-#SNPS_FIL_NAME=${15}
-#INDELS_NAME=${16}
-#INDELS_FIL_NAME=${17}
-#VCF_FIL_NAME=${18}
-#KNOWN_SNPS=${19}
-#KNOWN_INDELS=${20}
 
 ## Folder creation
 echo -e "Creating $output_dir/variant_calling"

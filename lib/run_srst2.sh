@@ -13,31 +13,10 @@ set -x
 #Execure processing_config.sh
 source $SCRIPTS_DIR/processing_config.sh
 
-
-#VARIABLES
-
-
-#USE_SGE=$1
-#SRST2=$2
-#OUTPUT_DIR=$3
-#SRST2_DB_PATH_ARGannot=$4
-#SRST2_DB_PATH_PlasmidFinder=$5
-#SRST2_DB_PATH_mlst=$6
-#SRST2_DB_PATH_mlst_definitions=$7
-#THREADS=$8
-#FASTQ_compress_R1_list=$9
-#FASTQ_compress_R2_list=${10}
-#sample_number=${11}
-#sample_names=${12}
-#resistance_list=${13}
-#plasmid_list=${14}
-#mlst_list=${15}
-#SRST2_DELIMITER=${16}
+#Create directories
 
 sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
 
-
-#create directories
 for count in $sample; do
 	mkdir -p $output_dir/srst2/$sample
 	echo "Directory for $sample created"
