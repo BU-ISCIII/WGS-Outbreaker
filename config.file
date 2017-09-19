@@ -12,11 +12,12 @@ RUN_PLATFORM=NS500454
 
 SEQ_TYPE=PE
 TRIMMING=YES
-MAPPING=YES
-DUPLICATE_FILTER=YES
-VARIANT_CALLING=YES
-KMERFINDER=YES
-SRST2=YES
+MAPPING=NO
+DUPLICATE_FILTER=NO
+VARIANT_CALLING=NO
+KMERFINDER=NO
+SRST2=NO
+CFSAN=YES
 
 ## System variables
 JAVA_RAM=-Xmx28g
@@ -50,6 +51,7 @@ SRST2_DB_PATH_ARGannot=/home/ahernandez/Documents/desarrollo/reference/reference
 SRST2_DB_PATH_PlasmidFinder=/home/ahernandez/Documents/desarrollo/reference/reference_srst2/PlasmidFinder.fasta
 SRST2_DB_PATH_mlst_db=/home/ahernandez/Documents/desarrollo/reference/reference_srst2/Salmonella_enterica.fasta
 SRST2_DB_PATH_mlst_definitions=/home/ahernandez/Documents/desarrollo/reference/reference_srst2/senterica.txt
+CFSAN_ref_path=/home/ahernandez/Documents/desarrollo/reference/Salmonella_enterica_subsp._enterica_serovar_Enteritidis_P125109.fasta
 
 ## Software variables
 # Fastqc

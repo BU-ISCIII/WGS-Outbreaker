@@ -36,14 +36,26 @@ fi
 $SCRIPTS_DIR/run_preprocessing.sh
 
 # Execute mapping
-$SCRIPTS_DIR/run_mapping.sh
+if [ $mapping == "YES" ]; then
+	$SCRIPTS_DIR/run_mapping.sh
+fi
 
 # Execute variant Calling
-$SCRIPTS_DIR/run_variantCalling_haploid.sh
+if [ $variant_calling == "YES" ]; then
+	$SCRIPTS_DIR/run_variantCalling_haploid.sh
+fi
 
 # Execute kmerfinder
-$SCRIPTS_DIR/run_identification_ST.sh
+if [ $kmerfinder == "YES" ];then
+	$SCRIPTS_DIR/run_identification_ST.sh
+fi
 
 # Execure srst2
-$SCRIPTS_DIR/run_srst2.sh
+if [ $srst2 == "YES" ]; then
+	$SCRIPTS_DIR/run_srst2.sh
+fi
 
+#Execute CFSAN
+if [ $cfsan == "YES" ]; then
+	$SCRIPTS_DIR/run_cfsan.sh
+fi

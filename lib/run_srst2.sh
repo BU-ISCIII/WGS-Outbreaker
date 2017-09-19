@@ -77,7 +77,7 @@ $output_dir/srst2"
 
 if [ $srst2 == "YES" ];then
 	if [ "$use_sge" = "1" ]; then
-		resistance_qsub=$( qsub $Ssrst2_arg -N $JOBNAME.RESISTANCE $resistance_cmd )
+		resistance_qsub=$( qsub $srst2_arg -N $JOBNAME.RESISTANCE $resistance_cmd )
 		jobid_resistance=$( echo $resistance_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
 		echo -e "RESISTANCE FILES:$jobid_resistance\n" >> $output_dir/logs/jobids.txt
 

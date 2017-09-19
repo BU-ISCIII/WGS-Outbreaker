@@ -36,6 +36,8 @@ duplicate_filter=$( cat $CONFIG_FILE | grep -w 'DUPLICATE_FILTER' | cut -d '=' -
 variant_calling=$( cat $CONFIG_FILE | grep -w 'VARIANT_CALLING' | cut -d '=' -f2 )
 kmerfinder=$( cat $CONFIG_FILE | grep -w 'KMERFINDER' | cut -d '=' -f2 )
 srst2=$( cat $CONFIG_FILE | grep -w 'SRST2' | cut -d '=' -f2 )
+cfsan=$( cat $CONFIG_FILE | grep -w 'CFSAN' | cut -d '=' -f2 )
+
 
 # REFERENCES
 exome_enrichement=$( cat $CONFIG_FILE | grep -w 'EXOME_ENRICHMENT' | cut -d '=' -f2 )
@@ -47,7 +49,7 @@ srst2_db_path_argannot=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH_ARGannot' | 
 srst2_db_path_plasmidfinder=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH_PlasmidFinder' | cut -d '=' -f2)
 srst2_db_path_mlst_db=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH_mlst_db' | cut -d '=' -f2)
 srst2_db_path_mlst_definitions=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH_mlst_definitions' | cut -d '=' -f2)
-
+cfsan_ref_path=$( cat $CONFIG_FILE | grep -w 'CFSAN_ref_path' | cut -d '=' -f2)
 
 # Arguments
 trimmomatic_version=$( cat $CONFIG_FILE | grep -w 'trimmomatic_version' | cut -d '=' -f2 )
@@ -116,6 +118,27 @@ do
         plasmid[$i]=$sample.plasmid
 	mlst[$i]=$sample.mlst
 
+	#crate CFSAN output names
+	align[$i]=$sample.read.sam
+	sort_sam[$i]=$sample.sorted.sam
+	dedup_sam[$i]=$sample.dedup.sam
+	dedup_metrics[$i]=$sample.dedup.metrix.txt
+	dedup_bam[$i]=$sample.dedup.bam
+	dedup_bam_bai[$i]=$sample.dedup.bam.bai
+	intervals[$i]=$sample.intervals
+	unsorted_bam[$i]=$sample.unsorted.bam
+	unsorted_bai[$i]=$sample.unsorted.bai
+	var_flt[$i]=$sample.var.flv.vcf
+	sort_bam[$i]=$sample.sorted.bam
+	pileup[$i]=$sample.pileup
+	snp_preserved[$i]=$sample.var.flt.preserved.vcf
+	snp_removed[$i]=$sample.var.flt.removed.vcf
+	consensus_fasta[$i]=$sample.consenus.fasta
+	consensus_vcf[$i]=$sample.consenus.vcf
+	consensus_preserved_fasta[$i]=$sample.consenus_preserved.fasta
+        consensus_preserved_vcf[$i]=$sample.consenus_preserved.vcf
+	metrics[$i]=$sample.metrics
+
         let i=i+1
 done
 
@@ -150,3 +173,25 @@ kmerfinderST_list=$( echo ${kmerfinderST[@]} | tr " " ":")
 resistance_list=$( echo ${resistance[@]} | tr " " ":")
 plasmid_list=$( echo ${plasmid[@]} | tr " " ":")
 mlst_list=$( echo ${mlst[@]} | tr " " ":")
+
+align_list=$( echo ${align[@]} | tr " " ":")
+sort_sam_list=$( echo ${sort_sam[@]} | tr " " ":")
+dedup_sam_list=$( echo ${dedup_sam[@]} | tr " " ":")
+dedup_metrics_list=$( echo ${dedup_metrics[@]} | tr " " ":")
+dedup_bam_list=$( echo ${dedup_bam[@]} | tr " " ":")
+dedup_bam_bai_list=$( echo ${dedup_bam_bai[@]} | tr " " ":")
+intervals_list=$( echo ${intervals[@]} | tr " " ":")
+unsorted_bam_list=$( echo ${unsorted_bam[@]} | tr " " ":")
+unsorted_bai_list=$( echo ${unsorted_bai[@]} | tr " " ":")
+var_flt_list=$( echo ${var_flt[@]} | tr " " ":")
+sort_bam_list=$( echo ${sort_bam[@]} | tr " " ":")
+pileup_list=$( echo ${pileup[@]} | tr " " ":")
+snp_preserved_list=$( echo ${snp_preserved[@]} | tr " " ":")
+snp_removed_list=$( echo ${snp_removed[@]} | tr " " ":")
+consensus_fasta_list=$( echo ${consensus_fasta[@]} | tr " " ":")
+consensus_vcf_list=$( echo ${consensus_vcf[@]} | tr " " ":")
+consensus_preserved_fasta_list=$( echo ${consensus_preserved_fasta[@]} | tr " " ":")
+consensus_preserved_vcf_list=$( echo ${consensus_preserved_vcf[@]} | tr " " ":")
+metrics_list=$( echo ${metrics[@]} | tr " " ":")
+
+
