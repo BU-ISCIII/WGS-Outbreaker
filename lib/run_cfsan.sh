@@ -55,9 +55,19 @@ aling_sample_to_reference_cmd="$SCRIPTS_DIR/alingnmen_cfsan.sh \
         $fastq_files_R2_list \
 	$cfsan_ref_path"
 
-picard_sort_sam_cmd=
+picard_sort_sam_cmd="$SCRIPTS_DIR/cfsan_sort_sam.sh \
+	$threads \
+	$output_dir/CFSAN/samples \
+	$samples \
+	$sort_sam_list \
+	$picard_path"
 
-picard_mark_duplicate_cmd=
+picard_mark_duplicate_cmd="$SCRIPTS_DIR/picard_duplicates.sh \
+	$output_dir/CFSAN/samples \
+	$samples
+	$sort_sam_list \
+	$dedup_sam_list \
+	$picard_path"
 
 gatk_add_or_replace_group_cmd=
 
@@ -108,6 +118,15 @@ if [ $cfsan == "YES" ]; then
 	jobid_align_cfsan=$( echo $align_cfsan_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
 	echo -e "ALIGN FILES:$jobid_alig_cfsan\n" >> output_dir/logs/jobids.txt
 	
+	cfsan_sort_sam_qsub=$( qsub $cfsan_arg -N $JOBNAME.SORT_SAM $picard_sort_sam_cmd)
+        jobid_cfsan_sort_sam=$( echo $cfsan_sort_sam_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "SORT SAM FILES:$jobid_cfsan_sort_sam\n" >> output_dir/logs/jobids.txt
+	
+	cfsan_duplicates_qsub=$( qsub $cfsan_arg -N $JOBNAME.SORT_SAM $picard_mark_duplicate_cmd)
+        jobid_cfsan_duplicates=$( echo $cfsan_duplicates_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "MARK DUPLICATES FILES:$jobid_cfsan_duplicates\n" >> output_dir/logs/jobids.txt
+
+	
 	else
 		for count in `seq 1 $sample_count`; do
 		echo "Running cfsan for $sample"
@@ -115,7 +134,15 @@ if [ $cfsan == "YES" ]; then
 		
 		echo "CFSAN align for $sample"
 		run_cfsan_aling=$($aling_sample_to_reference_cmd $count)
+		
+	
+		echo "CFSAN sort sam for $sample"
+		run_cfsan_sort_sam=$($picard_sort_sam_cmd $count)
+		
+		echo "CFSAN mark duplicates for $sample"
+		run_cfsan_duplicates=$($picard_mark_duplicate_cmd $count)
 		done
+
 	fi
 fi
 	
