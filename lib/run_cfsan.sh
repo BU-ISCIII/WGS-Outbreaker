@@ -69,13 +69,40 @@ picard_mark_duplicate_cmd="$SCRIPTS_DIR/picard_duplicates.sh \
 	$dedup_sam_list \
 	$picard_path"
 
-gatk_add_or_replace_group_cmd=
+gatk_add_or_replace_group_cmd="$SCRIPTS_DIR/cfsan_readgroup.sh \
+	$threads
+	$output_dir/CFSAN/samples \
+	$samples
+	$dedup_sam_list \
+	$dedup_bam_list
+	$platform
+	$picard_path"
 
-samtool_inex_cmd=
 
-gatk_realinger_target_creator_cmd=
+samtool_index_cmd="$SCRIPTS_DIR/cfsan_samtool_index.sh \
+	$threads \
+	$output_dir/CFSAN/samples \
+	$samples \
+	$dedup_bam_list"
 
-gatk_indel_realigner_cmd=
+gatk_realinger_target_creator_cmd="$SCRIPTS_DIR/cfsan_target_creator.sh \
+	$threads
+	$output_dir/CFSAN/samples \
+	$samples
+	$dedup_bam_list
+	$intervals_list
+	$gatk_path
+	$ref_path"
+
+gatk_indel_realigner_cmd="$SCRIPTS_DIR/cfsan_indel_realigner.sh \
+	$threads \
+	$output_dir/CFSAN/samples \
+	$samples \
+	$intervals_list \
+	$dedup_bam_list \
+	$unsorted_bam_list \
+	$gatk_path \
+	$ref_path"
 
 cfsan_prepsamples_cmd=
 
@@ -126,7 +153,23 @@ if [ $cfsan == "YES" ]; then
         jobid_cfsan_duplicates=$( echo $cfsan_duplicates_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
         echo -e "MARK DUPLICATES FILES:$jobid_cfsan_duplicates\n" >> output_dir/logs/jobids.txt
 
+	cfsan_read_group_qsub=$( qsub $cfsan_arg -N $JOBNAME.READGROUP $gatk_add_or_replace_group_cmd)
+	jobid_cfsan_read_group=$( echo $cfsan_read_group_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "READ GROUP FILES:$jobid_cfsan_read_group\n" >> output_dir/logs/jobids.txt
 	
+	cfsan_samtool_index_qsub=$( qsub $cfsan_arg -N $JOBNAME.CFSAN.INDEX $samtool_index_cmd)
+	jobid_cfsan_samtool_index=$( echo $cfsan_samtool_index_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "SAMTOOL INDEX FILES:$jobid_cfsan_samtool_index\n" >> output_dir/logs/jobids.txt
+
+	cfsan_target_creator_qsub=$( qsub $cfsan_arg -N $JOBNAME.CFSAN.TARGET.CREATOR $gatk_realinger_target_creator_cmd)
+	jobid_cfsan_target_creator=$( echo $cfsan_target_creator_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "TARGET CREATOR FILES:$jobid_cfsan_target_creator\n" >> output_dir/logs/jobids.txt
+
+	cfsan_indel_realigner_qsub=$( qsub $cfsan_arg -N $JOBNAME.INDEL.REALIGNER  $gatk_indel_realigner_cmd)
+	jobid_cfsan_indel_realigner=$( echo $cfsan_indel_realigner_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "INDEL REALIGNER FILES:$jobid_cfsan_indel_realigner\n" >> output_dir/logs/jobids.txt
+
+
 	else
 		for count in `seq 1 $sample_count`; do
 		echo "Running cfsan for $sample"
@@ -135,13 +178,26 @@ if [ $cfsan == "YES" ]; then
 		echo "CFSAN align for $sample"
 		run_cfsan_aling=$($aling_sample_to_reference_cmd $count)
 		
-	
 		echo "CFSAN sort sam for $sample"
 		run_cfsan_sort_sam=$($picard_sort_sam_cmd $count)
 		
 		echo "CFSAN mark duplicates for $sample"
 		run_cfsan_duplicates=$($picard_mark_duplicate_cmd $count)
+
+		echo "CFSAN read group for $sample"
+                run_cfsan_read_group=$($gatk_add_or_replace_group_cmd $count)
+                
+		echo "CFSAN samtool index for $sample"
+                run_cfsan_samtool_index=$($samtool_index_cmd $count)
+
+		echo "CFSAN target creator for $sample"
+		run_cfsan_target_creator=$($gatk_realinger_target_creator_cmd $count)
+		
+		echo "CFSAN indel realigner for $sample"
+		run_cfsan_indel_realigner=$($gatk_indel_realigner_cmd $count)
+		
 		done
+
 
 	fi
 fi
