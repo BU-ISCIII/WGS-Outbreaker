@@ -1,11 +1,6 @@
-#!/bin/bash
-#Author:A.Hernandez
+uthor:A.Hernandez
 #help
-#Usage: cfsan_call_sites.sh 
-
-export VarscanMpileup2snp_ExtraParams="--min-var-freq 0.90"
-export VarscanJvm_ExtraParams="-Xmx15g"
-
+#Usage: cfsan_snp_matrix.sh 
 
 # Test whether the script is being executed with sge or not.
 if [ -z $sge_task_id ]; then
@@ -24,19 +19,23 @@ set -x
 
 #VARIABLES
 
-threads=$1
-dir=$2
-samples=$3
-unsorted_bam_list=$4
-cfsan_ref_path=$5
+dir=$1
+samples=$2
+consensus_fasta_list=$3
+consensus_preserved_fasta_list=$4
+snpma_fasta=$5
+snpma_preser_fasta=$6
+
 
 if [ "$use_sge" = "1" ]; then                                                                                                                                                                                               
    	sample_count=$sge_task_id                                                                      
 else                                                                                                        
-   	sample_count=$6                                                                                   
+   	sample_count=$7                                                                                   
 fi
 
 sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
-unsorted_bam_file=$( echo $unsorted_bam_list | tr ":" "\n" | head -$sample_count | tail -1)
+consensus_fasta_file=$( echo $consensus_fasta_list | tr ":" "\n" | head -$sample_count | tail -1)
+consensus_preserved_fasta_file=$( echo $consensus_preserved_fasta_list | tr ":" "\n" | head -$sample_count | tail -1)
 
-cfsan_snp_pipeline call_sites $cfsan_ref_path $dir/$sample
+cfsan_snp_pipeline snp_matrix -c $dir/$sample/$consensus_fasta_file -o $dir/$snpma_fasta $dir/sampleDirectories.txt.OrigVCF.filtered
+cfsan_snp_pipeline snp_matrix -c $dir/$samples/$consensus_preserved_fasta_file -o $dir/$snpma_preser_fasta $dir/sampleDirectories.txt.PresVCF.filtered

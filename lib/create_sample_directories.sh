@@ -1,7 +1,7 @@
 #!/bin/bash
-#author:A. Hernandez
-#help
-#usage: cfsan_filter_regions.sh
+
+#Author:A.Hernandez
+## Usage : alignmen_cfsan.sh ...
 
 
 # Test whether the script is being executed with sge or not.
@@ -18,12 +18,15 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
+echo `date`
 
 #VARIABLES
 
-dir=$1
-cfsan_ref_path=$2
+samples=$1
+dir=$2
+sample_count=$3
 
-cfsan_snp_pipeline filter_regions -n var.flt.vcf $dir/sampleDirectories.txt $cfsan_ref_path
-
+touch $dir/sampleDirectories.txt
+sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
+echo $dir/samples/$sample >> $dir/sampleDirectories.txt
 

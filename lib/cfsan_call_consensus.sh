@@ -1,11 +1,6 @@
-#!/bin/bash
-#Author:A.Hernandez
+uthor:A.Hernandez
 #help
-#Usage: cfsan_call_sites.sh 
-
-export VarscanMpileup2snp_ExtraParams="--min-var-freq 0.90"
-export VarscanJvm_ExtraParams="-Xmx15g"
-
+#Usage: cfsan_call_consensus.sh 
 
 # Test whether the script is being executed with sge or not.
 if [ -z $sge_task_id ]; then
@@ -24,19 +19,28 @@ set -x
 
 #VARIABLES
 
-threads=$1
-dir=$2
-samples=$3
-unsorted_bam_list=$4
-cfsan_ref_path=$5
+dir=$1
+samples=$2
+snp_list=$3
+snp_list_preser=$4
+consensus_fasta_list=$5
+consensus_vcf_list=$6
+consensus_preserved_fasta_list=$7
+consensus_preserved_vcf_list=$8
 
 if [ "$use_sge" = "1" ]; then                                                                                                                                                                                               
    	sample_count=$sge_task_id                                                                      
 else                                                                                                        
-   	sample_count=$6                                                                                   
+   	sample_count=$9                                                                                   
 fi
 
 sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
-unsorted_bam_file=$( echo $unsorted_bam_list | tr ":" "\n" | head -$sample_count | tail -1)
+consensus_fasta_file=$( echo $consensus_fasta_list | tr ":" "\n" | head -$sample_count | tail -1)
+consensus_vcf_file=$( echo $consensus_vcf_list | tr ":" "\n" | head -$sample_count | tail -1)
+consensus_preserved_fasta_file=$( echo $consensus_preserved_fasta_list= | tr ":" "\n" | head -$sample_count | tail -1)
+consensus_preserved_vcf_file=$( echo $consensus_preserved_vcf_list= | tr ":" "\n" | head -$sample_count | tail -1)
 
-cfsan_snp_pipeline call_sites $cfsan_ref_path $dir/$sample
+cfsan_snp_pipeline call_consensus -l $dir/$snp_list --vcfFileName $consensus_vcf_file -o $dir/$sample/$consensus_fasta_file $dir/$sample/reads.all.pileup
+
+cfsan_snp_pipeline call_consensus -l $dir/$snp_list --vcfFileName $consensus_preserved_vcf_file -o $dir/$sample/$consensus_preserved_fasta_file $dir/$sample/reads.all.pileup
+

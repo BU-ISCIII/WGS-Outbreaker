@@ -28,6 +28,7 @@ else
   	dir=$output_dir/raw
 fi
 
+
 if [ $trimming == "YES" ]; then
 	fastq_files_R1_list=$compress_paired_R1_list
 	fastq_files_R2_list=$compress_paired_R2_list
@@ -35,6 +36,20 @@ else
 	fastq_files_R1_list=$fastq_R1_list
         fastq_files_R2_list=$fastq_R2_list
 fi
+
+
+# Creation sampleDirectories.txt file
+
+sampledirectories_cmd="$SCRIPTS_DIR/create_sample_directories.sh \
+	$samples \
+	$output_dir/CFSAN"
+
+for count in `seq 1 $sample_count`; do
+	echo "creation sampleDirectories.txt file"
+        run_sample_directories=$($sampledirectories_cmd $count)
+
+done
+
 
 create_ln_cmd="$SCRIPTS_DIR/create_ln.sh \
 	$dir \
@@ -104,23 +119,42 @@ gatk_indel_realigner_cmd="$SCRIPTS_DIR/cfsan_indel_realigner.sh \
 	$gatk_path \
 	$ref_path"
 
-cfsan_prepsamples_cmd=
+cfsan_call_sites_cmd="$SCRIPTS_DIR/cfsan_call_sites.sh \
+	$threads
+	$output_dir/CFSAN/samples \
+	$samples
+	$unsorted_bam_list
+	$cfsan_ref_path"
 
-cfsan_snp_filer_cmd=
+cfsan_snp_filter_cmd="$SCRIPTS_DIR/cfsan_filter_regions.sh \
+	$output_dir/CFSAN \
+	$cfsan_ref_path"
 
-cfsan_snp_filter_fil_cmd=
 
-cfsan_snplist_cmd=
+cfsan_snplist_cmd="$SCRIPTS_DIR/cfsan_snp_list.sh \
+	$var_vcf
+	$var_preserv_vcf
+	$output_dir/CFSAN"
 
-cfsan_snplist_fil_cmd=
+cfsan_call_consensus_cmd="$SCRIPTS_DIR/cfsan_call_consensus.sh \
+	$output_dir/CFSAN \
+	$samples \
+	$snp_list \
+	$snp_list_preser \
+	$consensus_fasta_list \
+	$consensus_vcf_list \
+	$consensus_preserved_fasta_list \
+	$consensus_preserved_vcf_list"
 
-cfsan_call_consensus_cmd=
+cfsan_create_snpmatrix_cmd="$SCRIPTS_DIR/cfan_snp_matrix.sh \
+	$output_dir/CFSAN \
+	$samples \
+	$consensus_fasta_list \
+	$consensus_preserved_fasta_list \
+	$snpma_fasta \
+	$snpma_preser_fasta"
 
-cfsan_call_consensus_fil_cmd=
 
-cfsan_create_snpmatrix_cmd=
-
-sfsan_create_snpmatrix_fil_cmd=
 
 cfsan_snp_reference_cmd=
 
@@ -169,6 +203,27 @@ if [ $cfsan == "YES" ]; then
 	jobid_cfsan_indel_realigner=$( echo $cfsan_indel_realigner_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
         echo -e "INDEL REALIGNER FILES:$jobid_cfsan_indel_realigner\n" >> output_dir/logs/jobids.txt
 
+	cfsan_call_sites_qsub=$( qsub $cfsan_arg -N $JOBNAME.CALL.SITES $cfsan_call_sites_cmd)
+	jobid_cfsan_call_sites=$( echo $cfsan_call_sites_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "CALL SITES FILES:$jobid_cfsan_call_sites\n" >> output_dir/logs/jobids.txt
+
+	cfsan_snp_filter_qsub=$( qsub $cfsan_arg -N $JOBNAME.SNP.FILTER $cfsan_snp_filter_cmd)
+        jobid_cfsan_snp_filter=$( echo $cfsan_snp_filter_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "SNP FILTER FILES:$jobid_cfsan_snp_filter\n" >> output_dir/logs/jobids.txt
+
+	cfsan_snplist_qsub=$( qsub $cfsan_arg -N $JOBNAME.SNP.LIST $cfsan_snplist_cmd)
+        jobid_cfsan_snplist=$( echo $cfsan_snplist_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "SNP LIST FILES:$jobid_cfsan_snplist\n" >> output_dir/logs/jobids.txt
+
+	cfsan_call_consensus_qsub=$( qsub $cfsan_arg -N $JOBNAME.CALL.CONSENSUS $cfsan_call_consensus_cmd)
+	jobid_cfsan_call_consensus=$( echo $cfsan_call_consensus_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "CALL CONSENSUS FILES:$jobid_cfsan_call_consensus\n" >> output_dir/logs/jobids.txt
+
+	cfsan_create_snpmatrix_qsub=$( qsub $cfsan_arg -N $JOBNAME.CALL.CONSENSUS $cfsan_create_snpmatrix_cmd)
+        jobid_cfsan_create_snpmatrix=$( echo $cfsan_create_snpmatrix_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "SNP MATRIX FILES:$jobid_cfsan_create_snpmatrix\n" >> output_dir/logs/jobids.txt
+
+
 
 	else
 		for count in `seq 1 $sample_count`; do
@@ -195,10 +250,27 @@ if [ $cfsan == "YES" ]; then
 		
 		echo "CFSAN indel realigner for $sample"
 		run_cfsan_indel_realigner=$($gatk_indel_realigner_cmd $count)
+
+		echo "CFSAN call sites for $sample"
+		run_cfsan_call_sites=$($cfsan_call_sites_cmd $count)
 		
 		done
-
-
+	
 	fi
 fi
+
+echo "CFSAN snp filter"
+run_cfsan_snp_filter=$($cfsan_snp_filter_cmd)
+
+echo "CFSAN snp list"
+run_cfsan_snplist=$($cfsan_snplist_cmd $count)
+
+for count in `seq 1 $sample_count`; do
+
+	echo "CFSAN call consensus for $sample"
+	run_cfsan_call_consensus=$($cfsan_call_consensus_cmd $count)
+done
+
+echo "CFSAN snp matrix"
+run_cfsan_snpmatrix=$($cfsan_create_snpmatrix_cmd $count)
 	

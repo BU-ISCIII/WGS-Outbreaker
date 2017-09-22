@@ -194,4 +194,9 @@ consensus_preserved_fasta_list=$( echo ${consensus_preserved_fasta[@]} | tr " " 
 consensus_preserved_vcf_list=$( echo ${consensus_preserved_vcf[@]} | tr " " ":")
 metrics_list=$( echo ${metrics[@]} | tr " " ":")
 
+var_vcf=var.flt.vcf
+var_preserv_vcf=var.flt_preserved.vcf
+snp_list=snplist.txt
+snp_list_preser=snplist_preserved.txt
+
 
