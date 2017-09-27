@@ -84,12 +84,24 @@ else
 
 fi
 
+vcf_to_tsv_cmd="$SCRIPTS_DIR/vcf_to_tsv.sh \
+	$threads
+	$output_dir/variant_calling/variants_gatk/variants \
+	$vcfsnpsfilArray_list \
+	$tsv_file"
+
+tsv_to_msa_cmd="$SCRIPTS_DIR/tsv_to_msa.sh \
+	$threads
+        $output_dir/variant_calling/variants_gatk/variants \
+	$tsv_file
+	$msa_file"
+
 if [ $variant_calling == "YES" ]; then
 		if [ "$use_sge" = "1" ]; then
              	precalling=$( qsub $precalling_args -t 1-$sample_count -N $JOBNAME.CALLING $precalling_cmd)
     		jobid_precalling=$( echo $precalling | cut -d ' ' -f3 | cut -d '.' -f1 )
     		calling_args="${SGE_ARGS} -hold_jid $jobid_precalling"
-    		callling=$( qsub $calling_Args -N $JOBNAME.CALLING $calling_cmd)
+    		calling=$( qsub $calling_Args -N $JOBNAME.CALLING $calling_cmd)
        		jobid_calling=$( echo $calling | cut -d ' ' -f3 | cut -d '.' -f1 )
        		echo -e "Variant Calling:$jobid_precalling - $jobid_calling \n" >> $output_dir/logs/jobids.txt
 		else
@@ -101,3 +113,23 @@ if [ $variant_calling == "YES" ]; then
         	calling=$($calling_cmd)
       fi
 fi
+
+if [ $vcf_to_msa == "YES" ]; then
+	if [ "$use_sge" = "1" ]; then
+	vcf_to_msa_args="${SGE_ARGS} -hold_jid $jobid_calling"
+	run_vcf_to_tsv=$( qsub $vcf_to_tsv_args -t 1-$sample_count -N $JOBNAME.VCF_TO_TSV $vcf_to_tsv_cmd)
+        jobid_vcf_to_tsv=$( echo $run_vcf_to_tsv | cut -d ' ' -f3 | cut -d '.' -f1 )
+	
+	tsv_to_msa_args="${SGE_ARGS} -hold_jid $jobid_vcf_to_tsv"
+        run_tsv_to_msa=$( qsub $tsv_to_msa_args -t 1-$sample_count -N $JOBNAME.TSV_TO_MSA $tsv_to_msa_cmd)
+        jobid_tsv_to_msa=$( echo $run_vcf_to_tsv | cut -d ' ' -f3 | cut -d '.' -f1 )
+	echo -e "vcf to msa:$jobid_vcf_to_tsv - $jobid_tsv_to_msa\n" >> $output_dir/logs/jobids.txt
+
+	else
+
+	echo "Running variant calling on sample"
+	run_vcf_to_tsv=$($vcf_to_tsv_cmd)
+	run_tsv_to_msa=$($tsv_to_msa_cmd)
+	fi
+fi
+

@@ -40,11 +40,6 @@ if [ $mapping == "YES" ]; then
 	$SCRIPTS_DIR/run_mapping.sh
 fi
 
-# Execute variant Calling
-if [ $variant_calling == "YES" ]; then
-	$SCRIPTS_DIR/run_variantCalling_haploid.sh
-fi
-
 # Execute kmerfinder
 if [ $kmerfinder == "YES" ];then
 	$SCRIPTS_DIR/run_identification_ST.sh
@@ -59,3 +54,9 @@ fi
 if [ $cfsan == "YES" ]; then
 	$SCRIPTS_DIR/run_cfsan.sh
 fi
+
+# Execute variant Calling
+if [ $variant_calling == "YES" ]; then
+        $SCRIPTS_DIR/run_variantCalling_haploid.sh
+fi
+

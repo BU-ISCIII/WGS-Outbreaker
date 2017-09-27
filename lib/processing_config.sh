@@ -37,7 +37,7 @@ variant_calling=$( cat $CONFIG_FILE | grep -w 'VARIANT_CALLING' | cut -d '=' -f2
 kmerfinder=$( cat $CONFIG_FILE | grep -w 'KMERFINDER' | cut -d '=' -f2 )
 srst2=$( cat $CONFIG_FILE | grep -w 'SRST2' | cut -d '=' -f2 )
 cfsan=$( cat $CONFIG_FILE | grep -w 'CFSAN' | cut -d '=' -f2 )
-
+vcf_to_msa=$( cat $CONFIG_FILE | grep -w 'VCF_TO_MSA' | cut -d '=' -f2 )
 
 # REFERENCES
 exome_enrichement=$( cat $CONFIG_FILE | grep -w 'EXOME_ENRICHMENT' | cut -d '=' -f2 )
@@ -52,7 +52,7 @@ srst2_db_path_mlst_definitions=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH_mlst
 cfsan_ref_path=$( cat $CONFIG_FILE | grep -w 'CFSAN_ref_path' | cut -d '=' -f2)
 
 # Arguments
-trimmomatic_version=$( cat $CONFIG_FILE | grep -w 'trimmomatic_version' | cut -d '=' -f2 )
+trimmomatic_version=$( cat $CONFIG_FILE | grep -w 'trimmomatic_version' | cut -d '=' -f2)
 trimmomatic_path=$( cat $CONFIG_FILE | grep -w 'TRIMMOMATIC_PATH' | cut -d '=' -f2 )
 trim_args=$( cat $CONFIG_FILE | grep -w 'TRIM_ARGS' | cut -d '=' -f2 )
 picard_path=$( cat $CONFIG_FILE | grep -w 'PICARD_PATH' | cut -d '=' -f2 )
@@ -190,3 +190,6 @@ snp_preserved_list=$( echo ${snp_preserved[@]} | tr " " ":")
 snp_removed_list=$( echo ${snp_removed[@]} | tr " " ":")
 metrics_list=$( echo ${metrics[@]} | tr " " ":")
 
+
+tsv_file=all_samples_snps_fil.tsv
+msa_file=all_samples_snps_fil.fasta
