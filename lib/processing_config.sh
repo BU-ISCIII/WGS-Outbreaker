@@ -133,10 +133,10 @@ do
 	pileup[$i]=$sample.pileup
 	snp_preserved[$i]=$sample.var.flt.preserved.vcf
 	snp_removed[$i]=$sample.var.flt.removed.vcf
-	consensus_fasta[$i]=$sample.consenus.fasta
-	consensus_vcf[$i]=$sample.consenus.vcf
-	consensus_preserved_fasta[$i]=$sample.consenus_preserved.fasta
-        consensus_preserved_vcf[$i]=$sample.consenus_preserved.vcf
+	consensus_fasta[$i]=$sample.consensus.fasta
+	consensus_vcf[$i]=$sample.consensus.vcf
+	consensus_preserved_fasta[$i]=$sample.consensus_preserved.fasta
+        consensus_preserved_vcf[$i]=$sample.consensus_preserved.vcf
 	metrics[$i]=$sample.metrics
 
         let i=i+1
@@ -188,15 +188,5 @@ sort_bam_list=$( echo ${sort_bam[@]} | tr " " ":")
 pileup_list=$( echo ${pileup[@]} | tr " " ":")
 snp_preserved_list=$( echo ${snp_preserved[@]} | tr " " ":")
 snp_removed_list=$( echo ${snp_removed[@]} | tr " " ":")
-consensus_fasta_list=$( echo ${consensus_fasta[@]} | tr " " ":")
-consensus_vcf_list=$( echo ${consensus_vcf[@]} | tr " " ":")
-consensus_preserved_fasta_list=$( echo ${consensus_preserved_fasta[@]} | tr " " ":")
-consensus_preserved_vcf_list=$( echo ${consensus_preserved_vcf[@]} | tr " " ":")
 metrics_list=$( echo ${metrics[@]} | tr " " ":")
-
-var_vcf=var.flt.vcf
-var_preserv_vcf=var.flt_preserved.vcf
-snp_list=snplist.txt
-snp_list_preser=snplist_preserved.txt
-
 

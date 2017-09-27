@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#Author:A.Hernandez
+##Author: A. Hernandez
 #help
-#Usage: cfsan_call_consensus.sh 
+#Usage: cfsan_metrics.sh
 
 # Test whether the script is being executed with sge or not.
 if [ -z $sge_task_id ]; then
@@ -23,16 +23,14 @@ set -x
 
 dir=$1
 samples=$2
+cfsan_ref_path=$3
 
 if [ "$use_sge" = "1" ]; then                                                                                                                                                                                               
    	sample_count=$sge_task_id                                                                      
 else                                                                                                        
-   	sample_count=$3                                                                                   
+   	sample_count=$4                                                                               
 fi
 
 sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
 
-cfsan_snp_pipeline call_consensus -l $dir/snplist.txt --vcfFileName consensus.vcf -o $dir/samples/$sample/consensus.fasta $dir/samples/$sample/reads.all.pileup
-
-cfsan_snp_pipeline call_consensus -l $dir/snplist_preserved.txt --vcfFileName consensus_preserved.vcf -o $dir/samples/$sample/consensus_preserved.fasta -e $dir/samples/$sample/var.flt_removed.vcf $dir/samples/$sample/reads.all.pileup
-
+cfsan_snp_pipeline collect_metrics -o $dir/samples/$sample/metrics $dir/samples/$sample $cfsan_ref_path

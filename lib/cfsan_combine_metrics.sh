@@ -1,8 +1,8 @@
 #!/bin/bash
-##Auhtor: A.Hernandez
 
+##Author: A. Hernandez
 #help
-#Usage: cfsan_snp_list.sh 
+#Usage: cfsan_combine_metrics.sh
 
 # Test whether the script is being executed with sge or not.
 if [ -z $sge_task_id ]; then
@@ -23,6 +23,4 @@ set -x
 
 dir=$1
 
-
-cfsan_snp_pipeline merge_sites -n var.flt.vcf -o $dir/snplist.txt $dir/sampleDirectories.txt $dir/sampleDirectories.txt.OrigVCF.filtered
-cfsan_snp_pipeline merge_sites -n var.flt_preserved.vcf -o $dir/snplist_preserved.txt $dir/sampleDirectories.txt $dir/sampleDirectories.txt.PresVCF.filtered
+cfsan_snp_pipeline combine_metrics -n metrics -o $dir/metrics.tsv $dir/sampleDirectories.txt

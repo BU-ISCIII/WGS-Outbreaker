@@ -132,43 +132,33 @@ cfsan_snp_filter_cmd="$SCRIPTS_DIR/cfsan_filter_regions.sh \
 
 
 cfsan_snplist_cmd="$SCRIPTS_DIR/cfsan_snp_list.sh \
-	$var_vcf
-	$var_preserv_vcf
 	$output_dir/CFSAN"
 
 cfsan_call_consensus_cmd="$SCRIPTS_DIR/cfsan_call_consensus.sh \
 	$output_dir/CFSAN \
-	$samples \
-	$snp_list \
-	$snp_list_preser \
-	$consensus_fasta_list \
-	$consensus_vcf_list \
-	$consensus_preserved_fasta_list \
-	$consensus_preserved_vcf_list"
+	$samples"
 
-cfsan_create_snpmatrix_cmd="$SCRIPTS_DIR/cfan_snp_matrix.sh \
+cfsan_create_snpmatrix_cmd="$SCRIPTS_DIR/cfsan_snp_matrix.sh \
+	$output_dir/CFSAN"
+
+cfsan_snp_reference_cmd="$SCRIPTS_DIR/cfsan_snp_reference.sh \
+	$output_dir/CFSAN \
+	$cfsan_ref_path"
+
+cfsan_collect_metrics_cmd="$SCRIPTS_DIR/cfsan_metrics.sh \
 	$output_dir/CFSAN \
 	$samples \
-	$consensus_fasta_list \
-	$consensus_preserved_fasta_list \
-	$snpma_fasta \
-	$snpma_preser_fasta"
+	$cfsan_ref_path"
+
+cfsan_combine_metrics_cmd="$SCRIPTS_DIR/cfsan_combine_metrics.sh \
+	$output_dir/CFSAN" 
+	
+cfsan_merge_vcf_cmd="$SCRIPTS_DIR/cfsan_merge_vcf.sh \
+        $output_dir/CFSAN"
 
 
-
-cfsan_snp_reference_cmd=
-
-cfsan_snp_reference_fil_cmd=
-
-cfsan_collect_metrics_cmd=
-
-cfsan_combine_metrics_cmd=
-
-cfsan_matrix_distance_cmd=
-
-cfsan_matrix_distance_fil_cmd=
-
-cfsan_merge_vcf_cmd=
+cfsan_matrix_distance_cmd="$SCRIPTS_DIR/cfsan_snp_distance.sh \
+	$output_dir/CFSAN"
 
 cfsan_clean_cmd=
 
@@ -219,9 +209,29 @@ if [ $cfsan == "YES" ]; then
 	jobid_cfsan_call_consensus=$( echo $cfsan_call_consensus_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
         echo -e "CALL CONSENSUS FILES:$jobid_cfsan_call_consensus\n" >> output_dir/logs/jobids.txt
 
-	cfsan_create_snpmatrix_qsub=$( qsub $cfsan_arg -N $JOBNAME.CALL.CONSENSUS $cfsan_create_snpmatrix_cmd)
+	cfsan_create_snpmatrix_qsub=$( qsub $cfsan_arg -N $JOBNAME.SNP.MATRIX $cfsan_create_snpmatrix_cmd)
         jobid_cfsan_create_snpmatrix=$( echo $cfsan_create_snpmatrix_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
         echo -e "SNP MATRIX FILES:$jobid_cfsan_create_snpmatrix\n" >> output_dir/logs/jobids.txt
+
+	cfsan_snp_reference_qsub=$( qsub $cfsan_arg -N $JOBNAME.SNP.REFERENCE $cfsan_snp_reference_cmd)
+        jobid_cfsan_snp_reference=$( echo $cfsan_snp_reference_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "SNP REFERENCE FILES:$jobid_cfsan_snp_reference\n" >> output_dir/logs/jobids.txt
+
+	cfsan_collect_metrics_qsub=$( qsub $cfsan_arg -N $JOBNAME.COLLECT.METRICS $cfsan_collect_metrics_cmd)
+        jobid_cfsan_collect_metrics=$( echo $cfsan_collect_metrics_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "COLLECT METRICS FILES:$jobid_cfsan_collect_metrics\n" >> output_dir/logs/jobids.txt
+
+	cfsan_combine_metrics_qsub=$( qsub $cfsan_arg -N $JOBNAME.COMBINE.METRICS $cfsan_combine_metrics_cmd)
+        jobid_cfsan_combine_metrics=$( echo $cfsan_combine_metrics_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "COMBINE METRICS FILES:$jobid_cfsan_combine_metrics\n" >> output_dir/logs/jobids.txt
+
+	cfsan_merge_vcf_qsub=$( qsub $cfsan_arg -N $JOBNAME.MERGE.VCF $cfsan_merge_vcf_cmd)
+        jobid_cfsan_merge_vcf=$( echo $cfsan_merge_vcf_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "MERGE VCF FILES:$jobid_cfsan_merge_vcf\n" >> output_dir/logs/jobids.txt
+
+	cfsan_matrix_distance_qsub=$( qsub $cfsan_arg -N $JOBNAME.MERGE.VCF $cfsan_matrix_distance_cmd)
+        jobid_cfsan_matrix_distance=$( echo $cfsan_matrix_distance_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "MATRIX DISTANCE FILES:$jobid_cfsan_matrix_dsitance\n" >> output_dir/logs/jobids.txt
 
 
 
@@ -263,7 +273,7 @@ echo "CFSAN snp filter"
 run_cfsan_snp_filter=$($cfsan_snp_filter_cmd)
 
 echo "CFSAN snp list"
-run_cfsan_snplist=$($cfsan_snplist_cmd $count)
+run_cfsan_snplist=$($cfsan_snplist_cmd)
 
 for count in `seq 1 $sample_count`; do
 
@@ -272,5 +282,22 @@ for count in `seq 1 $sample_count`; do
 done
 
 echo "CFSAN snp matrix"
-run_cfsan_snpmatrix=$($cfsan_create_snpmatrix_cmd $count)
+run_cfsan_snpmatrix=$($cfsan_create_snpmatrix_cmd)
 	
+echo "CFSAN snp reference"
+run_cfsan_snp_reference=$($cfsan_snp_reference_cmd)
+
+for count in `seq 1 $sample_count`; do
+	echo "CFSAN collect metrics"
+	run_cfsan_collect_metrics=$($cfsan_collect_metrics_cmd $count)
+done
+
+echo "CFSAN combine metrics"
+run_cfsan_combine_metrics=$($cfsan_combine_metrics_cmd)
+
+echo "CFSAN merge VCF"
+run_cfsan_merge_vcf=$($cfsan_merge_vcf_cmd)
+
+echo "CFSAN matrix distance"
+run_cfsan_matrix_distance=$($cfsan_matrix_distance_cmd)
+

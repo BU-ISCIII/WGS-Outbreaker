@@ -1,8 +1,8 @@
 #!/bin/bash
-##Auhtor: A.Hernandez
 
+##Author: A. Hernandez
 #help
-#Usage: cfsan_snp_list.sh 
+#Usage: cfsan_snp_reference.sh
 
 # Test whether the script is being executed with sge or not.
 if [ -z $sge_task_id ]; then
@@ -19,10 +19,10 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
-#VARAIBLES
+#VARIABLES
 
 dir=$1
+cfsan_ref_path=$2
 
-
-cfsan_snp_pipeline merge_sites -n var.flt.vcf -o $dir/snplist.txt $dir/sampleDirectories.txt $dir/sampleDirectories.txt.OrigVCF.filtered
-cfsan_snp_pipeline merge_sites -n var.flt_preserved.vcf -o $dir/snplist_preserved.txt $dir/sampleDirectories.txt $dir/sampleDirectories.txt.PresVCF.filtered
+cfsan_snp_pipeline snp_reference -l $dir/snplist.txt -o $dir/referenceSNP.fasta $cfsan_ref_path
+cfsan_snp_pipeline snp_reference -l $dir/snplist_preserved.txt -o $dir/referenceSNP_preserved.fasta $cfsan_ref_path
