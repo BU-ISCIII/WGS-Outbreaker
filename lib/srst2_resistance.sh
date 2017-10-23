@@ -30,7 +30,7 @@ resistance_list=$6
 srst2_db_path_argannot=$7
 
 if [ "$use_sge" = "1" ]; then
-        sample_count=$sge_task_id
+        sample_count=$SGE_TASK_ID
 else
         sample_count=$8
 fi

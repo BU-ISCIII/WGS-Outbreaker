@@ -5,7 +5,7 @@
 #Usage: cfsan_call_consensus.sh 
 
 # Test whether the script is being executed with sge or not.
-if [ -z $sge_task_id ]; then
+if [ -z $SGE_TASK_ID ]; then
         use_sge=0
 else
         use_sge=1
@@ -25,7 +25,7 @@ dir=$1
 samples=$2
 
 if [ "$use_sge" = "1" ]; then                                                                                                                                                                                               
-   	sample_count=$sge_task_id                                                                      
+   	sample_count=$SGE_TASK_ID                                                                    
 else                                                                                                        
    	sample_count=$3                                                                                   
 fi

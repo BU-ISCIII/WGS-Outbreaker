@@ -28,7 +28,7 @@ duplicateBamArray_list=$4
 picard_path=$5
                                                                                                                                                                                                                               
 if [ "$use_sge" = "1" ]; then                                                                                                                                                                                               
-   	sample_count=$sge_task_id                                                                      
+   	sample_count=$SGE_TASK_ID                                                                     
 else                                                                                                        
    	sample_count=$6                                                                                     
 fi

@@ -4,7 +4,7 @@
 
 # Test whether the script is being executed with sge or not.
 
-if [ -z $sge_task_id ]; then
+if [ -z $SGE_TASK_ID ]; then
         use_sge=0
 else
         use_sge=1
@@ -19,6 +19,7 @@ set -x
 
 
 # VARAIBLES
+
 dir=$1
 output_dir=$2
 srst2_db_path_mlst_db=$3
@@ -28,9 +29,8 @@ fastq_files_R1_list=$6
 fastq_files_R2_list=$7
 mlst_list=$8
 
-
 if [ "$use_sge" = "1" ]; then
-        sample_count=$sge_task_id
+        sample_count=$SGE_TASK_ID
 else
         sample_count=$9
 fi

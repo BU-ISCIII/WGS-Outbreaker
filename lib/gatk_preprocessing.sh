@@ -2,7 +2,7 @@
 ## Author S. Monzon                                                                                                  ## version v2.0                                                                                                      
 
 # Test whether the script is being executed with sge or not.
-if [ -z $sge_task_id ]; then
+if [ -z $SGE_TASK_ID ]; then
 	use_sge=0
 else
 	use_sge=1
@@ -43,7 +43,7 @@ gatk_path=${11}
 
 
 if [ "$use_sge" = "1" ]; then
-	sample_count=$sge_task_id
+	sample_count=$SGE_TASK_ID
 else
 	sample_count=${12}
 fi
@@ -52,52 +52,6 @@ sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
 input=$( echo $input_list | tr ":" "\n" | head -$sample_count | tail -1)
 realignedBamArray=$( echo $realignedBamArray_list | tr ":" "\n" | head -$sample_count | tail -1)
 recalibratedBamArray=$( echo $recalibratedBamArray_list | tr ":" "\n" | head -$sample_count | tail -1)
-
-mkdir -p $output_dir/realignment
-
-if [ $know_indels == "NO" ]; then
-
-	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
- 		-T RealignerTargetCreator \
-		-I $input_dir/$sample/$input \
- 		-R $ref_path \
- 		-o $output_dir/realignment/$input-IndelRealigner.intervals \
- 		-nt $threads \
- 		-S LENIENT \
- 		-log $output_dir/realignment/$input-targetCreator.log
-                                                                                       
-	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
- 		-T IndelRealigner \
-		-I $input_dir/$sample/$input \
- 		-R $ref_path \
- 		-targetIntervals $output_dir/realignment/$input-IndelRealigner.intervals \
- 		-o $output_dir/realignment/$realignedBamArray \
- 		-S LENIENT \
- 		-log $output_dir/$input-realigner.log
-
-else
-    
-   	 java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
-    		-T RealignerTargetCreator \
-    		-I $input/$sample/$input \
-    		-known $know_indels \
-    		-R $ref_path \
-    		-o $output_dir/realignment/$input-IndelRealigner.intervals \
-    		-nt $threads \
-    		-S LENIENT \
-    		-log $output_dir/realignment/$input-targetCreator.log
-                                                                                        
-    	java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
-    		-T IndelRealigner \
-    		-I $input_dir/$sample/$input \
-    		-known $know_indels \
-    		-R $ref_path \
-    		-targetIntervals $output_dir/realignment/$input-IndelRealigner.intervals \
-    		-o $output_dir/realignment/$realignedBamArray \
-    		-S LENIENT \
-    		-log $output_dir/$input-realigner.log                                        
-
-fi
 
 
 if [ $know_snps != "NO" ]; then

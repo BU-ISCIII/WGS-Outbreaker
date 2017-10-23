@@ -3,7 +3,7 @@
 #Author: A.Hernandez
 
 # Help 
-# usage: run_cfsan.sh ....
+# usage: vcf_to_tsv.sh ....
 #
 
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
@@ -15,9 +15,8 @@ set -x
 
 #VARIABLES
 
-threads=$1
-dir=$2
-vcfsnpsfilArray_list=$3
-tsv_file=$4
+dir=$1
+vcfsnps_list=$2
+tsv_file=$3
 
-bcftools query -f '%CHROM\t%POS\t%REF\t[%TGT\t]\n' $dir/$vcfsnpsfilArray_list --print-header -o $dir/$tsv_file
+bcftools query -f '%CHROM\t%POS\t%REF\t[%TGT\t]\n' $dir/$vcfsnps_list --print-header -o $dir/$tsv_file

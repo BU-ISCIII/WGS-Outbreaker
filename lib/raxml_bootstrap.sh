@@ -1,8 +1,9 @@
 #!/bin/bash
+## Author: A. Hernandez
+# Help
+# usage: raxml_bootstrap.sh ....
+#
 
-#Author:A.Hernandez
-#help
-#Usage: cfsan_snp_matrix.sh 
 
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
@@ -14,6 +15,8 @@ set -x
 #VARIABLES
 
 dir=$1
+output_dir=$2
+snp_msa=$3
+model=$4
 
-cfsan_snp_pipeline snp_matrix -c consensus.fasta -o $dir/snpma.fasta $dir/sampleDirectories.txt.OrigVCF.filtered
-cfsan_snp_pipeline snp_matrix -c consensus_preserved.fasta -o $dir/snpma_preserved.fasta $dir/sampleDirectories.txt.PresVCF.filtered
+raxmlHPC-MPI-AVX -m $model -V -b 12345 -w $output_dir -n RAXML_TREE_BOOTSTRAP -p 12345 -s $dir/$snp_msa -N 100

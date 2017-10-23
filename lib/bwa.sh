@@ -2,7 +2,7 @@
 ## Author A. Hernandez
 ## version v2.0                                                                                                                                                                                                                                   
 # Test whether the script is being executed with sge or not.
-if [ -z $sge_task_id ]; then                                                                                                                                                                                                       
+if [ -z $SGE_TASK_ID ]; then                                                                                                                                                                                                       
  	use_sge=0                                                                                                                                                                                                                      
 else                                                                                                                                                                                                                               
  	use_sge=1                                                                                                                                                                                                                      
@@ -37,9 +37,9 @@ mappingArray_sam_list=$7
 ref_path=$8
 
 if [ "$use_sge" = "1" ]; then                                                      
- 	sample_count=$sge_task_id                                                  
+ 	sample_count=$SGE_TASK_ID                                                  
 else                                                                               
- 	sample_count=${9}                                                               
+ 	sample_count=$9                                                               
 fi                                                                                 
                                                                                                                                                                         
 sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)       

@@ -44,7 +44,7 @@ fastq_R1_list=$5
 fastq_R2_list=$6
 
 if [ "$use_sge" = "1" ]; then
-	sample_count=$sge_task_id
+	sample_count=$SGE_TASK_ID
 else
 	sample_count=$7
 fi

@@ -2,12 +2,6 @@
 #help
 #Usage: cfsan_merge_vcf.sh
 
-# Test whether the script is being executed with sge or not.
-if [ -z $sge_task_id ]; then
-        use_sge=0
-else
-        use_sge=1
-fi
 
 
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status

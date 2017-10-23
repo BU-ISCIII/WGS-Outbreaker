@@ -8,7 +8,7 @@ export VarscanJvm_ExtraParams="-Xmx15g"
 
 
 # Test whether the script is being executed with sge or not.
-if [ -z $sge_task_id ]; then
+if [ -z $SGE_TASK_ID ]; then
         use_sge=0
 else
         use_sge=1
@@ -24,16 +24,15 @@ set -x
 
 #VARIABLES
 
-threads=$1
-dir=$2
-samples=$3
-unsorted_bam_list=$4
-cfsan_ref_path=$5
+dir=$1
+samples=$2
+unsorted_bam_list=$3
+cfsan_ref_path=$4
 
 if [ "$use_sge" = "1" ]; then                                                                                                                                                                                               
-   	sample_count=$sge_task_id                                                                      
+   	sample_count=$SGE_TASK_ID                                                                   
 else                                                                                                        
-   	sample_count=$6                                                                                   
+   	sample_count=$5                                                                                 
 fi
 
 sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)

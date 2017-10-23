@@ -23,11 +23,13 @@ mkdir -p $output_dir/Alignment
 mkdir -p $output_dir/Alignment/SAM
 mkdir -p $output_dir/Alignment/BAM
 
-jobid_trimmomatic=$(cat $output_dir/logs/jobids.txt | grep -w "TRIMMOMATIC" | cut -d ':' -f2 )
+jobid_compress=$(cat $output_dir/logs/jobids.txt | grep -w "COMPRESS_FILE" | cut -d ':' -f2 )
 
 if [ -d $output_dir/QC/trimmomatic ]; then
 	input_dir=$output_dir/QC/trimmomatic
-	mapping_args="${SGE_ARGS} -pe orte $threads -hold_jid ${jobid_trimmomatic}"
+	if [ "$use_sge" = "1" ]; then
+		mapping_args="${SGE_ARGS} -pe openmp $threads -hold_jid ${jobid_compress}"
+	fi
 else
   	input_dir=$output_dir/raw
 fi
@@ -73,13 +75,13 @@ samtobam_cmd="$SCRIPTS_DIR/samTobam.sh \
 
 if [ $mapping == "YES" ]; then
  
-	if [ "use_sge" = "1" ]; then
+	if [ "$use_sge" = "1" ]; then
 	
 	mapping_qsub=$( qsub $mapping_args -t 1-$sample_count -N $JOBNAME.MAPPING $mapping_cmd)
 	jobid_mapping=$( echo $mapping_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
 	
 	echo -e "MAPPING:$jobid_mapping\n" >> $output_dir/logs/jobids.txt
-		samtobam_args="$SGE_ARGS -hold_jid $jobid_mapping"
+		samtobam_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid_mapping"
 		samtobam=$( qsub $samtobam_args -t 1-$sample_count -N $JOBNAME.SAMTOBAM $samtobam_cmd)
 		jobid_samtobam=$( echo $samtobam | cut -d ' ' -f3 | cut -d '.' -f1 )
 	
@@ -103,7 +105,7 @@ picard_cmd="$SCRIPTS_DIR/picard_duplicates.sh \
 
 if [ $duplicate_filter == "YES" ]; then
 	if [ "$use_sge" = "1" ]; then
-		picard_args="$SGE_ARGS -hold_jid $jobid_samtobam"
+		picard_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid_samtobam"
    		picard=$( qsub $picard_args -t 1-$sample_count -N $JOBNAME.PICARD $picard_cmd)
 		jobid_picard=$( echo $picard | cut -d ' ' -f3 | cut -d '.' -f1 )
 		
@@ -134,15 +136,15 @@ bamutil_postduplicates="$SCRIPTS_DIR/bamutil.sh \
 	$exome_enrichement"  
         
 if [ "$use_sge" = "1" ]; then                                                                                                                                                  
-	bamutil_pre_args="${SGE_ARGS} -hold_jid $jobid_samtobam"
+	bamutil_pre_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid_samtobam"
 	bamutil_pre=$( qsub $bamutil_pre_args -t 1-$sample_count -N $JOBNAME.BAMUTIL_PRE $bamutil_preduplicates)                                                                                
         jobid_bamutil_pre=$( echo $bamutil_pre | cut -d ' ' -f3 | cut -d '.' -f1 )                                                                                                   
         echo -e "BAMUTIL_PRE:$jobid_bamutil_pre\n" >> $output_dir/logs/jobids.txt
  	
 	if [ $duplicate_filter == "YES" ]; then                                                                                                                                            
- 		bamutil_post_args="${SGE_ARGS} -hold_jid $jobid_picard"                                                                                                                 
+ 		bamutil_post_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid_picard"                                                                                                                 
  		bamutil_post=$( qsub $bamutil_post_args -t 1-$sample_count -N $JOBNAME.BAMUTIL_POST $bamutil_postduplicates)                                                                       
- 		jobid_bamutil_post=$( echo $bamtuil_post | cut -d ' ' -f3 | cut -d '.' -f1 )
+ 		jobid_bamutil_post=$( echo $bamutil_post | cut -d ' ' -f3 | cut -d '.' -f1 )
  		echo -e "BAMUTIL_POST:$jobid_bamutil_post\n" >> $output_dir/logs/jobids.txt
  	fi                                                                                                                                                                         
 else                                                                                                                                                                           

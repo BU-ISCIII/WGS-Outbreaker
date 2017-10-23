@@ -4,7 +4,7 @@
 
 #Test whether the script is being used with sge or not.
 
-if [ -z $sge_task_id ]; then
+if [ -z $SGE_TASK_ID ]; then
 	use_sge=0
 
 else
@@ -29,8 +29,8 @@ fastq_files_R1=$4
 fastq_files_R2=$5
 concatFastq_list=$6
 
-if [ "use_sge" = "1" ]; then
-	sample_count=$sge_task_id
+if [ "$use_sge" = "1" ]; then
+	sample_count=$SGE_TASK_ID
 else
  	sample_count=$7
 fi

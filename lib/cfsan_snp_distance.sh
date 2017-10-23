@@ -3,13 +3,6 @@
 #help
 #Usage: cfsan_snp_distance.sh
 
-# Test whether the script is being executed with sge or not.
-if [ -z $sge_task_id ]; then
-        use_sge=0
-else
-        use_sge=1
-fi
-
 
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
@@ -21,7 +14,6 @@ set -x
 #VARIABLES
 
 dir=$1
-
 
 cfsan_snp_pipeline distance -p $dir/snp_distance_pairwise.tsv -m $dir/snp_distance_matrix.tsv $dir/snpma.fasta
 cfsan_snp_pipeline distance -p $dir/snp_distance_pairwise_preserved.tsv -m $dir/snp_distance_matrix_preserved.tsv $dir/snpma.fasta

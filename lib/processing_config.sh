@@ -10,7 +10,10 @@ set -u
 set -x
 
 
-CONFIG_FILE=/home/ahernandez/outbreakWGS/config.file
+
+
+
+CONFIG_FILE=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/20171013_pruebaPipe/config.file
 
 # RunInfo
 email=$( cat $CONFIG_FILE | grep -w 'MAIL' | cut -d '=' -f2 )
@@ -87,7 +90,7 @@ do
         #create compress name
         compress_paired_R1[$i]=$sample.trimmed_R1.fastq.gz
         compress_paired_R2[$i]=$sample.trimmed_R2.fastq.gz
-        compress_unpaired_R1[$i]=$sample.trimmed_unpaired__R1.fastq.gz
+        compress_unpaired_R1[$i]=$sample.trimmed_unpaired_R1.fastq.gz
         compress_unpaired_R2[$i]=$sample.trimmed_unpaired_R2.fastq.gz
 
 	# Create mapping names
@@ -104,7 +107,8 @@ do
         duplicateBamArray[$i]=$sample.woduplicates.bam
 
         # Create gatk output names
-        recalibratedBamArray[$i]=$sample.recalibrated.bam
+        haplotypeGVCF[$i]=$sample.g.vcf
+	recalibratedBamArray[$i]=$sample.recalibrated.bam
         realignedBamArray[$i]=$sample.realigned.bam
 
         #Create concat output names
@@ -148,6 +152,7 @@ vcfsnpsfilArray_list=all_samples_snps_fil.vcf
 vcfindelsArray_list=all_samples_indels.vcf
 vcfindelsfilArray_list=all_samples_indels_fil.vcf
 vcffilArray_list=all_samples_fil.vcf
+vcfsnpPass=all_samples_pass_snp.vcf
 
 fastq_R1_list=$( echo ${fastqArray_R1[@]} | tr " " ":" )
 fastq_R2_list=$( echo ${fastqArray_R2[@]} | tr " " ":" )
@@ -166,6 +171,7 @@ mappingArray_rg_list=$( echo ${mappingArray_rg[@]} | tr " " ":" )
 bamstatArray_pre_list=$( echo ${bamstatArray_pre[@]} | tr " " ":" )
 bamstatArray_post_list=$( echo ${bamstatArray_post[@]} | tr " " ":" )
 duplicateBamArray_list=$( echo ${duplicateBamArray[@]} | tr " " ":" )
+haplotypeGVCF_list=$( echo ${haplotypeGVCF[@]} |tr " " ":")
 recalibratedBamArray_list=$( echo ${recalibratedBamArray[@]} | tr " " ":" )
 realignedBamArray_list=$( echo ${realignedBamArray[@]} | tr " " ":" )
 concatFastq_list=$( echo ${concatFastq[@]} | tr " " ":")
@@ -189,7 +195,15 @@ pileup_list=$( echo ${pileup[@]} | tr " " ":")
 snp_preserved_list=$( echo ${snp_preserved[@]} | tr " " ":")
 snp_removed_list=$( echo ${snp_removed[@]} | tr " " ":")
 metrics_list=$( echo ${metrics[@]} | tr " " ":")
+cfsan_snpma_fasta=snpma.fasta
+cfsan_snpma_fil_fasta=snpma_preserved.fasta
 
+tsv_allsnp_file=all_samples_snp.tsv
+msa_allsnp_file=all_samples_snp.fasta
+tsv_fil_file=all_samples_snps_fil.tsv
+msa_fil_file=all_samples_snps_fil.fasta
 
-tsv_file=all_samples_snps_fil.tsv
-msa_file=all_samples_snps_fil.fasta
+raxml=$( cat $CONFIG_FILE | grep -w 'RAXML' | cut -d '=' -f2 )
+model_raxml=$( cat $CONFIG_FILE | grep -w 'MODEL_RAXML' | cut -d '=' -f2)
+max_snp=$( cat $CONFIG_FILE | grep -w 'MAX_SNP' | cut -d '=' -f2)
+window_size=$( cat $CONFIG_FILE | grep -w 'WINDOW_SIZE' | cut -d '=' -f2)

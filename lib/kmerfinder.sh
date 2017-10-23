@@ -22,20 +22,19 @@ echo `date`
 
 # VARIABLES
 
-threads=$1
-dir=$2
-output_dir=$3
-samples=$4
-concatFastq_list=$5
-kmerfinderST_list=$6
-kmerfinder_path=$7
-bact_db_path=$8
+dir=$1
+output_dir=$2
+samples=$3
+concatFastq_list=$4
+kmerfinderST_list=$5
+kmerfinder_path=$6
+bact_db_path=$7
 
 
 if [ "$use_sge" = "1" ]; then
-	sample_count=$sge_task_id
+	sample_count=$SGE_TASK_ID
 else
-	sample_count=$9
+	sample_count=$8
 fi
 
 sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)

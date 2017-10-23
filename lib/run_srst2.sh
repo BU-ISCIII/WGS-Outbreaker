@@ -23,11 +23,13 @@ for count in $sample; do
 	done
 
 
-jobid_trimmomatic=$( cat $output_dir/logs/jobids.txt | grep -w "TRIMMOMATIC" | cut -d ':' -f2 )
+jobid_compress=$( cat $output_dir/logs/jobids.txt | grep -w "COMPRESS_FILE" | cut -d ':' -f2 )
 
 if [ -d $output_dir/QC/trimmomatic ]; then
         dir=$output_dir/QC/trimmomatic
-        srst2_arg="${SGE_ARGS} -hold_jid ${jobid_trimmomatic}"
+	if [ "$use_sge" = "1" ]; then
+        	srst2_arg="${SGE_ARGS} -pe openmp $threads -hold_jid ${jobid_compress}"
+	fi
 else
         dir=$output_dir/raw
 fi
@@ -40,7 +42,7 @@ else
         fastq_files_R2_list=$fastq_R2_list
 fi
 
-resistance_cmd="$SCRIPTS_DIR/resistance.sh \
+resistance_cmd="$SCRIPTS_DIR/srst2_resistance.sh \
 	$dir \
 	$output_dir/srst2 \
 	$samples \
@@ -50,7 +52,7 @@ resistance_cmd="$SCRIPTS_DIR/resistance.sh \
 	$srst2_db_path_argannot"
 
 
-plasmid_cmd="$SCRIPTS_DIR/plasmid.sh \
+plasmid_cmd="$SCRIPTS_DIR/srst2_plasmid.sh \
 	$dir \
 	$output_dir/srst2 \
 	$samples \
@@ -60,7 +62,7 @@ plasmid_cmd="$SCRIPTS_DIR/plasmid.sh \
 	$srst2_db_path_plasmidfinder"
 
 
-mlst_cmd="$SCRIPTS_DIR/mlst.sh \
+mlst_cmd="$SCRIPTS_DIR/srst2_mlst.sh \
 	$dir \
 	$output_dir/srst2 \
 	$srst2_db_path_mlst_db \
@@ -71,27 +73,28 @@ mlst_cmd="$SCRIPTS_DIR/mlst.sh \
 	$mlst_list"
 
 
-summary_cmd="$SCRIPTS_DIR/summary_srst2.sh \
-$output_dir/srst2 
-$output_dir/srst2" 
+summary_cmd="$SCRIPTS_DIR/srst2_summary.sh \
+	$output_dir/srst2 \
+	$output_dir/srst2" 
 
 if [ $srst2 == "YES" ];then
 	if [ "$use_sge" = "1" ]; then
-		resistance_qsub=$( qsub $srst2_arg -N $JOBNAME.RESISTANCE $resistance_cmd )
+		resistance_qsub=$( qsub $srst2_arg -t 1-$sample_count -N $JOBNAME.RESISTANCE $resistance_cmd )
 		jobid_resistance=$( echo $resistance_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
-		echo -e "RESISTANCE FILES:$jobid_resistance\n" >> $output_dir/logs/jobids.txt
+		echo -e "RESISTANCE_FILES:$jobid_resistance\n" >> $output_dir/logs/jobids.txt
 
-		plasmids_qsub=$( qsub $srst2_arg -N $JOBNAME.PLASMIDS $plasmid_cmd )
+		plasmids_qsub=$( qsub $srst2_arg -t 1-$sample_count -N $JOBNAME.PLASMIDS $plasmid_cmd )
                 jobid_plasmid=$( echo $plasmids_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
-                echo -e "PLASMID FILES:$jobid_plasmid\n" >> $output_dir/logs/jobids.txt
+                echo -e "PLASMID_FILES:$jobid_plasmid\n" >> $output_dir/logs/jobids.txt
 	
-		mlst_qsub=$( qsub $srst2_arg -N $JOBNAME.MLST $mlst_cmd )
+		mlst_qsub=$( qsub $srst2_arg -t 1-$sample_count -N $JOBNAME.MLST $mlst_cmd )
                 jobid_mlst=$( echo $mlst_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
-                echo -e "MLST FILES:$jobid_mlst\n" >> $output_dir/logs/jobids.txt
+                echo -e "MLST_FILES:$jobid_mlst\n" >> $output_dir/logs/jobids.txt
 		
-		summary_qsub=$( qsub $srst2_arg -N $JOBNAME.SUMMARY $summary_cmd )
-                jobid_mlst=$( echo $summary | cut -d ' ' -f3 | cut -d '.' -f1 )
-                echo -e "SUMAMRY FILES:$jobid_summary\n" >> $output_dir/logs/jobids.txt
+		summary_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid_mlst"
+		summary_qsub=$( qsub $summary_args -N $JOBNAME.SUMMARY $summary_cmd )
+                jobid_summary=$( echo $summary_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+                echo -e "SUMAMRY_FILES:$jobid_summary\n" >> $output_dir/logs/jobids.txt
 
 		
 	else

@@ -1,14 +1,7 @@
 #!/bin/bash
 #Author: A.Hernandez
 #help
-#Usage: cfsan_call_consensus.sh 
-
-# Test whether the script is being executed with sge or not.
-if [ -z $sge_task_id ]; then
-        use_sge=0
-else
-        use_sge=1
-fi
+#Usage: tsv_to_msa.sh 
 
 
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
@@ -20,9 +13,8 @@ set -x
 
 #VARIABLES
 
-threads=$1
-dir=$2
-tsv_file=$3
-msa_file=$4
+dir=$1
+tsv_file=$2
+msa_file=$3
 
-perl matrixToAlignment.pl $dir/$tsv_file > $dir/$msa_file
+perl $SCRIPTS_DIR/matrixToAlignment.pl $dir/$tsv_file > $dir/$msa_file
