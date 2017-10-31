@@ -28,11 +28,12 @@ samples=$5
 fastq_files_R1_list=$6
 fastq_files_R2_list=$7
 mlst_list=$8
+srst2_delim=$9
 
 if [ "$use_sge" = "1" ]; then
         sample_count=$SGE_TASK_ID
 else
-        sample_count=$9
+        sample_count=${10}
 fi
 
 sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
@@ -42,7 +43,7 @@ mlst_name=$( echo $mlst_list | tr ":" "\n" | head -$sample_count | tail -1)
 
 echo -e "Running mlst.sh for $sample"
 
-srst2 --input_pe $dir/$sample/$fastq_files_R1 $dir/$sample/$fastq_files_R2 --forward trimmed_R1 --reverse trimmed_R2 --log --output $output_dir/$sample/$mlst_name --mlst_db $srst2_db_path_mlst_db --mlst_definitions $srst2_db_path_mlst_definitions --mlst_delimiter '-'
+srst2 --input_pe $dir/$sample/$fastq_files_R1 $dir/$sample/$fastq_files_R2 --forward trimmed_R1 --reverse trimmed_R2 --log --output $output_dir/$sample/$mlst_name --mlst_db $srst2_db_path_mlst_db --mlst_definitions $srst2_db_path_mlst_definitions --mlst_delimiter "$srst2_delim"
 
 echo -e "mlst.sh for $sample finished"
 

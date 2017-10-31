@@ -13,9 +13,10 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
+CONFIG_FILE=$1
 
 #Execure processing_config.sh
-source $SCRIPTS_DIR/processing_config.sh
+source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
 
 ## Folder creation
 echo -e "Creating $output_dir/Alignment"
@@ -81,7 +82,7 @@ if [ $mapping == "YES" ]; then
 	jobid_mapping=$( echo $mapping_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
 	
 	echo -e "MAPPING:$jobid_mapping\n" >> $output_dir/logs/jobids.txt
-		samtobam_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid_mapping"
+		samtobam_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid_mapping"
 		samtobam=$( qsub $samtobam_args -t 1-$sample_count -N $JOBNAME.SAMTOBAM $samtobam_cmd)
 		jobid_samtobam=$( echo $samtobam | cut -d ' ' -f3 | cut -d '.' -f1 )
 	
@@ -105,7 +106,7 @@ picard_cmd="$SCRIPTS_DIR/picard_duplicates.sh \
 
 if [ $duplicate_filter == "YES" ]; then
 	if [ "$use_sge" = "1" ]; then
-		picard_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid_samtobam"
+		picard_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid_samtobam"
    		picard=$( qsub $picard_args -t 1-$sample_count -N $JOBNAME.PICARD $picard_cmd)
 		jobid_picard=$( echo $picard | cut -d ' ' -f3 | cut -d '.' -f1 )
 		
@@ -118,42 +119,4 @@ if [ $duplicate_filter == "YES" ]; then
 
 		done
 	fi
-fi
-
-## FASTQC                                                                                                                                                                      
-bamutil_preduplicates="$SCRIPTS_DIR/bamutil.sh \
-	$output_dir/Alignment/BAM \
-	$samples \
-	$mappingArray_rg_list \
-	$bamstatArray_pre_list \
-	$exome_enrichement"
-
-bamutil_postduplicates="$SCRIPTS_DIR/bamutil.sh \
-	$output_dir/Alignment/BAM \
-	$samples \
-	$duplicateBamArray_list \
-	$bamstatArray_post_list \
-	$exome_enrichement"  
-        
-if [ "$use_sge" = "1" ]; then                                                                                                                                                  
-	bamutil_pre_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid_samtobam"
-	bamutil_pre=$( qsub $bamutil_pre_args -t 1-$sample_count -N $JOBNAME.BAMUTIL_PRE $bamutil_preduplicates)                                                                                
-        jobid_bamutil_pre=$( echo $bamutil_pre | cut -d ' ' -f3 | cut -d '.' -f1 )                                                                                                   
-        echo -e "BAMUTIL_PRE:$jobid_bamutil_pre\n" >> $output_dir/logs/jobids.txt
- 	
-	if [ $duplicate_filter == "YES" ]; then                                                                                                                                            
- 		bamutil_post_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid_picard"                                                                                                                 
- 		bamutil_post=$( qsub $bamutil_post_args -t 1-$sample_count -N $JOBNAME.BAMUTIL_POST $bamutil_postduplicates)                                                                       
- 		jobid_bamutil_post=$( echo $bamutil_post | cut -d ' ' -f3 | cut -d '.' -f1 )
- 		echo -e "BAMUTIL_POST:$jobid_bamutil_post\n" >> $output_dir/logs/jobids.txt
- 	fi                                                                                                                                                                         
-else                                                                                                                                                                           
-	for count in `seq 1 $sample_count`
-	do                                                                                                                   echo "Running fastqc on sample $count"
-	bamutil_pre=$( $bamutil_preduplicates $count)                                                      
- 		
-		if [ $duplicate_filter == "YES" ]; then
-			bamutil_post=$( $bamutil_postduplicates $count)
-		fi
-	done
 fi

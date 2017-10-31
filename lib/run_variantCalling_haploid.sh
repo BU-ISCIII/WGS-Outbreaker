@@ -12,8 +12,11 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
+CONFIG_FILE=$1
+
+
 #Execute processing_config.sh
-source $SCRIPTS_DIR/processing_config.sh
+source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
 
 
 ## Folder creation
@@ -22,10 +25,10 @@ mkdir -p $output_dir/variant_calling
 
 if [ "$use_sge" = "1" -a $duplicate_filter == "YES" ]; then
  	jobid=$(cat $output_dir/logs/jobids.txt | grep -w "PICARD" | cut -d ':' -f2 )
- 	calling_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid"
+ 	calling_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid"
 else
  	jobid=$(cat $output_dir/logs/jobids.txt | grep -w "TRIMMOMATIC" | cut -d ':' -f2 )
- 	calling_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid"
+ 	calling_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid"
 fi
 
 
@@ -74,7 +77,7 @@ if [ $know_snps == "NO" ];then
                 jobid_calling=$( echo $calling | cut -d ' ' -f3 | cut -d '.' -f1 )
                 echo -e "Variant Calling:$jobid_calling \n" >> $output_dir/logs/jobids.txt
         	
-		jointvcf_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid_calling"
+		jointvcf_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid_calling"
 		jointvcf=$( qsub $jointvcf_args -N $JOBNAME.JOINT.VCF $joint_vcf_cmd)
                 jobid_jointvcf=$( echo $jointvcf | cut -d ' ' -f3 | cut -d '.' -f1 )
                 echo -e "Joint vcf:$jobid_jointvcf \n" >> $output_dir/logs/jobids.txt        
@@ -125,12 +128,12 @@ else
                 precalling=$( qsub $precalling_args -t 1-$sample_count -N $JOBNAME.CALLING $precalling_cmd)
                 jobid_precalling=$( echo $precalling | cut -d ' ' -f3 | cut -d '.' -f1 )
                 
-		calling_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid_precalling"
+		calling_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid_precalling"
                 calling=$( qsub $calling_args -t 1-$sample_count -N $JOBNAME.CALLING $calling_cmd)
                 jobid_calling=$( echo $calling | cut -d ' ' -f3 | cut -d '.' -f1 )
                 echo -e "Variant Calling:$jobid_precalling - $jobid_calling \n" >> $output_dir/logs/jobids.txt
         
-		jointvcf_arg=calling_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid_calling"
+		jointvcf_arg=calling_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid_calling"
                 jointvcf=$( qsub $calling_args -N $JOBNAME.JOINT.VCF $joint_vcf_cmd)
                 jobid_jointvcf=$( echo $jointvcf | cut -d ' ' -f3 | cut -d '.' -f1 )
                 echo -e "Joint vcf:$jobid_jointvcf \n" >> $output_dir/logs/jobids.txt

@@ -11,8 +11,11 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
+CONFIG_FILE=$1
+
+
 #Execure processing_config.sh
-source $SCRIPTS_DIR/processing_config.sh
+source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
 
 #Folder creation
 
@@ -163,13 +166,13 @@ if [ $variant_calling == "YES" ]; then
         	jobid_raxmlinfe_gatk_allsnp=$(echo $raxmlinfe_gatk_allsnp_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
         	echo -e "RAXMLinfe_GATKallsnp:$jobid_raxmlinfe_gatk_allsnp\n" >> $output_dir/logs/jobids.txt
 
-        	raxmlbool_gatk_all_args="${SGE_ARGS} -hold_jid ${jobid_raxmlinfe_gatk_allsnp} -pe orte 100 mpirun"
-		raxmlboot_gatk_allsnp_qsub=$( qsub -N $JOBNAME.RAXMLboot_GATKallsnp $raxml_gatk_args_allsnp $run_raxmlboot_gatk_allsnp_cmd)
+        	raxmlboot_gatk_all_args="${SGE_ARGS} -hold_jid ${jobid_raxmlinfe_gatk_allsnp} -pe orte 100 mpirun"
+		raxmlboot_gatk_allsnp_qsub=$( qsub -N $JOBNAME.RAXMLboot_GATKallsnp $raxmlboot_gatk_all_args $run_raxmlboot_gatk_allsnp_cmd)
         	jobid_raxmlboot_gatk_allsnp=$(echo $raxmlboot_gatk_allsnp_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
         	echo -e "RAXMLboot_GATKallsnp:$jobid_raxmlboot_gatk_allsnp\n" >> $output_dir/logs/jobids.txt
 
 		raxmlannot_gatk_allsnp_arg="${SGE_ARGS} -hold_jid ${jobid_raxmlboot_gatk_allsnp}"
-        	raxmlannot_gatk_allsnp_qsub=$( qsub -N $JOBNAME.RAXMLannot_GATKallsnp $raxml_gatk_args_allsnp $run_raxmlannot_gatk_allsnp_cmd)
+        	raxmlannot_gatk_allsnp_qsub=$( qsub -N $JOBNAME.RAXMLannot_GATKallsnp $raxmlannot_gatk_allsnp_arg $run_raxmlannot_gatk_allsnp_cmd)
         	jobid_raxmlannot_gatk_allsnp=$(echo $raxmlannot_gatk_allsnp_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
         	echo -e "RAXMLannot_GATKallsnp:$jobid_raxmlannot_gatk_allsnp\n" >> $output_dir/logs/jobids.txt
 
@@ -180,12 +183,12 @@ if [ $variant_calling == "YES" ]; then
         	echo -e "RAXMLinfe_GATKpreser:$jobid_raxmlinfe_gatk_preser\n" >> $output_dir/logs/jobids.txt
 
         	raxmlboot_gatk_preser_arg="${SGE_ARGS} -hold_jid ${jobid_raxmlinfe_gatk_preser} -pe orte 100 mpirun"
-		raxmlboot_gatk_preser_qsub=$( qsub -N $JOBNAME.RAXMLboot_GATKpreser $raxml_gatk_args_fil $run_raxmlboot_gatk_preser_cmd)
+		raxmlboot_gatk_preser_qsub=$( qsub -N $JOBNAME.RAXMLboot_GATKpreser $raxmlboot_gatk_preser_arg $run_raxmlboot_gatk_preser_cmd)
         	jobid_raxmlboot_gatk_preser=$(echo $raxmlboot_gatk_preser_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
         	echo -e "RAXMLboot_GATKpreser:$jobid_raxmlboot_gatk_preser\n" >> $output_dir/logs/jobids.txt
 
         	raxmlannot_gatk_preser_arg="${SGE_ARGS} -hold_jid ${jobid_raxmlboot_gatk_preser}"
-		raxmlannot_gatk_preser_qsub=$( qsub -N $JOBNAME.RAXMLannot_GATKpreser $raxml_gatk_args_fil $run_raxmlannot_gatk_preser_cmd)
+		raxmlannot_gatk_preser_qsub=$( qsub -N $JOBNAME.RAXMLannot_GATKpreser $raxmlannot_gatk_preser_arg $run_raxmlannot_gatk_preser_cmd)
         	jobid_raxmlannot_gatk_preser=$(echo $raxmlannot_gatk_preser_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
         	echo -e "RAXMLannot_GATKpreser:$jobid_raxmlannot_gatk_preser\n" >> $output_dir/logs/jobids.txt
 

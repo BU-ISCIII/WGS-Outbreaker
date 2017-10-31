@@ -17,13 +17,15 @@ set -x
 # Configuration
 CONFIG_FILE=$1
 
+
 #Global VARIABLES
 export JOBNAME="outbrekWGS_pipeline_v2.0"
 export SCRIPTS_DIR=$( cat $CONFIG_FILE | grep -w 'SCRIPTS_DIR' | cut -d '=' -f2 )
 export TEMP=$( cat $CONFIG_FILE | grep -w 'TEMP_DIR' | cut -d '=' -f2 )
 export JAVA_RAM=$( cat $CONFIG_FILE | grep -w 'JAVA_RAM' | cut -d '=' -f2 )
 
-source $SCRIPTS_DIR/processing_config.sh
+source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
+
 
 ## SGE args
 if [ "$use_sge" = "1" ]; then
@@ -33,34 +35,43 @@ fi
 
 
 # Execute preprocessing
-$SCRIPTS_DIR/run_preprocessing.sh
+$SCRIPTS_DIR/run_preprocessing.sh $CONFIG_FILE
 
 # Execute mapping
 if [ $mapping == "YES" ]; then
-	$SCRIPTS_DIR/run_mapping.sh
+	$SCRIPTS_DIR/run_mapping.sh $CONFIG_FILE
 fi
 
 # Execute kmerfinder
 if [ $kmerfinder == "YES" ];then
-	$SCRIPTS_DIR/run_identification_ST.sh
+	$SCRIPTS_DIR/run_identification_ST.sh $CONFIG_FILE
+
 fi
 
 # Execure srst2
 if [ $srst2 == "YES" ]; then
-	$SCRIPTS_DIR/run_srst2.sh
+	$SCRIPTS_DIR/run_srst2.sh $CONFIG_FILE
+
 fi
 
 #Execute CFSAN
 if [ $cfsan == "YES" ]; then
-	$SCRIPTS_DIR/run_cfsan.sh
+	$SCRIPTS_DIR/run_cfsan.sh $CONFIG_FILE
 fi
 
 # Execute variant Calling
 if [ $variant_calling == "YES" ]; then
-        $SCRIPTS_DIR/run_variantCalling_haploid.sh
+        $SCRIPTS_DIR/run_variantCalling_haploid.sh $CONFIG_FILE
 fi
 
 if [ $raxml == "YES" ]; then
-	$SCRIPTS_DIR/run_raxml.sh
+	$SCRIPTS_DIR/run_raxml.sh $CONFIG_FILE
+
 fi
 
+#Execute stats
+
+if [ $stats == "YES" ]; then
+	 $SCRIPTS_DIR/run_stats.sh $CONFIG_FILE
+
+fi

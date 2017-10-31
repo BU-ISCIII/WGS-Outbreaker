@@ -35,6 +35,8 @@ ref_path=${10}
 gatk_path=${11}
 haplotypeGVCF_list=${12}
 vcfsnpPass=${13}
+max_snp=${14}
+window_size=${15}
 
 
 echo $haplotypeGVCF_list | tr ":" "\n" | awk -v prefix=$output_dir/variants '{print prefix "/" $0}' > $output_dir/gvcf.list
@@ -64,13 +66,13 @@ java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
         -o $output_dir/variants/$vcfsnpsfilArray_list \
 	--clusterSize $max_snp\
         --clusterWindowSize $window_size \
-        --filterExpression "MQ < 40" \
+        --filterExpression "MQ < 40.0" \
         --filterName "RMSMappingQuality" \
-        --filterExpression "DP < 5 " \
+        --filterExpression "DP < 5" \
         --filterName "LowCoverage" \
-        --filterExpression "QD < 2.0 " \
+        --filterExpression "QD < 2.0" \
         --filterName "LowQD" \
-        --filterExpression "FS > 60.0 " \
+        --filterExpression "FS > 60.0" \
         --filterName "p-value StrandBias" \
         --filterExpression "SOR > 3.0" \
         --filterName "StandOddRatio" \

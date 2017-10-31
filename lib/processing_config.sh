@@ -10,10 +10,8 @@ set -u
 set -x
 
 
-
-
-
-CONFIG_FILE=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/20171013_pruebaPipe/config.file
+SOURCE_ARG=$1
+CONFIG_FILE=$( echo $SOURCE_ARG | cut -d '-' -f3)
 
 # RunInfo
 email=$( cat $CONFIG_FILE | grep -w 'MAIL' | cut -d '=' -f2 )
@@ -26,6 +24,7 @@ sequencing_center=$( cat $CONFIG_FILE | grep -w 'SEQUENCING_CENTER' | cut -d '='
 run_platform=$( cat $CONFIG_FILE | grep -w 'RUN_PLATFORM' | cut -d '=' -f2 )
 
 use_sge=$( cat $CONFIG_FILE | grep -w 'USE_SGE' | cut -d '=' -f2 )
+vmem=$( cat $CONFIG_FILE | grep -w 'H_VMEM' | cut -d '=' -f2)
 samples=$( cat $CONFIG_FILE | grep -w 'SAMPLES' | cut -d '=' -f2 )
 
 input_dir=$( cat $CONFIG_FILE | grep -w 'INPUT_DIR' | cut -d '=' -f2 )
@@ -41,6 +40,8 @@ kmerfinder=$( cat $CONFIG_FILE | grep -w 'KMERFINDER' | cut -d '=' -f2 )
 srst2=$( cat $CONFIG_FILE | grep -w 'SRST2' | cut -d '=' -f2 )
 cfsan=$( cat $CONFIG_FILE | grep -w 'CFSAN' | cut -d '=' -f2 )
 vcf_to_msa=$( cat $CONFIG_FILE | grep -w 'VCF_TO_MSA' | cut -d '=' -f2 )
+stats=$( cat $CONFIG_FILE | grep -w 'STATS' | cut -d '=' -f2 )
+
 
 # REFERENCES
 exome_enrichement=$( cat $CONFIG_FILE | grep -w 'EXOME_ENRICHMENT' | cut -d '=' -f2 )
@@ -52,7 +53,6 @@ srst2_db_path_argannot=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH_ARGannot' | 
 srst2_db_path_plasmidfinder=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH_PlasmidFinder' | cut -d '=' -f2)
 srst2_db_path_mlst_db=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH_mlst_db' | cut -d '=' -f2)
 srst2_db_path_mlst_definitions=$( cat $CONFIG_FILE | grep -w 'SRST2_DB_PATH_mlst_definitions' | cut -d '=' -f2)
-cfsan_ref_path=$( cat $CONFIG_FILE | grep -w 'CFSAN_ref_path' | cut -d '=' -f2)
 
 # Arguments
 trimmomatic_version=$( cat $CONFIG_FILE | grep -w 'trimmomatic_version' | cut -d '=' -f2)
@@ -61,7 +61,7 @@ trim_args=$( cat $CONFIG_FILE | grep -w 'TRIM_ARGS' | cut -d '=' -f2 )
 picard_path=$( cat $CONFIG_FILE | grep -w 'PICARD_PATH' | cut -d '=' -f2 )
 gatk_path=$( cat $CONFIG_FILE | grep -w 'GATK_PATH' | cut -d '=' -f2 )
 kmerfinder_path=$( cat $CONFIG_FILE | grep -w 'KMERFINDER_PATH' | cut -d '=' -f2 )
-#SRST2_DELIMITER=$( cat $CONFIG_FILE | grep -w 'SRST2_DELIMITER' | cut -d '=' -f2 )
+srst2_delim=$( cat $CONFIG_FILE | grep -w 'SRST2_DELIMITER' | cut -d '=' -f2 )
 
 
 ## Extract fastq and names for samples.
@@ -143,6 +143,11 @@ do
         consensus_preserved_vcf[$i]=$sample.consensus_preserved.vcf
 	metrics[$i]=$sample.metrics
 
+	#create coverage stats names
+	coverage[$i]=$sample.coverage.csv
+	coverage_graph[$i]=$sample.coverage.graph.csv
+
+
         let i=i+1
 done
 
@@ -207,3 +212,7 @@ raxml=$( cat $CONFIG_FILE | grep -w 'RAXML' | cut -d '=' -f2 )
 model_raxml=$( cat $CONFIG_FILE | grep -w 'MODEL_RAXML' | cut -d '=' -f2)
 max_snp=$( cat $CONFIG_FILE | grep -w 'MAX_SNP' | cut -d '=' -f2)
 window_size=$( cat $CONFIG_FILE | grep -w 'WINDOW_SIZE' | cut -d '=' -f2)
+
+coverage_list=$( echo ${coverage[@]} | tr " " ":")
+coverage_graph_list=$( echo ${coverage_graph[@]} | tr " " ":")
+

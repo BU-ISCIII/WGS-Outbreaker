@@ -1,6 +1,6 @@
 ## RunInfo
 AUTHOR=ahernandez
-DATE=20170803
+DATE=20171027
 MAIL=ana.hernandez.plaza@gmail.com
 
 DATE_RUN=20170803
@@ -12,68 +12,84 @@ RUN_PLATFORM=NS500454
 
 SEQ_TYPE=PE
 TRIMMING=YES
-MAPPING=YES
-DUPLICATE_FILTER=YES
-VARIANT_CALLING=YES
-KMERFINDER=YES
-SRST2=YES
+MAPPING=NO
+DUPLICATE_FILTER=NO
+VARIANT_CALLING=NO
+KMERFINDER=NO
+SRST2=NO
 CFSAN=YES
-VCF_TO_MSA=YES
+VCF_TO_MSA=NO
+RAXML=NO
+STATS=NO
 
 ## System variables
-JAVA_RAM=-Xmx28g
-THREADS=6
-SCRIPTS_DIR=/home/ahernandez/outbreakWGS/lib
-TEMP_DIR=/home/ahernandez/Documents/desarrollo/TMP
+JAVA_RAM=-Xmx5g
+H_VMEM=10g
+THREADS=10
+SCRIPTS_DIR=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/outbreakWGS/outbreakWGS/lib
+TEMP_DIR=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/20171027_prueba_config/TMP
+
 
 ## sge variables
-USE_SGE=0
+USE_SGE=1
+
 
 ## INPUT VARIABLES
-INPUT_DIR=/home/ahernandez/00-reads/00-reads
+INPUT_DIR=/processing_Data/bioinformatics/research/20170905_GMIPT2017_ICSMAH_C/ANALYSIS/sau/00-reads
 
 # Sample info
-SAMPLES=193308:193309:193310
+SAMPLES=M1057:M1058:M1060:M1061:M1062:M3362:M3369:M3371:M3378:M3445:M3477
 
-193308=193308_R1.fastq.gz	193308_R2.fastq.gz 
-193309=193309_R1.fastq.gz	193309_R2.fastq.gz
-193310=193310_R1.fastq.gz	193310_R2.fastq.gz
+M1057=M1057_S1_L001_R1_001.fastq.gz	M1057_S1_L001_R2_001.fastq.gz
+M1058=M1058_S2_L001_R1_001.fastq.gz	M1058_S2_L001_R2_001.fastq.gz
+M1060=M1060_S3_L001_R1_001.fastq.gz	M1060_S3_L001_R2_001.fastq.gz
+M1061=M1061_S4_L001_R1_001.fastq.gz	M1061_S4_L001_R2_001.fastq.gz
+M1062=M1062_S5_L001_R1_001.fastq.gz	M1062_S5_L001_R2_001.fastq.gz
+M3362=M3362_S17_L001_R1_001.fastq.gz	M3362_S17_L001_R2_001.fastq.gz
+M3369=M3369_S8_L001_R1_001.fastq.gz	M3369_S8_L001_R2_001.fastq.gz
+M3371=M3371_S10_L001_R1_001.fastq.gz	M3371_S10_L001_R2_001.fastq.gz
+M3378=M3378_S16_L001_R1_001.fastq.gz	M3378_S16_L001_R2_001.fastq.gz
+M3445=M3445_S13_L001_R1_001.fastq.gz	M3445_S13_L001_R2_001.fastq.gz
+M3477=M3477_S14_L001_R1_001.fastq.gz	M3477_S14_L001_R2_001.fastq.gz
+
 
 # Output dirs
-OUTPUT_DIR=/home/ahernandez/Documents/desarrollo/test_results
+OUTPUT_DIR=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/20171027_prueba_config/test_results
 
 ## Reference Variables
-GENOME_REF=/home/ahernandez/Documents/desarrollo/reference/Salmonella_enterica_subsp._enterica_serovar_Enteritidis_P125109.fasta
+GENOME_REF=/processing_Data/bioinformatics/research/20170905_GMIPT2017_ICSMAH_C/REFERENCES/sa_reference.fasta
 EXOME_ENRICHMENT=NO
 KNOWN_SNPS=NO
 KNOWN_INDELS=NO
-BACT_DB_PATH=/home/ahernandez/software/kmerFinder/all_bacteria_db
-SRST2_DB_PATH_ARGannot=/home/ahernandez/Documents/desarrollo/reference/reference_srst2/ARGannot.r1.fasta
-SRST2_DB_PATH_PlasmidFinder=/home/ahernandez/Documents/desarrollo/reference/reference_srst2/PlasmidFinder.fasta
-SRST2_DB_PATH_mlst_db=/home/ahernandez/Documents/desarrollo/reference/reference_srst2/Salmonella_enterica.fasta
-SRST2_DB_PATH_mlst_definitions=/home/ahernandez/Documents/desarrollo/reference/reference_srst2/senterica.txt
-CFSAN_ref_path=/home/ahernandez/Documents/desarrollo/reference/Salmonella_enterica_subsp._enterica_serovar_Enteritidis_P125109.fasta
+BACT_DB_PATH=/processing_Data/bioinformatics/services_and_colaborations/CNM/bacteriologia/SRVCNM036_20161128_SEOUTBREAK_SH_S/REFERENCES/kmerFinder/all_bacteria_db
+SRST2_DB_PATH_ARGannot=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/REFERENCES/salmonella/REFERENCES/ARGannot.r1.fasta
+SRST2_DB_PATH_PlasmidFinder=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/REFERENCES/salmonella/REFERENCES/PlasmidFinder.fasta
+SRST2_DB_PATH_mlst_db=/processing_Data/bioinformatics/research/20170905_GMIPT2017_ICSMAH_C/REFERENCES/sa_mlst_alleles.fasta
+SRST2_DB_PATH_mlst_definitions=/processing_Data/bioinformatics/research/20170905_GMIPT2017_ICSMAH_C/REFERENCES/sa_mlst_profile.txt
+
 
 ## Software variables
 # Fastqc
 
 # Trimmomatic
-trimmomatic_version=0.36
-TRIMMOMATIC_PATH=/opt/Trimmomatic
-TRIM_ARGS=ILLUMINACLIP:/opt/Trimmomatic/adapters/TruSeq3-PE.fa:2:30:10_TRAILING:10_SLIDINGWINDOW:4:15_MINLEN:70
+trimmomatic_version=0.33
+TRIMMOMATIC_PATH=/opt/Trimmomatic-0.33
+TRIM_ARGS=ILLUMINACLIP:/opt/Trimmomatic-0.33/adapters/TruSeq3-PE.fa:2:30:10_TRAILING:10_SLIDINGWINDOW:4:15_MINLEN:70
 
 # Picard
-PICARD_PATH=/opt/picard-tools
+PICARD_PATH=/opt/picard-tools/picard-tools-1.140
 PICARD_ARGS=ASSUME_SORTED=true VALIDATION_STRINGENCY=LENIENT REMOVE_DUPLICATES=false
 
 # GATK
-GATK_PATH=/opt/gatk
+GATK_PATH=/opt/gatk/gatk-3.8.0
+MAX_SNP=3
+WINDOW_SIZE=1000
 
 #Kmerfinder
-KMERFINDER_PATH=/home/ahernandez/software/kmerFinder/genomicepidemiology-kmerdb-077ba38a546a
+KMERFINDER_PATH=/processing_Data/bioinformatics/references/kmerFinder/genomicepidemiology-kmerdb-077ba38a546a
 
 #srst2
-SRST2_DELIMITER=-
+SRST2_DELIMITER=_
 
 #RAxML
 MODEL_RAXML=GTRCAT

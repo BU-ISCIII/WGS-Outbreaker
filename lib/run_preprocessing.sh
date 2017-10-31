@@ -13,9 +13,10 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
+CONFIG_FILE=$1
 
 #Execute processing_config.sh
-source $SCRIPTS_DIR/processing_config.sh
+source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
 
 ## Create directories
 date                            
@@ -45,7 +46,8 @@ trimming_cmd="$SCRIPTS_DIR/trimmomatic.sh \
 if [ $trimming == "YES" ]; then
 	mkdir -p $output_dir/QC/trimmomatic
  	if [ "$use_sge" = "1" ]; then                                                                                           
- 		trimmomatic=$( qsub $SGE_ARGS -pe openmp $threads -t 1-$sample_count -N $JOBNAME.TRIMMOMATIC $trimming_cmd) 
+ 		trimmomatic_arg="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -t 1-$sample_count"
+		trimmomatic=$( qsub $trimmomatic_arg -N $JOBNAME.TRIMMOMATIC $trimming_cmd) 
 		jobid_trimmomatic=$( echo $trimmomatic | cut -d ' ' -f3 | cut -d '.' -f1 )                                              
     		echo -e "TRIMMOMATIC:$jobid_trimmomatic\n" >> $output_dir/logs/jobids.txt
 	else                                                                                                                    

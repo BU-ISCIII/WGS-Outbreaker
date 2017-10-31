@@ -9,9 +9,10 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
+CONFIG_FILE=$1
 
 #Execure processing_config.sh
-source $SCRIPTS_DIR/processing_config.sh
+source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
 
 #Create directories
 
@@ -70,7 +71,8 @@ mlst_cmd="$SCRIPTS_DIR/srst2_mlst.sh \
 	$samples \
 	$fastq_files_R1_list \
         $fastq_files_R2_list \
-	$mlst_list"
+	$mlst_list \
+	$srst2_delim"
 
 
 summary_cmd="$SCRIPTS_DIR/srst2_summary.sh \
