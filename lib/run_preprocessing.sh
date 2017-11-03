@@ -5,6 +5,17 @@
  # Help
  # usage: run_preprocessing.sh <INPUT_DIR> <RESULTS_DIR> <SAMPLES> 
 
+CONFIG_FILE=$1
+
+#Execute processing_config.sh
+if [ -z $SCRIPTS_DIR ]; then
+        SCRIPTS_DIR=$( cat $CONFIG_FILE | grep -w 'SCRIPTS_DIR' | cut -d '=' -f2 )
+        source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
+
+else
+        source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
+fi
+
 
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
@@ -13,10 +24,6 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
-CONFIG_FILE=$1
-
-#Execute processing_config.sh
-source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
 
 ## Create directories
 date                            
@@ -26,7 +33,6 @@ mkdir -p $output_dir/QC/fastqc
 
 
 ## TRIMMOMATIC
-
 
 trimming_cmd="$SCRIPTS_DIR/trimmomatic.sh \
 	$threads\

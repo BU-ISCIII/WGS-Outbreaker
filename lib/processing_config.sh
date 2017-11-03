@@ -13,6 +13,12 @@ set -x
 SOURCE_ARG=$1
 CONFIG_FILE=$( echo $SOURCE_ARG | cut -d '-' -f3)
 
+#Global VARIABLES
+JOBNAME="outbrekWGS_pipeline_v2.0"
+
+export TEMP=$( cat $CONFIG_FILE | grep -w 'TEMP_DIR' | cut -d '=' -f2 )
+export JAVA_RAM=$( cat $CONFIG_FILE | grep -w 'JAVA_RAM' | cut -d '=' -f2 )
+
 # RunInfo
 email=$( cat $CONFIG_FILE | grep -w 'MAIL' | cut -d '=' -f2 )
 
@@ -62,6 +68,12 @@ picard_path=$( cat $CONFIG_FILE | grep -w 'PICARD_PATH' | cut -d '=' -f2 )
 gatk_path=$( cat $CONFIG_FILE | grep -w 'GATK_PATH' | cut -d '=' -f2 )
 kmerfinder_path=$( cat $CONFIG_FILE | grep -w 'KMERFINDER_PATH' | cut -d '=' -f2 )
 srst2_delim=$( cat $CONFIG_FILE | grep -w 'SRST2_DELIMITER' | cut -d '=' -f2 )
+
+## SGE args
+if [ "$use_sge" = "1" ]; then
+        mkdir -p $output_dir/logs
+        SGE_ARGS="-V -j y -b y -wd $output_dir/logs -m a -M $email -q all.q"
+fi
 
 
 ## Extract fastq and names for samples.
@@ -216,3 +228,7 @@ window_size=$( cat $CONFIG_FILE | grep -w 'WINDOW_SIZE' | cut -d '=' -f2)
 coverage_list=$( echo ${coverage[@]} | tr " " ":")
 coverage_graph_list=$( echo ${coverage_graph[@]} | tr " " ":")
 
+dist_allsnp=distance_allsnp.txt
+dist_fil=distance_fil.txt
+dist_pair_allsnp=distance_pairs_allsnp.txt
+dist_pair_fil=distance_pairs_fil.txt

@@ -35,16 +35,9 @@ output_dir=$3
 samples=$4
 BamArray_list=$5
 vcfArray_list=$6
-#vcffilArray_list=$7
-#vcfsnpsArray_list=$8
-#vcfsnpsfilArray_list=$9
-#vcfindelsArray_list=${10}
-#vcfindelsfilArray_list=${11}
 ref_path=$7
 gatk_path=$8
 haplotypeGVCF_list=$9
-#vcfsnpPass=${15}
-
 
 if [ "$use_sge" = "1" ]; then
         sample_count=$SGE_TASK_ID
@@ -59,8 +52,6 @@ BamArray=$( echo $BamArray_list | tr ":" "\n" | head -$sample_count | tail -1)
 
 
 mkdir -p $output_dir/variants
-#echo $BamArray_list | tr ":" "\n" | awk -v prefix=$input_dir '{print prefix "/" $0}' > $output_dir/bam.list
-#echo $haplotypeGVCF_list | tr ":" "\n" | awk -v prefix=$output_dir/variants '{print prefix "/" $0}' > $output_dir/gvcf.list
 
 java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
       	-T HaplotypeCaller \

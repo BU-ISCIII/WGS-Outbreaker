@@ -14,9 +14,14 @@ set -x
 
 CONFIG_FILE=$1
 
-
 #Execute processing_config.sh
-source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
+if [ -z $SCRIPTS_DIR ]; then
+        SCRIPTS_DIR=$( cat $CONFIG_FILE | grep -w 'SCRIPTS_DIR' | cut -d '=' -f2 )
+        source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
+
+else
+        source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
+fi
 
 
 ## Folder creation
@@ -75,12 +80,12 @@ if [ $know_snps == "NO" ];then
                 if [ "$use_sge" = "1" ]; then
                 calling=$( qsub $calling_args -t 1-$sample_count -N $JOBNAME.CALLING $calling_cmd)
                 jobid_calling=$( echo $calling | cut -d ' ' -f3 | cut -d '.' -f1 )
-                echo -e "Variant Calling:$jobid_calling \n" >> $output_dir/logs/jobids.txt
+                echo -e "Variant_Calling:$jobid_calling \n" >> $output_dir/logs/jobids.txt
         	
 		jointvcf_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid_calling"
 		jointvcf=$( qsub $jointvcf_args -N $JOBNAME.JOINT.VCF $joint_vcf_cmd)
                 jobid_jointvcf=$( echo $jointvcf | cut -d ' ' -f3 | cut -d '.' -f1 )
-                echo -e "Joint vcf:$jobid_jointvcf \n" >> $output_dir/logs/jobids.txt        
+                echo -e "Joint_ VCF:$jobid_jointvcf \n" >> $output_dir/logs/jobids.txt        
 	
 		else
 		for count in `seq 1 $sample_count`

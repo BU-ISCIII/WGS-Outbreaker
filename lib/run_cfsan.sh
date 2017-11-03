@@ -4,6 +4,18 @@
 # usage: run_cfsan.sh ....
 #
 
+CONFIG_FILE=$1
+
+#Execute processing_config.sh
+if [ -z $SCRIPTS_DIR ]; then
+        SCRIPTS_DIR=$( cat $CONFIG_FILE | grep -w 'SCRIPTS_DIR' | cut -d '=' -f2 )
+        source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
+
+else
+        source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
+fi
+
+
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
 # Treat unset variables and parameters other than the special parameters ‘@’ or ‘*’ as an error when performing parameter expansion. An error message will be written to the standard error, and a non-interactive shell will exit
@@ -12,9 +24,6 @@ set -u
 set -x
 
 CONFIG_FILE=$1
-
-#Execure processing_config.sh
-source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
 
 #Folder creation
 
@@ -71,65 +80,15 @@ aling_sample_to_reference_cmd="$SCRIPTS_DIR/cfsan_align.sh \
         $fastq_files_R2_list \
 	$ref_path"
 
-picard_sort_sam_cmd="$SCRIPTS_DIR/cfsan_sort_sam.sh \
-	$threads \
-	$output_dir/CFSAN/samples \
-	$samples \
-	$sort_sam_list \
-	$picard_path"
-
-picard_mark_duplicate_cmd="$SCRIPTS_DIR/picard_duplicates.sh \
-	$output_dir/CFSAN/samples \
-	$samples
-	$sort_sam_list \
-	$dedup_sam_list \
-	$picard_path"
-
-gatk_add_or_replace_group_cmd="$SCRIPTS_DIR/cfsan_readgroup.sh \
-	$threads
-	$output_dir/CFSAN/samples \
-	$samples
-	$dedup_sam_list \
-	$dedup_bam_list
-	$platform
-	$picard_path"
-
-
-samtool_index_cmd="$SCRIPTS_DIR/cfsan_samtool_index.sh \
-	$threads \
-	$output_dir/CFSAN/samples \
-	$samples \
-	$dedup_bam_list"
-
-gatk_realinger_target_creator_cmd="$SCRIPTS_DIR/cfsan_target_creator.sh \
-	$threads
-	$output_dir/CFSAN/samples \
-	$samples
-	$dedup_bam_list
-	$intervals_list
-	$gatk_path
-	$ref_path"
-
-gatk_indel_realigner_cmd="$SCRIPTS_DIR/cfsan_indel_realigner.sh \
-	$threads \
-	$output_dir/CFSAN/samples \
-	$samples \
-	$intervals_list \
-	$dedup_bam_list \
-	$unsorted_bam_list \
-	$gatk_path \
-	$ref_path"
-
 cfsan_call_sites_cmd="$SCRIPTS_DIR/cfsan_call_sites.sh \
 	$output_dir/CFSAN/samples \
 	$samples
 	$unsorted_bam_list
-	$cfsan_ref_path"
+	$ref_path"
 
 cfsan_snp_filter_cmd="$SCRIPTS_DIR/cfsan_filter_regions.sh \
 	$output_dir/CFSAN \
-	$cfsan_ref_path"
-
+	$ref_path"
 
 cfsan_snplist_cmd="$SCRIPTS_DIR/cfsan_snp_list.sh \
 	$output_dir/CFSAN"
@@ -143,12 +102,12 @@ cfsan_create_snpmatrix_cmd="$SCRIPTS_DIR/cfsan_snp_matrix.sh \
 
 cfsan_snp_reference_cmd="$SCRIPTS_DIR/cfsan_snp_reference.sh \
 	$output_dir/CFSAN \
-	$cfsan_ref_path"
+	$ref_path"
 
 cfsan_collect_metrics_cmd="$SCRIPTS_DIR/cfsan_metrics.sh \
 	$output_dir/CFSAN \
 	$samples \
-	$cfsan_ref_path"
+	$ref_path"
 
 cfsan_combine_metrics_cmd="$SCRIPTS_DIR/cfsan_combine_metrics.sh \
 	$output_dir/CFSAN" 

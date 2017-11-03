@@ -17,22 +17,9 @@ set -x
 # Configuration
 CONFIG_FILE=$1
 
-
-#Global VARIABLES
-export JOBNAME="outbrekWGS_pipeline_v2.0"
 export SCRIPTS_DIR=$( cat $CONFIG_FILE | grep -w 'SCRIPTS_DIR' | cut -d '=' -f2 )
-export TEMP=$( cat $CONFIG_FILE | grep -w 'TEMP_DIR' | cut -d '=' -f2 )
-export JAVA_RAM=$( cat $CONFIG_FILE | grep -w 'JAVA_RAM' | cut -d '=' -f2 )
 
 source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
-
-
-## SGE args
-if [ "$use_sge" = "1" ]; then
-	mkdir -p $output_dir/logs
-	export SGE_ARGS="-V -j y -b y -wd $output_dir/logs -m a -M $email -q all.q"
-fi
-
 
 # Execute preprocessing
 $SCRIPTS_DIR/run_preprocessing.sh $CONFIG_FILE
@@ -64,6 +51,7 @@ if [ $variant_calling == "YES" ]; then
         $SCRIPTS_DIR/run_variantCalling_haploid.sh $CONFIG_FILE
 fi
 
+#Execute RAxML
 if [ $raxml == "YES" ]; then
 	$SCRIPTS_DIR/run_raxml.sh $CONFIG_FILE
 

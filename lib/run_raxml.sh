@@ -4,6 +4,18 @@
 # usage: run_raxml.sh ....
 #
 
+CONFIG_FILE=$1
+
+#Execute processing_config.sh
+if [ -z $SCRIPTS_DIR ]; then
+        SCRIPTS_DIR=$( cat $CONFIG_FILE | grep -w 'SCRIPTS_DIR' | cut -d '=' -f2 )
+        source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
+
+else
+        source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
+fi
+
+
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
 # Treat unset variables and parameters other than the special parameters ‘@’ or ‘*’ as an error when performing parameter expansion. An error message will be written to the standard error, and a non-interactive shell will exit
@@ -12,10 +24,6 @@ set -u
 set -x
 
 CONFIG_FILE=$1
-
-
-#Execure processing_config.sh
-source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
 
 #Folder creation
 
