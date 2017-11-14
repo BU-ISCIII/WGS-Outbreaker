@@ -24,6 +24,11 @@ source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
 # Execute preprocessing
 $SCRIPTS_DIR/run_preprocessing.sh $CONFIG_FILE
 
+#Execute references
+
+$SCRIPTS_DIR/run_references.sh $CONFIG_FILE
+
+
 # Execute mapping
 if [ $mapping == "YES" ]; then
 	$SCRIPTS_DIR/run_mapping.sh $CONFIG_FILE

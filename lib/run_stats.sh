@@ -26,8 +26,8 @@ mkdir -p $output_dir/stats
 
 jobid_samtobam=$(cat $output_dir/logs/jobids.txt | grep -w "SAMTOBAM" | cut -d ':' -f2 )
 jobid_picard=$(cat $output_dir/logs/jobids.txt | grep -w "PICARD" | cut -d ':' -f2 )
-jobid_msa_allsnp=$(cat $output_dir/logs/jobids.txt | grep -w "TSV_TO_MSAallsnp" | cut -d ':' -f2 )
-jobid_msa_fil=$(cat $output_dir/logs/jobids.txt | grep -w "TSV_TO_MSAfil" | cut -d ':' -f2 )
+jobid_msa_filsnp=$(cat $output_dir/logs/jobids.txt | grep -w "TSV_TO_MSAfilsnp" | cut -d ':' -f2 )
+jobid_msa_passnp=$(cat $output_dir/logs/jobids.txt | grep -w "TSV_TO_MSApassnp" | cut -d ':' -f2 )
 
 
 if [ $stats == "YES" ]; then
@@ -42,21 +42,22 @@ if [ $stats == "YES" ]; then
 		$ref_path"
 
 	r_script_cmd="$SCRIPTS_DIR/graphs_coverage.R \
-		$output_dir/stats"
+		$output_dir/stats
+		$depth"
 
-	distances_allsnp_cmd="$SCRIPTS_DIR/distances.R \
+	distances_filsnp_cmd="$SCRIPTS_DIR/distances.R \
 		$output_dir/variant_calling/variants_gatk/variants \
                 $output_dir/stats \
-                $msa_allsnp_file \
-		$dist_allsnp \
-                $dist_pair_allsnp"
+                $msa_filsnp_file \
+		$dist_filsnp \
+                $dist_pair_filsnp"
 	
-	distances_fil_cmd="$SCRIPTS_DIR/distances.R \
+	distances_passnp_cmd="$SCRIPTS_DIR/distances.R \
                 $output_dir/variant_calling/variants_gatk/variants \
                 $output_dir/stats \
-                $msa_fil_file \
-		$dist_fil \
-		$dist_pair_fil"
+                $msa_passnp_file \
+		$dist_passnp \
+		$dist_pair_passnp"
 
 	bamutil_preduplicates="$SCRIPTS_DIR/bamutil.sh \
         	$output_dir/Alignment/BAM \
@@ -86,15 +87,15 @@ if [ "$use_sge" = "1" ]; then
 	jobid_graph=$( echo $graph_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
         echo -e "GRAPH:$jobid_graph\n" >> $output_dir/logs/jobids.txt
 	
-	distances_allsnp_args="${SGE_ARGS} -pe orte $threads -hold_jid $jobid_msa_allsnp"
-        distances_allsnp_qsub=$( qsub $distances_allsnp_args -N $JOBNAME.DISTANCEallsnp $distances_allsnp_cmd)
-        jobid_distances_allsnp=$( echo $distances_allsnp_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
-        echo -e "DISTANCESallsnp:$jobid_distances_allsnp\n" >> $output_dir/logs/jobids.txt
+	distances_filsnp_args="${SGE_ARGS} -pe orte $threads -hold_jid $jobid_msa_filsnp"
+        distances_filsnp_qsub=$( qsub $distances_filsnp_args -N $JOBNAME.DISTANCEfilsnp $distances_filsnp_cmd)
+        jobid_distances_filsnp=$( echo $distances_filsnp_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "DISTANCESfilsnp:$jobid_distances_filsnp\n" >> $output_dir/logs/jobids.txt
 
-	distances_fil_args="${SGE_ARGS} -pe orte $threads -hold_jid $jobid_msa_fil"
-        distances_fil_qsub=$( qsub $distances_fil_args -N $JOBNAME.DISTANCEfil $distances_fil_cmd)
-        jobid_distances_fil=$( echo $distances_fil_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
-        echo -e "DISTANCESfil:$jobid_distances_fil\n" >> $output_dir/logs/jobids.txt
+	distances_passnp_args="${SGE_ARGS} -pe orte $threads -hold_jid $jobid_msa_passnp"
+        distances_passnp_qsub=$( qsub $distances_passnp_args -N $JOBNAME.DISTANCEpassnp $distances_passnp_cmd)
+        jobid_distances_passnp=$( echo $distances_passnp_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        echo -e "DISTANCESpassnp:$jobid_distances_passnp\n" >> $output_dir/logs/jobids.txt
 	
 	bamutil_pre_args="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid_samtobam"
         bamutil_pre=$( qsub $bamutil_pre_args -t 1-$sample_count -N $JOBNAME.BAMUTIL_PRE $bamutil_preduplicates)     
@@ -123,7 +124,7 @@ else
 
 	done
 	$r_script_cmd
-	$distances_allsnp_cmd
-	$distances_fil_cmd
+	$distances_filsnp_cmd
+	$distances_passnp_cmd
 
 fi

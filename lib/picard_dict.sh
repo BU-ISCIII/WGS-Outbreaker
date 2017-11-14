@@ -1,8 +1,9 @@
 #!/bin/bash
+## Author A. Hernández
+## version v2.0
 
-#help
-#Usage: cfsan_snp_distance.sh
-
+# Help
+# usage: run_references.sh ....
 
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
@@ -13,8 +14,11 @@ set -x
 
 #VARIABLES
 
-dir=$1
+ref_path=$1
+genome_name=$2
+JAVA_RAM=$3
+picard_path=$4
 
-cfsan_snp_pipeline distance -p $dir/snp_distance_pairwise.tsv -m $dir/snp_distance_matrix.tsv $dir/snpma.fasta
-cfsan_snp_pipeline distance -p $dir/snp_distance_pairwise_preserved.tsv -m $dir/snp_distance_matrix_preserved.tsv $dir/snpma_preserved.fasta
+
+java $JAVA_RAM -jar $picard_path/picard.jar CreateSequenceDictionary R= $ref_path O= $genome_name.dict
 

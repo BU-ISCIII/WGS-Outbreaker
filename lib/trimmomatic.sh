@@ -22,16 +22,7 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-## Usage                                                                                                                                                                                                                           
-echo $#
-
-if [ $# != 13 -a "$use_sge" == "1" ]; then                                                                                                                                                                                          
-	echo "usage: <input dir> <output dir> <sample names (s1:s2:sn)> <fastq files R1 (f1:f2:fn)> <fastq files R2 (f1:f2:fn)> <trimmed output files paired R1> <trimmed output files paired R2> <trimmed output files unpaired R1> <trimmed output files unpaired R2> <threads> <trim_args> <trimmomatic_version> <trimmomatic path>"                                                                                             
- 	exit                                                                                                                                                                                                                           
-elif [ $# != 14 -a "$use_sge" == "0" ]; then                                                                                                                                                                                        
- 	echo "usage: <input dir> <output dir> <sample names (s1:s2:sn)> <fastq files R1 (f1:f2:fn)> <fastq files R2 (f1:f2:fn)> <trimmed output files paired R1> <trimmed output files paired R2> <trimmed output files unpaired R1> <trimmed output files unpaired R2> <threads> <trim_args> <trimmomatic_version> <trimmomatic path> <sample_number>"                                                                             
-  	exit                                                                                                                                                                                                                           
-fi                                                                                                                                                                                                                                 
+## Usage                                                                                                                                                                                                                                 
 echo `date`                                                                                                                                                                                                                        
                                                                                                                                                                                                                                     
 ## VARIABLES

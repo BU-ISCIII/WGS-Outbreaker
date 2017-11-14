@@ -1,8 +1,9 @@
 #!/bin/bash
+## Author A. Hernández
+## version v2.0
 
-#help
-#Usage: cfsan_snp_distance.sh
-
+# Help
+# usage: run_references.sh ....
 
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
@@ -13,8 +14,6 @@ set -x
 
 #VARIABLES
 
-dir=$1
+ref_path=$1
 
-cfsan_snp_pipeline distance -p $dir/snp_distance_pairwise.tsv -m $dir/snp_distance_matrix.tsv $dir/snpma.fasta
-cfsan_snp_pipeline distance -p $dir/snp_distance_pairwise_preserved.tsv -m $dir/snp_distance_matrix_preserved.tsv $dir/snpma_preserved.fasta
-
+bwa index $ref_path -p $ref_path

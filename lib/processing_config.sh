@@ -14,14 +14,13 @@ SOURCE_ARG=$1
 CONFIG_FILE=$( echo $SOURCE_ARG | cut -d '-' -f3)
 
 #Global VARIABLES
-JOBNAME="outbrekWGS_pipeline_v2.0"
 
 export TEMP=$( cat $CONFIG_FILE | grep -w 'TEMP_DIR' | cut -d '=' -f2 )
 export JAVA_RAM=$( cat $CONFIG_FILE | grep -w 'JAVA_RAM' | cut -d '=' -f2 )
 
 # RunInfo
 email=$( cat $CONFIG_FILE | grep -w 'MAIL' | cut -d '=' -f2 )
-
+JOBNAME="outbrekWGS_pipeline_v2.0"
 date_run=$( cat $CONFIG_FILE | grep -w 'DATE_RUN' | cut -d '=' -f2 )
 platform=$( cat $CONFIG_FILE | grep -w 'PLATFORM' | cut -d '=' -f2 )
 model=$( cat $CONFIG_FILE | grep -w 'MODEL' | cut -d '=' -f2 )
@@ -29,13 +28,15 @@ library=$( cat $CONFIG_FILE | grep -w 'LIBRARY' | cut -d '=' -f2 )
 sequencing_center=$( cat $CONFIG_FILE | grep -w 'SEQUENCING_CENTER' | cut -d '=' -f2 )
 run_platform=$( cat $CONFIG_FILE | grep -w 'RUN_PLATFORM' | cut -d '=' -f2 )
 
+#Memory variables
 use_sge=$( cat $CONFIG_FILE | grep -w 'USE_SGE' | cut -d '=' -f2 )
 vmem=$( cat $CONFIG_FILE | grep -w 'H_VMEM' | cut -d '=' -f2)
-samples=$( cat $CONFIG_FILE | grep -w 'SAMPLES' | cut -d '=' -f2 )
+threads=$( cat $CONFIG_FILE | grep -w 'THREADS' | cut -d '=' -f2 )
 
+#Working directories
+samples=$( cat $CONFIG_FILE | grep -w 'SAMPLES' | cut -d '=' -f2 )
 input_dir=$( cat $CONFIG_FILE | grep -w 'INPUT_DIR' | cut -d '=' -f2 )
 output_dir=$( cat $CONFIG_FILE | grep -w 'OUTPUT_DIR' | cut -d '=' -f2 )
-threads=$( cat $CONFIG_FILE | grep -w 'THREADS' | cut -d '=' -f2 )
 
 # Pipeline steps
 trimming=$( cat $CONFIG_FILE | grep -w 'TRIMMING' | cut -d '=' -f2 )
@@ -46,12 +47,14 @@ kmerfinder=$( cat $CONFIG_FILE | grep -w 'KMERFINDER' | cut -d '=' -f2 )
 srst2=$( cat $CONFIG_FILE | grep -w 'SRST2' | cut -d '=' -f2 )
 cfsan=$( cat $CONFIG_FILE | grep -w 'CFSAN' | cut -d '=' -f2 )
 vcf_to_msa=$( cat $CONFIG_FILE | grep -w 'VCF_TO_MSA' | cut -d '=' -f2 )
+raxml=$( cat $CONFIG_FILE | grep -w 'RAXML' | cut -d '=' -f2 )
 stats=$( cat $CONFIG_FILE | grep -w 'STATS' | cut -d '=' -f2 )
 
 
 # REFERENCES
 exome_enrichement=$( cat $CONFIG_FILE | grep -w 'EXOME_ENRICHMENT' | cut -d '=' -f2 )
 ref_path=$( cat $CONFIG_FILE | grep -w 'GENOME_REF' | cut -d '=' -f2 )
+genome_name=$( cat $CONFIG_FILE | grep -w 'GENOME_NAME' | cut -d '=' -f2 )
 know_snps=$( cat $CONFIG_FILE | grep -w 'KNOWN_SNPS' | cut -d '=' -f2 )
 know_indels=$( cat $CONFIG_FILE | grep -w 'KNOWN_INDELS' | cut -d '=' -f2 )
 bact_db_path=$( cat $CONFIG_FILE | grep -w 'BACT_DB_PATH' | cut -d '=' -f2 )
@@ -67,7 +70,12 @@ trim_args=$( cat $CONFIG_FILE | grep -w 'TRIM_ARGS' | cut -d '=' -f2 )
 picard_path=$( cat $CONFIG_FILE | grep -w 'PICARD_PATH' | cut -d '=' -f2 )
 gatk_path=$( cat $CONFIG_FILE | grep -w 'GATK_PATH' | cut -d '=' -f2 )
 kmerfinder_path=$( cat $CONFIG_FILE | grep -w 'KMERFINDER_PATH' | cut -d '=' -f2 )
-srst2_delim=$( cat $CONFIG_FILE | grep -w 'SRST2_DELIMITER' | cut -d '=' -f2 )
+srst2_delim=$( cat $CONFIG_FILE | grep -w 'SRST2_DELIMITER' | cut -d '=' -f2)
+model_raxml=$( cat $CONFIG_FILE | grep -w 'MODEL_RAXML' | cut -d '=' -f2)
+max_snp=$( cat $CONFIG_FILE | grep -w 'MAX_SNP' | cut -d '=' -f2)
+window_size=$( cat $CONFIG_FILE | grep -w 'WINDOW_SIZE' | cut -d '=' -f2)
+depth=$( cat $CONFIG_FILE | grep -w 'DEPTH_COVERAGE' | cut -d '=' -f2)
+
 
 ## SGE args
 if [ "$use_sge" = "1" ]; then
@@ -163,36 +171,79 @@ do
         let i=i+1
 done
 
+#VCF FILES
+
+#Merge GCVFs
 vcfArray_list=all_samples.vcf
-vcfsnpsArray_list=all_samples_snps.vcf
-vcfsnpsfilArray_list=all_samples_snps_fil.vcf
+
+#selectVariants
+vcfsnpsArray_list=all_samples_snp.vcf
 vcfindelsArray_list=all_samples_indels.vcf
+
+#Variant filtration
+vcfsnpsfilArray_list=all_samples_snp_fil.vcf
 vcfindelsfilArray_list=all_samples_indels_fil.vcf
-vcffilArray_list=all_samples_fil.vcf
+
+#VCFtool PASS snp
 vcfsnpPass=all_samples_pass_snp.vcf
 
+#snp and indels fil
+vcffilArray_list=all_samples_fil.vcf
+
+
+#CFSAN FASTA FILES
+
+cfsan_snpma_fasta=snpma.fasta
+cfsan_snpma_fil_fasta=snpma_preserved.fasta
+
+#VCF TO MSA FILES
+
+tsv_filsnp_file=snp_fil.tsv
+msa_filsnp_file=snp_fil.fasta
+
+tsv_passnp_file=snp_pass.tsv
+msa_passnp_file=snp_pass.fasta
+
+#DISTANCE MATRIX FILES
+
+dist_filsnp=distance_filsnp.txt
+dist_passnp=distance_passnp.txt
+
+dist_pair_filsnp=distance_pairs_filsnp.txt
+dist_pair_passnp=distance_pairs_passnp.txt
+
+
+#LIST FILES
 fastq_R1_list=$( echo ${fastqArray_R1[@]} | tr " " ":" )
 fastq_R2_list=$( echo ${fastqArray_R2[@]} | tr " " ":" )
+
 trimmedFastqArray_paired_R1_list=$( echo ${trimmedFastqArray_paired_R1[@]} | tr " " ":" )
 trimmedFastqArray_paired_R2_list=$( echo ${trimmedFastqArray_paired_R2[@]} | tr " " ":" )
 trimmedFastqArray_unpaired_R1_list=$( echo ${trimmedFastqArray_unpaired_R1[@]} | tr " " ":" )
 trimmedFastqArray_unpaired_R2_list=$( echo ${trimmedFastqArray_unpaired_R2[@]} | tr " " ":" )
+
 compress_paired_R1_list=$( echo ${compress_paired_R1[@]} | tr " " ":" )
 compress_paired_R2_list=$( echo ${compress_paired_R2[@]} | tr " " ":" )
 compress_unpaired_R1_list=$( echo ${compress_unpaired_R1[@]} | tr " " ":" )
 compress_unpaired_R2_list=$( echo ${compress_unpaired_R2[@]} | tr " " ":" )
+
 mappingArray_sam_list=$( echo ${mappingArray_sam[@]} | tr " " ":" )
 mappingArray_bam_list=$( echo ${mappingArray_bam[@]} | tr " " ":" )
 mappingArray_sorted_list=$( echo ${mappingArray_sorted[@]} | tr " " ":" )
 mappingArray_rg_list=$( echo ${mappingArray_rg[@]} | tr " " ":" )
+
 bamstatArray_pre_list=$( echo ${bamstatArray_pre[@]} | tr " " ":" )
 bamstatArray_post_list=$( echo ${bamstatArray_post[@]} | tr " " ":" )
+
 duplicateBamArray_list=$( echo ${duplicateBamArray[@]} | tr " " ":" )
+
 haplotypeGVCF_list=$( echo ${haplotypeGVCF[@]} |tr " " ":")
 recalibratedBamArray_list=$( echo ${recalibratedBamArray[@]} | tr " " ":" )
 realignedBamArray_list=$( echo ${realignedBamArray[@]} | tr " " ":" )
+
 concatFastq_list=$( echo ${concatFastq[@]} | tr " " ":")
 kmerfinderST_list=$( echo ${kmerfinderST[@]} | tr " " ":")
+
 resistance_list=$( echo ${resistance[@]} | tr " " ":")
 plasmid_list=$( echo ${plasmid[@]} | tr " " ":")
 mlst_list=$( echo ${mlst[@]} | tr " " ":")
@@ -212,23 +263,7 @@ pileup_list=$( echo ${pileup[@]} | tr " " ":")
 snp_preserved_list=$( echo ${snp_preserved[@]} | tr " " ":")
 snp_removed_list=$( echo ${snp_removed[@]} | tr " " ":")
 metrics_list=$( echo ${metrics[@]} | tr " " ":")
-cfsan_snpma_fasta=snpma.fasta
-cfsan_snpma_fil_fasta=snpma_preserved.fasta
-
-tsv_allsnp_file=all_samples_snp.tsv
-msa_allsnp_file=all_samples_snp.fasta
-tsv_fil_file=all_samples_snps_fil.tsv
-msa_fil_file=all_samples_snps_fil.fasta
-
-raxml=$( cat $CONFIG_FILE | grep -w 'RAXML' | cut -d '=' -f2 )
-model_raxml=$( cat $CONFIG_FILE | grep -w 'MODEL_RAXML' | cut -d '=' -f2)
-max_snp=$( cat $CONFIG_FILE | grep -w 'MAX_SNP' | cut -d '=' -f2)
-window_size=$( cat $CONFIG_FILE | grep -w 'WINDOW_SIZE' | cut -d '=' -f2)
 
 coverage_list=$( echo ${coverage[@]} | tr " " ":")
 coverage_graph_list=$( echo ${coverage_graph[@]} | tr " " ":")
 
-dist_allsnp=distance_allsnp.txt
-dist_fil=distance_fil.txt
-dist_pair_allsnp=distance_pairs_allsnp.txt
-dist_pair_fil=distance_pairs_fil.txt

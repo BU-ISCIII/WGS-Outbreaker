@@ -5,6 +5,7 @@ library(plyr)
 
 args <- commandArgs(trailingOnly = TRUE)
 dir <- args[1]
+maxCov <- as.numeric(args[2])
 
 setwd(dir)
 
@@ -15,7 +16,7 @@ print(files <- list.files(pattern="coverage.csv$"))
 
 cov_graph <- NULL
 pdf(file="coverage_graph.pdf",width=15)
-maxCov=200
+
 
 for (f in files){
  	df=read.table(f, sep="\t")
@@ -23,16 +24,17 @@ for (f in files){
  	cov <- ddply(df,.(chr),summarize,covThreshold=covThreshold,fracAboveThreshold=1-cumsum(diffFracBelowThreshold))
 
 	cov_graph <- rbind(cov_graph,cbind(cov, sample= gsub("^(AA-[0-9a-zA-Z]+).*$", "\\1", f)))
+	cov_subset <- subset(cov,covThreshold<maxCov & chr == "genome")
 
 
-	p2<-ggplot(subset(cov, covThreshold<maxCov & chr == "genome"), aes(x= covThreshold, y=100* fracAboveThreshold)) +
+	p2<-ggplot(cov_subset, aes(x= covThreshold, y=100* fracAboveThreshold)) +
 geom_line() +
 ylim(0, 100) +
 theme_bw() +
 theme(axis.text.x = element_text(size = 10.5,angle=75, vjust=0.5), strip.text.x = element_text(size=6.5)) +
 labs(title=paste("Genome Coverage",f,sep=" "), x="Depth of coverage", y="Percentage of coverage")
 
-	plot(p2)
+	print(p2)
 }
 
 dev.off()

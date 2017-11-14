@@ -31,8 +31,8 @@ mkdir -p $output_dir/RAXML
 echo "Directory for RAXML created"
 
 jobid_cfsan_matrix_distance=$(cat $output_dir/logs/jobids.txt | grep -w "MATRIX_DISTANCE_FILES" | cut -d ':' -f2 )
-jobid_tsv_to_msa_allsnp=$(cat $output_dir/logs/jobids.txt | grep -w "TSV_TO_MSAallsnp" | cut -d ':' -f2 )
-jobid_tsv_to_msa_fil=$(cat $output_dir/logs/jobids.txt | grep -w "TSV_TO_MSAallsnp" | cut -d ':' -f2 )
+jobid_tsv_to_msa_filsnp=$(cat $output_dir/logs/jobids.txt | grep -w "TSV_TO_MSAfilsnp" | cut -d ':' -f2 )
+jobid_tsv_to_msa_passnp=$(cat $output_dir/logs/jobids.txt | grep -w "TSV_TO_MSApassnp" | cut -d ':' -f2 )
 
 if [ $cfsan == "YES" ]; then
 	mkdir -p $output_dir/RAXML/CFSAN/preser
@@ -131,34 +131,34 @@ fi
 if [ $variant_calling == "YES" ]; then
 	mkdir -p $output_dir/RAXML/GATK/preser
         mkdir -p $output_dir/RAXML/GATK/all_snp
-        dir_gatk=$output_dir/variant_calling/variants_gatk/variants/
+        dir_gatk=$output_dir/variant_calling/variants_gatk/variants
 
-	run_raxmlinfe_gatk_allsnp_cmd="$SCRIPTS_DIR/raxml_inference.sh \
+	run_raxmlinfe_gatk_filsnp_cmd="$SCRIPTS_DIR/raxml_inference.sh \
                 $dir_gatk \
                 $output_dir/RAXML/GATK/all_snp \
-                $msa_allsnp_file \
+                $msa_filsnp_file \
                 $model_raxml"
 
-        run_raxmlboot_gatk_allsnp_cmd="$SCRIPTS_DIR/raxml_bootstrap.sh \
+        run_raxmlboot_gatk_filsnp_cmd="$SCRIPTS_DIR/raxml_bootstrap.sh \
                 $dir_gatk \
                 $output_dir/RAXML/GATK/all_snp \
-                $msa_allsnp_file \
+                $msa_filsnp_file \
                 $model_raxml"
 
-        run_raxmlannot_gatk_allsnp_cmd="$SCRIPTS_DIR/raxml_annot.sh \
+        run_raxmlannot_gatk_filsnp_cmd="$SCRIPTS_DIR/raxml_annot.sh \
                 $output_dir/RAXML/GATK/all_snp \
                 $model_raxml"
 
         run_raxmlinfe_gatk_preser_cmd="$SCRIPTS_DIR/raxml_inference.sh \
                 $dir_gatk \
                 $output_dir/RAXML/GATK/preser \
-                $msa_fil_file \
+                $msa_passnp_file \
                 $model_raxml"
 
         run_raxmlboot_gatk_preser_cmd="$SCRIPTS_DIR/raxml_bootstrap.sh \
                 $dir_gatk \
                 $output_dir/RAXML/GATK/preser \
-                $msa_fil_file \
+                $msa_passnp_file \
                 $model_raxml"
 
         run_raxmlannot_gatk_preser_cmd="$SCRIPTS_DIR/raxml_annot.sh \
@@ -166,27 +166,27 @@ if [ $variant_calling == "YES" ]; then
                 $model_raxml"	
 
 	if [ "$use_sge" = "1" ]; then
-	        raxml_gatk_args_allsnp="${SGE_ARGS} -hold_jid ${jobid_tsv_to_msa_allsnp} -pe orte 100 mpirun"
-		raxml_gatk_args_fil="${SGE_ARGS} -hold_jid ${jobid_tsv_to_msa_fil} -pe orte 100 mpirun"
+	        raxml_gatk_args_filsnp="${SGE_ARGS} -hold_jid ${jobid_tsv_to_msa_filsnp} -pe orte 100 mpirun"
+		raxml_gatk_args_passnp="${SGE_ARGS} -hold_jid ${jobid_tsv_to_msa_passnp} -pe orte 100 mpirun"
 	
-#GATK all snp
-        	raxmlinfe_gatk_allsnp_qsub=$( qsub -N $JOBNAME.RAXMLinfe_GATKallsnp $raxml_gatk_args_allsnp $run_raxmlinfe_gatk_allsnp_cmd)
-        	jobid_raxmlinfe_gatk_allsnp=$(echo $raxmlinfe_gatk_allsnp_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
-        	echo -e "RAXMLinfe_GATKallsnp:$jobid_raxmlinfe_gatk_allsnp\n" >> $output_dir/logs/jobids.txt
+#GATK fil snp
+        	raxmlinfe_gatk_filsnp_qsub=$( qsub -N $JOBNAME.RAXMLinfe_GATKallsnp $raxml_gatk_args_filsnp $run_raxmlinfe_gatk_filsnp_cmd)
+        	jobid_raxmlinfe_gatk_filsnp=$(echo $raxmlinfe_gatk_filsnp_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        	echo -e "RAXMLinfe_GATKfilsnp:$jobid_raxmlinfe_gatk_filsnp\n" >> $output_dir/logs/jobids.txt
 
-        	raxmlboot_gatk_all_args="${SGE_ARGS} -hold_jid ${jobid_raxmlinfe_gatk_allsnp} -pe orte 100 mpirun"
-		raxmlboot_gatk_allsnp_qsub=$( qsub -N $JOBNAME.RAXMLboot_GATKallsnp $raxmlboot_gatk_all_args $run_raxmlboot_gatk_allsnp_cmd)
-        	jobid_raxmlboot_gatk_allsnp=$(echo $raxmlboot_gatk_allsnp_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
-        	echo -e "RAXMLboot_GATKallsnp:$jobid_raxmlboot_gatk_allsnp\n" >> $output_dir/logs/jobids.txt
+        	raxmlboot_gatk_fil_args="${SGE_ARGS} -hold_jid ${jobid_raxmlinfe_gatk_filsnp} -pe orte 100 mpirun"
+		raxmlboot_gatk_filsnp_qsub=$( qsub -N $JOBNAME.RAXMLboot_GATKfilsnp $raxmlboot_gatk_fil_args $run_raxmlboot_gatk_filsnp_cmd)
+        	jobid_raxmlboot_gatk_filsnp=$(echo $raxmlboot_gatk_filsnp_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        	echo -e "RAXMLboot_GATKfilsnp:$jobid_raxmlboot_gatk_filsnp\n" >> $output_dir/logs/jobids.txt
 
-		raxmlannot_gatk_allsnp_arg="${SGE_ARGS} -hold_jid ${jobid_raxmlboot_gatk_allsnp}"
-        	raxmlannot_gatk_allsnp_qsub=$( qsub -N $JOBNAME.RAXMLannot_GATKallsnp $raxmlannot_gatk_allsnp_arg $run_raxmlannot_gatk_allsnp_cmd)
-        	jobid_raxmlannot_gatk_allsnp=$(echo $raxmlannot_gatk_allsnp_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
-        	echo -e "RAXMLannot_GATKallsnp:$jobid_raxmlannot_gatk_allsnp\n" >> $output_dir/logs/jobids.txt
+		raxmlannot_gatk_filsnp_arg="${SGE_ARGS} -hold_jid ${jobid_raxmlboot_gatk_filsnp}"
+        	raxmlannot_gatk_filsnp_qsub=$( qsub -N $JOBNAME.RAXMLannot_GATKfilsnp $raxmlannot_gatk_filsnp_arg $run_raxmlannot_gatk_filsnp_cmd)
+        	jobid_raxmlannot_gatk_filsnp=$(echo $raxmlannot_gatk_filsnp_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
+        	echo -e "RAXMLannot_GATKfilsnp:$jobid_raxmlannot_gatk_filsnp\n" >> $output_dir/logs/jobids.txt
 
-#GATK snp fil
+#GATK pass fil
 
-        	raxmlinfe_gatk_preser_qsub=$( qsub -N $JOBNAME.RAXMLinfe_GATKpreser $raxml_gatk_args_fil $run_raxmlinfe_gatk_preser_cmd)
+        	raxmlinfe_gatk_preser_qsub=$( qsub -N $JOBNAME.RAXMLinfe_GATKpreser $raxml_gatk_args_passnp $run_raxmlinfe_gatk_preser_cmd)
         	jobid_raxmlinfe_gatk_preser=$(echo $raxmlinfe_gatk_preser_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
         	echo -e "RAXMLinfe_GATKpreser:$jobid_raxmlinfe_gatk_preser\n" >> $output_dir/logs/jobids.txt
 
