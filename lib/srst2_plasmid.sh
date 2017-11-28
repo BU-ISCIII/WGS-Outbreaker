@@ -1,7 +1,12 @@
 #!/bin/bash
 ## Author: A.Hernandez
-## Usage: plasmid.sh ..
+## version v2.0
 
+if [ $# -eq 0 ];then
+        echo -e "\nScript to run srst2 for plasmid\n"
+        echo -e "Usage: srst2_plasmid.sh input_dir output_dir samples_list FASTQ_R1_list FASTQ_R2_list plasmid_list srst2_plasmid_db"
+        exit
+fi
 
 # Test whether the script is being executed with sge or not.
 
@@ -30,9 +35,8 @@ plasmid_list=$6
 srst2_db_path_plasmidfinder=$7
 
 
-
 if [ "$use_sge" = "1" ]; then
-        sample_count=$sge_task_id
+        sample_count=$SGE_TASK_ID
 else
         sample_count=$8
 fi
@@ -47,4 +51,3 @@ echo -e "Running plasmid.sh for $sample \n\n"
 srst2 --input_pe $dir/$sample/$fastq_files_R1 $dir/$sample/$fastq_files_R2 --forward trimmed_R1 --reverse trimmed_R2 --log --output $output_dir/$sample/$plasmid_name --gene_db $srst2_db_path_plasmidfinder
 
 echo -e "plasmid.sh for $sample finished \n\n"
-

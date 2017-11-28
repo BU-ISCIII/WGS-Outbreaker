@@ -1,13 +1,11 @@
 #!/bin/bash
+## Author: A. Hernandez
+## version v2.0
 
-#help
-#Usage: cfsan_snp_distance.sh
-
-# Test whether the script is being executed with sge or not.
-if [ -z $sge_task_id ]; then
-        use_sge=0
-else
-        use_sge=1
+if [ $# -eq 0 ];then
+        echo -e "\nScript to run cfsan distance\n"
+        echo -e "Usage: cfsan_snp_distance.sh input_dir"
+        exit
 fi
 
 
@@ -22,7 +20,5 @@ set -x
 
 dir=$1
 
-
 cfsan_snp_pipeline distance -p $dir/snp_distance_pairwise.tsv -m $dir/snp_distance_matrix.tsv $dir/snpma.fasta
-cfsan_snp_pipeline distance -p $dir/snp_distance_pairwise_preserved.tsv -m $dir/snp_distance_matrix_preserved.tsv $dir/snpma.fasta
-
+cfsan_snp_pipeline distance -p $dir/snp_distance_pairwise_preserved.tsv -m $dir/snp_distance_matrix_preserved.tsv $dir/snpma_preserved.fasta

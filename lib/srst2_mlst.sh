@@ -1,7 +1,12 @@
 #!/bin/bash
 ## Author: A.Hernandez
-## Usage: resistance.sh
+## version v2.0
 
+if [ $# -eq 0 ];then
+        echo -e "\nScript to run srst2 for mlst\n"
+        echo -e "Usage: srst2_mlst.sh input_dir output_dir srst2_mlst_fasta srst2_mlst_profile samples_list FASTQ_R1_list FASTQ_R2_list mlst_list srst2_delim"
+        exit
+fi
 
 # Test whether the script is being executed with sge or not.
 
@@ -18,30 +23,31 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
-
-# VARIABLES
+# VARAIBLES
 
 dir=$1
 output_dir=$2
-samples=$3
-fastq_files_R1_list=$4
-fastq_files_R2_list=$5
-resistance_list=$6
-srst2_db_path_argannot=$7
+srst2_db_path_mlst_db=$3
+srst2_db_path_mlst_definitions=$4
+samples=$5
+fastq_files_R1_list=$6
+fastq_files_R2_list=$7
+mlst_list=$8
+srst2_delim=$9
 
 if [ "$use_sge" = "1" ]; then
-        sample_count=$sge_task_id
+        sample_count=$SGE_TASK_ID
 else
-        sample_count=$8
+        sample_count=${10}
 fi
 
 sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
 fastq_files_R1=$( echo $fastq_files_R1_list | tr ":" "\n" | head -$sample_count | tail -1)
 fastq_files_R2=$( echo $fastq_files_R2_list | tr ":" "\n" | head -$sample_count | tail -1)
-resistance_name=$( echo $resistance_list | tr ":" "\n" | head -$sample_count | tail -1)
+mlst_name=$( echo $mlst_list | tr ":" "\n" | head -$sample_count | tail -1)
 
-echo -e "Running resistance.sh for $sample \n\n"
+echo -e "Running mlst.sh for $sample"
 
-srst2 --input_pe $dir/$sample/$fastq_files_R1 $dir/$sample/$fastq_files_R2 --forward trimmed_R1 --reverse trimmed_R2 --log --output $output_dir/$sample/$resistance_name --gene_db $srst2_db_path_argannot
+srst2 --input_pe $dir/$sample/$fastq_files_R1 $dir/$sample/$fastq_files_R2 --forward trimmed_R1 --reverse trimmed_R2 --log --output $output_dir/$sample/$mlst_name --mlst_db $srst2_db_path_mlst_db --mlst_definitions $srst2_db_path_mlst_definitions --mlst_delimiter "$srst2_delim"
 
-echo -e "Resistance.sh for $sample finished \n\n"
+echo -e "mlst.sh for $sample finished"

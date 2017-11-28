@@ -1,10 +1,11 @@
 #!/bin/bash
-## Author: A. Hernandez
+## Author A. Hernández
 ## version v2.0
 
+
 if [ $# -eq 0 ];then
-        echo -e "\nScript to run cfsan snp_reference\n"
-        echo -e "Usage: cfsan_snp_reference.sh input_dir reference_path"
+        echo -e "\nScript to crete references for bowtie2\n"
+        echo -e "Usage: reference_bowtie.sh reference_path genome_name"
         exit
 fi
 
@@ -17,9 +18,7 @@ set -x
 
 #VARIABLES
 
-dir=$1
-cfsan_ref_path=$2
+ref_path=$1
+genome_name=$2
 
-cfsan_snp_pipeline snp_reference -l $dir/snplist.txt -o $dir/referenceSNP.fasta $cfsan_ref_path
-
-cfsan_snp_pipeline snp_reference -l $dir/snplist_preserved.txt -o $dir/referenceSNP_preserved.fasta $cfsan_ref_path
+bowtie2-build $ref_path $genome_name

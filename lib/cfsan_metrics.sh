@@ -1,16 +1,19 @@
 #!/bin/bash
+## Author: A. Hernandez
+## version v2.0
 
-##Author: A. Hernandez
-#help
-#Usage: cfsan_metrics.sh
+if [ $# -eq 0 ];then
+        echo -e "\nScript to run cfsan collect_metrics\n"
+        echo -e "Usage: cfsan_metrics.sh input_dir samples_list reference_path"
+        exit
+fi
 
 # Test whether the script is being executed with sge or not.
-if [ -z $sge_task_id ]; then
+if [ -z $SGE_TASK_ID ]; then
         use_sge=0
 else
         use_sge=1
 fi
-
 
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
@@ -25,8 +28,8 @@ dir=$1
 samples=$2
 cfsan_ref_path=$3
 
-if [ "$use_sge" = "1" ]; then                                                                                                                                                                                               
-   	sample_count=$sge_task_id                                                                      
+if [ "$use_sge" = "1" ]; then
+	sample_count=$SGE_TASK_ID                                                                   
 else                                                                                                        
    	sample_count=$4                                                                               
 fi

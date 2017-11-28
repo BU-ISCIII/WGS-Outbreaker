@@ -1,10 +1,16 @@
 #!/bin/bash
 ## Author S. Monzon
 ## version v2.0
+## usage bamutil.sh
 
+if [ $# -eq 0 ]; then
+	echo -e "\nScrip to run bam stats\n"
+	echo -e "Usage: bamutils.sh output_dir samples_list bamRG_list bamStat_list exome_enrichement"
+	exit
+fi
 
 # Test whether the script is being executed with sge or not.
-if [ -z $sge_task_id ]; then
+if [ -z $SGE_TASK_ID ]; then
   	use_sge=0
 else
   	use_sge=1
@@ -17,22 +23,7 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
-
-## Usage
-
-if [ $# != 5 -a "$use_sge" == "1" ]; then
-  	echo "usage: ............"
-  	exit
-elif [ $# != 6 -a "$use_sge" == "0" ]; then
-  	echo "usage: ............"
-   	exit
-fi
-
-
-echo `date`
-
 # VARIABLES
-
 output_dir=$1
 samples=$2
 mappingArray_rg_list=$3
@@ -40,7 +31,7 @@ bamstatArray_pre_list=$4
 exome_enrichement=$5
 
 if [ "$use_sge" = "1" ]; then
-  	sample_count=$sge_task_id
+  	sample_count=$SGE_TASK_ID
 else
   	sample_count=$6
 fi

@@ -1,7 +1,12 @@
 #!/bin/bash
-##Author:A.Hernandez
-## Usage :kmerfinder.sh ...
+## Author:A.Hernandez
+## version v2.0.
 
+if [ $# -eq 0 ];then
+        echo -e "\nScript to run kmerfinder\n"
+        echo -e "Usage: kmerfinder.sh input_dir output_dir samples_list concat_files kmerfinderST_list kmerfinder_path bacterial_db_path"
+        exit
+fi
 
 # Test whether the script is being executed with sge or not.
 if [ -z $SGE_TASK_ID ]; then 
@@ -17,31 +22,25 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
-echo `date`
-
-
 # VARIABLES
 
-threads=$1
-dir=$2
-output_dir=$3
-samples=$4
-concatFastq_list=$5
-kmerfinderST_list=$6
-kmerfinder_path=$7
-bact_db_path=$8
-
+dir=$1
+output_dir=$2
+samples=$3
+concatFastq_list=$4
+kmerfinderST_list=$5
+kmerfinder_path=$6
+bact_db_path=$7
 
 if [ "$use_sge" = "1" ]; then
-	sample_count=$sge_task_id
+	sample_count=$SGE_TASK_ID
 else
-	sample_count=$9
+	sample_count=$8
 fi
 
 sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
 concatFastq=$( echo $concatFastq_list | tr ":" "\n" | head -$sample_count | tail -1)
 kmerfinderST=$( echo $kmerfinderST_list | tr ":" "\n" | head -$sample_count | tail -1)
-
 
 echo -e "Running kmerfinder for $sample \n"
 

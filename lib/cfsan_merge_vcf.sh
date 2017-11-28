@@ -1,12 +1,12 @@
 #!/bin/bash
-#help
-#Usage: cfsan_merge_vcf.sh
+## Author: A. Hernandez
+## version v2.0
+## Usage: cfsan_merge_vcf.sh
 
-# Test whether the script is being executed with sge or not.
-if [ -z $sge_task_id ]; then
-        use_sge=0
-else
-        use_sge=1
+if [ $# -eq 0 ];then
+        echo -e "\nScript to run cfsan merge_vcfs\n"
+        echo -e "Usage: cfsan_merge_vcf.sh input_dir"
+        exit
 fi
 
 

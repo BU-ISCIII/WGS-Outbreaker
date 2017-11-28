@@ -2,12 +2,14 @@
 ## Author S. Monzon
 ## version v2.0
 
-####################
-###   Commands  ####
-####################
+if [ $# -eq 0 ];then
+        echo -e "\nScript to run FastQC\n"
+        echo -e "Usage: fastqc.sh theads input_dir output_dir samples_list FastqR1_list FastqR2_list"
+        exit
+fi
 
 
-# Test whether the script is being executed with sge or not.
+#  Test whether the script is being executed with sge or not.
 if [ -z $SGE_TASK_ID ]; then 
 	use_sge=0
 else 
@@ -21,19 +23,6 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
-   
-## Usage
-
-if [ $# != 6 -a "$use_sge" == "1" ]; then
-	echo "usage: <input dir> <output dir> <sample names (s1:s2:sn)> <fastq files R1 (f1:f2:fn)> <fastq files R2 (f1:f2:fn)> <threads>"
-	exit
-elif [ $# != 7 -a "$use_sge" == "0" ]; then                                                                         
-	echo "usage: <input dir> <output dir> <sample names (s1:s2:sn)> <fastq files R1 (f1:f2:fn)> <fastq files R2 (f1:f2:fn)> <threads> <sample_number>" 
- 	exit
-fi                                                                                                          
-
-echo `date`
-
 ## VARIABLES
 
 threads=$1
@@ -44,11 +33,10 @@ fastq_R1_list=$5
 fastq_R2_list=$6
 
 if [ "$use_sge" = "1" ]; then
-	sample_count=$sge_task_id
+	sample_count=$SGE_TASK_ID
 else
 	sample_count=$7
 fi
-
 
 sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)
 fastq_R1=$( echo $fastq_R1_list | tr ":" "\n" | head -$sample_count | tail -1) 

@@ -3,8 +3,8 @@
 ## version v2.0
 
 if [ $# -eq 0 ];then
-        echo -e "\nScript to run cfsan snp_reference\n"
-        echo -e "Usage: cfsan_snp_reference.sh input_dir reference_path"
+        echo -e "\nScript to run RAxML bootstrap\n"
+        echo -e "Usage: raxml_bootstrap.sh input_dir output_dir snp_matrix model_raxml"
         exit
 fi
 
@@ -18,8 +18,8 @@ set -x
 #VARIABLES
 
 dir=$1
-cfsan_ref_path=$2
+output_dir=$2
+snp_msa=$3
+model=$4
 
-cfsan_snp_pipeline snp_reference -l $dir/snplist.txt -o $dir/referenceSNP.fasta $cfsan_ref_path
-
-cfsan_snp_pipeline snp_reference -l $dir/snplist_preserved.txt -o $dir/referenceSNP_preserved.fasta $cfsan_ref_path
+raxmlHPC-MPI-AVX -m $model -V -b 12345 -w $output_dir -n RAXML_TREE_BOOTSTRAP -p 12345 -s $dir/$snp_msa -N 100

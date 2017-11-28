@@ -1,16 +1,12 @@
 #!/bin/bash
+## Author: A. Hernandez
+## version v2.0
 
-##Author: A. Hernandez
-#help
-#Usage: cfsan_combine_metrics.sh
-
-# Test whether the script is being executed with sge or not.
-if [ -z $sge_task_id ]; then
-        use_sge=0
-else
-        use_sge=1
+if [ $# -eq 0 ]; then
+	echo -e "\nScript to run csfan combine_metrics\n"
+	echo -e "Usage: cfsan_comben metrics.sh input_dir"
+	exit
 fi
-
 
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e

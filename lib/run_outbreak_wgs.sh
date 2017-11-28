@@ -1,11 +1,20 @@
 #!/bin/bash
 ## Author A.Hernandez
 ## version v2.0
-## usage: run_outbreak_wgs.sh <config.file>
 
-###############
-## VARIABLES ##
-###############
+if [ $# -eq 0  ]; then
+	echo -e "\nPipeline for whole genome sequencing analysis for outbreak detection and characterization of foodborne bacteria \n"
+	echo -e "Usage: run_outbreak_wgs.sh <config.file>\n"
+	echo -e "Steps:"
+	echo -e "\tPreprocessing"
+	echo -e "\tKmerfinder"
+	echo -e "\tSRST2: resisitances, plasmids and mlst"
+	echo -e "\tMapping: bwa mem"
+	echo -e "\tVariant calling: CFSAN and GATK"
+	echo -e "\tRaxml"
+	echo -e "\tStats"
+	exit
+fi
 
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
@@ -14,49 +23,53 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
-# Configuration
+# Read config file
 CONFIG_FILE=$1
 
-#Global VARIABLES
-export JOBNAME="exome_pipeline_v2.0"
 export SCRIPTS_DIR=$( cat $CONFIG_FILE | grep -w 'SCRIPTS_DIR' | cut -d '=' -f2 )
-export TEMP=$( cat $CONFIG_FILE | grep -w 'TEMP_DIR' | cut -d '=' -f2 )
-export JAVA_RAM=$( cat $CONFIG_FILE | grep -w 'JAVA_RAM' | cut -d '=' -f2 )
 
-source $SCRIPTS_DIR/processing_config.sh
-
-## SGE args
-if [ "$use_sge"="1" ]; then
- mkdir -p $output_dir/logs
-  export SGE_ARGS="-V -j y -b y -wd $output_dir/logs -m a -M $email"
-fi
-
+source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
 
 # Execute preprocessing
-$SCRIPTS_DIR/run_preprocessing.sh
+$SCRIPTS_DIR/run_preprocessing.sh $CONFIG_FILE
+
+# Check references
+if [ $check_references == "YES" ];then
+	$SCRIPTS_DIR/run_references.sh $CONFIG_FILE
+fi
 
 # Execute mapping
 if [ $mapping == "YES" ]; then
-	$SCRIPTS_DIR/run_mapping.sh
+	$SCRIPTS_DIR/run_mapping.sh $CONFIG_FILE
 fi
 
 # Execute kmerfinder
 if [ $kmerfinder == "YES" ];then
-	$SCRIPTS_DIR/run_identification_ST.sh
+	$SCRIPTS_DIR/run_identification_ST.sh $CONFIG_FILE
 fi
 
-# Execure srst2
+# Execute srst2
 if [ $srst2 == "YES" ]; then
-	$SCRIPTS_DIR/run_srst2.sh
+	$SCRIPTS_DIR/run_srst2.sh $CONFIG_FILE
 fi
 
 #Execute CFSAN
 if [ $cfsan == "YES" ]; then
-	$SCRIPTS_DIR/run_cfsan.sh
+	$SCRIPTS_DIR/run_cfsan.sh $CONFIG_FILE
 fi
 
 # Execute variant Calling
 if [ $variant_calling == "YES" ]; then
-        $SCRIPTS_DIR/run_variantCalling_haploid.sh
+        $SCRIPTS_DIR/run_variantCalling_haploid.sh $CONFIG_FILE
 fi
 
+#Execute RAxML
+if [ $raxml == "YES" ]; then
+	$SCRIPTS_DIR/run_raxml.sh $CONFIG_FILE
+fi
+
+#Execute stats
+
+if [ $stats == "YES" ]; then
+	 $SCRIPTS_DIR/run_stats.sh $CONFIG_FILE
+fi

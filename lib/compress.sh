@@ -1,11 +1,17 @@
 #!/bin/bash
 ## Author: A.Hernandez
+## version v2.0
 ## Usage: compress.sh
+
+if [ $# -eq 0 ];then
+        echo -e "\nScript to compress trimmed Fastq files\n"
+        echo -e "Usage: compress.sh input_dir output_dir samples_list trimmedFastqR1_paired trimmedFastqR2_paired trimmedFastqR1_unpaired trimmedFastqR2_unpaired"
+        exit
+fi
 
 
 # Test whether the script is being executed with sge or not.
-
-if [ -z $ste_task_id ]; then
+if [ -z $SGE_TASK_ID ]; then
         use_sge=0
 else
         use_sge=1
@@ -28,9 +34,8 @@ trimmedFastqArray_paired_R2_list=$5
 trimmedFastqArray_unpaired_R1_list=$6
 trimmedFastqArray_unpaired_R2_list=$7
 
-
 if [ "$use_sge" = "1" ]; then
-        sample_count=$sge_task_id
+        sample_count=$SGE_TASK_ID
 else
         sample_count=$8
 fi
