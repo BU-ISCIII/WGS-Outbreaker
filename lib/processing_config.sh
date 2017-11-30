@@ -104,6 +104,11 @@ model_raxml=$( cat $CONFIG_FILE | grep -w 'MODEL_RAXML' | cut -d '=' -f2)
 picard_path=$( cat $CONFIG_FILE | grep -w 'PICARD_PATH' | cut -d '=' -f2 )
 gatk_path=$( cat $CONFIG_FILE | grep -w 'GATK_PATH' | cut -d '=' -f2 )
 kmerfinder_path=$( cat $CONFIG_FILE | grep -w 'KMERFINDER_PATH' | cut -d '=' -f2 )
+srst2_delim=$( cat $CONFIG_FILE | grep -w 'SRST2_DELIMITER' | cut -d '=' -f2)
+model_raxml=$( cat $CONFIG_FILE | grep -w 'MODEL_RAXML' | cut -d '=' -f2)
+max_snp=$( cat $CONFIG_FILE | grep -w 'MAX_SNP' | cut -d '=' -f2)
+window_size=$( cat $CONFIG_FILE | grep -w 'WINDOW_SIZE' | cut -d '=' -f2)
+depth=$( cat $CONFIG_FILE | grep -w 'DEPTH_COVERAGE' | cut -d '=' -f2)
 
 
 ## SGE args
@@ -203,6 +208,7 @@ done
 #VCF FILES
 
 #Merge GCVFs
+
 vcfArray_list=snp_indels.vcf
 
 #selectVariants
@@ -228,6 +234,7 @@ cfsan_snpma_fasta=snpma.fasta
 cfsan_snpma_fil_fasta=snpma_preserved.fasta
 
 #VCF TO MSA FILES
+
 
 tsv_filsnp_file=snp_PassCluster.tsv
 msa_filsnp_file=snp_PassCluster.fasta

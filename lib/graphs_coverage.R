@@ -9,6 +9,7 @@ library(ggplot2)
 library(plyr)
 
 # Variables
+
 args <- commandArgs(trailingOnly = TRUE)
 dir <- args[1]
 maxCov <- as.numeric(args[2])

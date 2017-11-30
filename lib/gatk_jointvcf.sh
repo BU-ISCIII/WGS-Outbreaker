@@ -8,7 +8,6 @@ if [ $# -eq 0 ];then
         exit
 fi
 
-
 # Test whether the script is being executed with sge or not.
 if [ -z $SGE_TASK_ID ]; then
         use_sge=0
@@ -45,6 +44,7 @@ window_size=${16}
 echo $haplotypeGVCF_list | tr ":" "\n" | awk -v prefix=$output_dir/variants '{print prefix "/" $0}' > $output_dir/gvcf.list
 
 # Merge gVCF
+
 java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
         -T GenotypeGVCFs \
         -R $ref_path \
@@ -52,6 +52,7 @@ java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
         -o $output_dir/variants/$vcfArray_list
 
 # Select snp variants
+
 java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
       -R $ref_path \
       -T SelectVariants \
@@ -63,6 +64,7 @@ java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
       -log $output_dir/$vcfArray_list-selectSNP.log
 
 # Filter snp variants
+
 java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
         -R $ref_path \
         -T VariantFiltration \
@@ -83,6 +85,7 @@ java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
         -S LENIENT \
         -log $output_dir/$vcfArray_list-filterSNPs.log
 
+
 #Select PASS and SnpCluster with vcftools
 
 echo -e "Select PASS and SnpCluster"
@@ -90,11 +93,14 @@ echo -e "Select PASS and SnpCluster"
 vcftools --vcf $output_dir/variants/$vcfsnpsfilArray_list --remove-filtered 'RMSMappingQuality' --remove-filtered 'LowCoverage' --remove-filtered 'LowQD' --remove-filtered 'p-value StrandBias' --remove-filtered 'StandOddRatio' --recode -c > $output_dir/variants/$vcfsnpPassCluster
 
 # Select only pass snp with vcftools
+
 echo -e "Select PASS snp"
 
 vcftools --vcf $output_dir/variants/$vcfsnpsfilArray_list --remove-filtered-all --recode -c > $output_dir/variants/$vcfsnpPass
 
+
 # Select indels variants
+
 echo -e "Select and Filter Indels"
 java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
         -R $ref_path \
@@ -106,7 +112,9 @@ java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
         -S LENIENT \
         -log $output_dir/$vcfArray_list-selectIndels.log
 
+
 # Filter indels vatiants
+
 java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
         -T VariantFiltration \
         -R $ref_path \
@@ -117,7 +125,9 @@ java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
         -S LENIENT \
         -log $output_dir/$vcfArray_list-filterIndels.log
 
+
 # Combine snp and indels in one vcf file
+
 echo -e "Combine snps and indels vcf"
 java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
     -R $ref_path \

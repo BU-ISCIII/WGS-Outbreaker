@@ -2,6 +2,7 @@
 ## Author: A.Hernandez
 ## version v2.0
 
+
 if [ $# -eq 0 ];then
         echo -e "\nScript to create summary far for srst2\n"
         echo -e "Usage: srst2_summary.sh input_dir output_dir"

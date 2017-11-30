@@ -2,7 +2,6 @@
 ## Author A. Hernández
 ## version v2.0
 
-
 if [ $# -eq 0 ];then
         echo -e "\nScript to create dictionary with picartools\n"
         echo -e "Usage: picard_dict.sh reference_path genome_name JAVA_RAM picard_path"

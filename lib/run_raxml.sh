@@ -117,7 +117,6 @@ if [ $cfsan == "YES" ]; then
         	raxmlannot_cfsan_preser_qsub=$( qsub -N $JOBNAME.RAXMLannot_CFSANpreser $raxmlannot_cfsanpreser_args $run_raxmlannot_cfsan_preser_cmd)
         	jobid_raxmlannot_cfsan_preser=$(echo $raxmlannot_cfsan_preser_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
         	echo -e "RAXMLannot_CFSANpreser:$jobid_raxmlannot_cfsan_preser\n" >> $output_dir/logs/jobids.txt
-	
 	# Or local
         else
 
@@ -128,10 +127,12 @@ if [ $cfsan == "YES" ]; then
 		run_raxmlinfe_cfsan_preser=$($run_raxmlinfe_cfsan_preser_cmd)
 		run_raxmlboot_cfsan_preser=$($run_raxmlboot_cfsan_preser_cmd)
 		run_raxmlannot_cfsan_preser=$($run_raxmlannot_cfsan_preser_cmd)        	
+
 	fi
 fi
 
 # Execute raxml if GATK was executed
+
 if [ $variant_calling == "YES" ]; then
 	mkdir -p $output_dir/RAXML/GATK/preser
         mkdir -p $output_dir/RAXML/GATK/all_snp
@@ -169,6 +170,7 @@ if [ $variant_calling == "YES" ]; then
                 $output_dir/RAXML/GATK/preser \
                 $model_raxml"	
 
+
 	#In HPC
 	if [ "$use_sge" = "1" ]; then
 	        raxml_gatk_args_filsnp="${SGE_ARGS} -hold_jid ${jobid_tsv_to_msa_filsnp} -pe orte 100 mpirun"
@@ -204,6 +206,7 @@ if [ $variant_calling == "YES" ]; then
 		raxmlannot_gatk_preser_qsub=$( qsub -N $JOBNAME.RAXMLannot_GATKpreser $raxmlannot_gatk_preser_arg $run_raxmlannot_gatk_preser_cmd)
         	jobid_raxmlannot_gatk_preser=$(echo $raxmlannot_gatk_preser_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
         	echo -e "RAXMLannot_GATKpreser:$jobid_raxmlannot_gatk_preser\n" >> $output_dir/logs/jobids.txt
+
 
 	#Or local
         else

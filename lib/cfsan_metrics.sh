@@ -28,6 +28,7 @@ dir=$1
 samples=$2
 cfsan_ref_path=$3
 
+
 if [ "$use_sge" = "1" ]; then
 	sample_count=$SGE_TASK_ID                                                                   
 else                                                                                                        

@@ -22,6 +22,18 @@ else
         source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
 fi
 
+CONFIG_FILE=$1
+
+#Execute processing_config.sh
+if [ -z $SCRIPTS_DIR ]; then
+        SCRIPTS_DIR=$( cat $CONFIG_FILE | grep -w 'SCRIPTS_DIR' | cut -d '=' -f2 )
+        source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
+
+else
+        source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
+fi
+
+
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
 # Treat unset variables and parameters other than the special parameters ‘@’ or ‘*’ as an error when performing parameter expansion. An error message will be written to the standard error, and a non-interactive shell will exit
@@ -88,7 +100,9 @@ if [ $kmerfinder == "YES" ]; then
 		kmerfinder_qsub=$( qsub $kmerfinder_arg -t 1-$sample_count -N $JOBNAME.KMERFINDER $kmerfinder_cmd)
 		jobid_kmerfinder=$( echo $kmerfinder_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
 		echo -e "KMERFINDER:$jobid_kmerfinder\n" >> $output_dir/logs/jobids.txt
+
 	#Or local
+
 	else
 		for count in  `seq 1 $sample_count`; do
 			echo "Running concat files on sample $count"
