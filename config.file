@@ -3,47 +3,51 @@
 
 
 ############################################## RunInfo ################################################################
-AUTHOR=ahernandez
-DATE=20171027
-MAIL=ana.hernandez.plaza@gmail.com
+AUTHOR=
+DATE=
+MAIL=
 
-DATE_RUN=20170803
-LIBRARY=NEXTERA
-SEQUENCING_CENTER=ISCIII
-PLATFORM=ILLUMINA
-MODEL=NEXTSEQ
-RUN_PLATFORM=NS500454
-SEQ_TYPE=PE
+DATE_RUN=
+LIBRARY=
+SEQUENCING_CENTER=
+PLATFORM=
+MODEL=
+RUN_PLATFORM=
+SEQ_TYPE=
 
 ############################# Pipeline steps: Fill in with YES or NO (capital letter) ###################################
 
-TRIMMING=YES
-CHECK_REFERENCES=YES
-MAPPING=YES
-DUPLICATE_FILTER=YES
-VARIANT_CALLING=YES
-KMERFINDER=YES
-SRST2=YES
-CFSAN=YES
-VCF_TO_MSA=YES
-RAXML=YES
-STATS=YES
+TRIMMING=
+CHECK_REFERENCES=
+MAPPING=
+DUPLICATE_FILTER=
+VARIANT_CALLING=
+KMERFINDER=
+SRST2=
+CFSAN=
+VCF_TO_MSA=
+RAXML=
+STATS=
 
 ############################################# System variables #######################################################
 
 # Set memory for Java Virtual Machine
 # #Example: -Xmx15g
-JAVA_RAM=-Xmx15g
+JAVA_RAM=
 
 # If pipeline is executed in HPC =1, if pipeline is executed in local =0
-USE_SGE=1
+USE_SGE=
 
 # Set memory for slot
 #Example: 20g
-H_VMEM=20g
+H_VMEM=
 
 # Set number of threads
-THREADS=5
+THREADS=
+
+#Queues
+QUEUE=
+
 
 ############################################# Directories #########################################################
 
@@ -51,13 +55,13 @@ THREADS=5
 SCRIPTS_DIR=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/outbreakWGS/lib
 
 # Path to temporary directory
-TEMP_DIR=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/20171027_prueba_config/TMP
+TEMP_DIR=
 
 # Directory with input files
-INPUT_DIR=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/20171027_prueba_config/00-reads
+INPUT_DIR=
 
 # Directory for output files
-OUTPUT_DIR=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/20171027_prueba_config/test_results
+OUTPUT_DIR=
 
 ########################################## INPUT VARIABLES########################################################
 
@@ -69,60 +73,17 @@ OUTPUT_DIR=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T
 	# AAAA_01=AAAA_01_R1.fastq.gz    AAAA_01_R2.fastq.gz
 	# BBBB_02=BBBB_02_R1.fastq.gz    BBBB_02_R2.fastq.gz
 
-SAMPLES=3336-16-SH:3340-16-SH:3343-16-SH:3409-16-SH:3411-16-SH:3412-16-SH
-
-3336-16-SH=3336-16-SH_20_R1.fastq.gz	3336-16-SH_20_R2.fastq.gz
-3340-16-SH=3340-16-SH_20_R1.fastq.gz	3340-16-SH_20_R2.fastq.gz
-3343-16-SH=3343-16-SH_20_R1.fastq.gz	3343-16-SH_20_R2.fastq.gz
-3409-16-SH=3409-16-SH_20_R1.fastq.gz	3409-16-SH_20_R2.fastq.gz
-3411-16-SH=3411-16-SH_20_R1.fastq.gz	3411-16-SH_20_R2.fastq.gz
-3412-16-SH=3412-16-SH_20_R1.fastq.gz	3412-16-SH_20_R2.fastq.gz
+SAMPLES=
 
 ######################################################### Reference Variables ###########################################
 
 # Path to reference genome
-GENOME_REF=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/20171027_prueba_config/REFERENCES/Salmonella_enterica_subsp._enterica_serovar_Enteritidis_P125109.fasta
+GENOME_REF=
 
 # Path to reference genome without ".fasta"
-GENOME_NAME=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/20171027_prueba_config/REFERENCES/Salmonella_enterica_subsp._enterica_serovar_Enteritidis_P125109
+GENOME_NAME=
 
 # bed enrichment exomas. For outbreakWGS pipeline =NO
-=======
-
-## System variables
-JAVA_RAM=-Xmx15g
-H_VMEM=20g
-THREADS=5
-SCRIPTS_DIR=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/outbreakWGS/outbreakWGS/lib
-TEMP_DIR=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/20171027_prueba_config/TMP
-
-
-## sge variables
-USE_SGE=1
-
-
-## INPUT VARIABLES
-INPUT_DIR=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/20171027_prueba_config/00-reads
-
-# Sample info
-SAMPLES=3336-16-SH:3340-16-SH:3343-16-SH:3409-16-SH:3411-16-SH:3412-16-SH
-
-3336-16-SH=3336-16-SH_20_R1.fastq.gz	3336-16-SH_20_R2.fastq.gz
-3340-16-SH=3340-16-SH_20_R1.fastq.gz	3340-16-SH_20_R2.fastq.gz
-3343-16-SH=3343-16-SH_20_R1.fastq.gz	3343-16-SH_20_R2.fastq.gz
-3409-16-SH=3409-16-SH_20_R1.fastq.gz	3409-16-SH_20_R2.fastq.gz
-3411-16-SH=3411-16-SH_20_R1.fastq.gz	3411-16-SH_20_R2.fastq.gz
-3412-16-SH=3412-16-SH_20_R1.fastq.gz	3412-16-SH_20_R2.fastq.gz 
-
-
-# Output dirs
-OUTPUT_DIR=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/20171027_prueba_config/test_results
-
-## Reference Variables
-#
-GENOME_REF=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/20171027_prueba_config/REFERENCES/Salmonella_enterica_subsp._enterica_serovar_Enteritidis_P125109.fasta
-GENOME_NAME=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/ANALYSIS/20171027_prueba_config/REFERENCES/Salmonella_enterica_subsp._enterica_serovar_Enteritidis_P125109
-
 EXOME_ENRICHMENT=NO
 
 # Data base of known snps for GATK. For outbreakWGS pipeline =NO
@@ -131,22 +92,20 @@ KNOWN_SNPS=NO
 # Data base of known indels for GATK. For outbreakWGS pipeline =NO
 KNOWN_INDELS=NO
 
-
 # Path to kmerfinder database
-BACT_DB_PATH=/processing_Data/bioinformatics/services_and_colaborations/CNM/bacteriologia/SRVCNM036_20161128_SEOUTBREAK_SH_S/REFERENCES/kmerFinder/all_bacteria_db
+BACT_DB_PATH=
 
 # Path to resistence srst2 database
-SRST2_DB_PATH_ARGannot=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/REFERENCES/salmonella/REFERENCES/ARGannot.r1.fasta
+SRST2_DB_PATH_ARGannot=
 
 # Path to plasmid srst2 database
-SRST2_DB_PATH_PlasmidFinder=/processing_Data/bioinformatics/research/20170619_OUTBREAKSEQ_AH_IC_T/REFERENCES/salmonella/REFERENCES/PlasmidFinder.fasta
+SRST2_DB_PATH_PlasmidFinder=
 
 # Path to alleles srst2 file
-SRST2_DB_PATH_mlst_db=/processing_Data/bioinformatics/research/20170905_GMIPT2017_ICSMAH_C/REFERENCES/sa_mlst_alleles.fasta
+SRST2_DB_PATH_mlst_db=
 
 # Path to profiles srst2 file
-SRST2_DB_PATH_mlst_definitions=/processing_Data/bioinformatics/research/20170905_GMIPT2017_ICSMAH_C/REFERENCES/sa_mlst_profile.txt
-
+SRST2_DB_PATH_mlst_definitions=
 
 ####################################################### Software variables #######################################################
 
@@ -159,7 +118,7 @@ TRIMMOMATIC_PATH=/opt/Trimmomatic-0.33
 
 # Trimomatic argummens must be separated by "_"
 # Example: /opt/Trimmomatic-0.33/adapters/TruSeq3-PE.fa:2:30:10_TRAILING:10_SLIDINGWINDOW:4:15_MINLEN:70
-TRIM_ARGS=ILLUMINACLIP:/opt/Trimmomatic-0.33/adapters/TruSeq3-PE.fa:2:30:10_TRAILING:10_SLIDINGWINDOW:4:15_MINLEN:70
+TRIM_ARGS=ILLUMINACLIP:
 
 ################ Picardtools #####################
 # Picardtools path
@@ -174,9 +133,12 @@ KMERFINDER_PATH=/processing_Data/bioinformatics/references/kmerFinder/genomicepi
 
 ################### srst2 ######################
 ## Character(s) separating gene name from allele number in MLST database
-SRST2_DELIMITER=-
+SRST2_DELIMITER=
 
 ################## RAxML ###########################
+##Bootstrap
+BOOTSTRAP=100
+
 ## Model of substitution, for SNP data GTRCAT is recommended
 MODEL_RAXML=GTRCAT
 
