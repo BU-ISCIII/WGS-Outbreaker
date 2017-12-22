@@ -1,4 +1,4 @@
-#!/bin/bash
+#/bin/bash
 ## Author A.Hernandez
 ## version v2.0
 
@@ -13,7 +13,6 @@ fi
 CONFIG_FILE=$1
 
 # Check if run_outbreak_wgs.sh was execute
-
 if [ -z $SCRIPTS_DIR ]; then
         SCRIPTS_DIR=$( cat $CONFIG_FILE | grep -w 'SCRIPTS_DIR' | cut -d '=' -f2 )
         source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
@@ -29,7 +28,6 @@ set -e
 set -u
 #Print commands and their arguments as they are executed.
 set -x
-
 
 # Folder creation
 mkdir -p $output_dir/stats
@@ -83,7 +81,6 @@ bamutil_postduplicates="$SCRIPTS_DIR/bamutil.sh \
         $exome_enrichement"
 
 # Execute stats in HPC
-
 if [ "$use_sge" = "1" ]; then
 	bedtool_args="${SGE_ARGS} -pe orte $threads -hold_jid $jobid_picard"
 	bedtool_qsub=$( qsub $bedtool_args -t 1-$sample_count -N $JOBNAME.BEDTOOL $coverage_cmd)

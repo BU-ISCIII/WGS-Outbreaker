@@ -22,6 +22,7 @@ else
         source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
 fi
 
+
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
 # Treat unset variables and parameters other than the special parameters ‘@’ or ‘*’ as an error when performing parameter expansion. An error message will be written to the standard error, and a non-interactive shell will exit
@@ -43,7 +44,6 @@ else
 fi
 
 # Set input names
-
 if [ $duplicate_filter == "YES" ]; then
 	input_list=$duplicateBamArray_list
 else
@@ -81,6 +81,7 @@ if [ $know_snps == "NO" ];then
 	$ref_path \
 	$gatk_path \
 	$haplotypeGVCF_list"
+	
 
 	if [ $variant_calling == "YES" ]; then
 		#In HPC

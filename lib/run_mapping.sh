@@ -40,6 +40,7 @@ mkdir -p $output_dir/Alignment
 mkdir -p $output_dir/Alignment/SAM
 mkdir -p $output_dir/Alignment/BAM
 
+#Get jobid for compress files step
 jobid_compress=$(cat $output_dir/logs/jobids.txt | grep -w "COMPRESS_FILE" | cut -d ':' -f2 )
 
 #Check if trimmomatic was executed for input files
@@ -48,7 +49,6 @@ if [ -d $output_dir/QC/trimmomatic ]; then
 	if [ "$use_sge" = "1" ]; then
 		mapping_args="${SGE_ARGS} -pe openmp $threads -hold_jid ${jobid_compress}"
 	fi
-
 	#Mapping command with trimming files
         mapping_cmd="$SCRIPTS_DIR/bwa.sh \
                 $threads \
@@ -92,7 +92,6 @@ samtobam_cmd="$SCRIPTS_DIR/samTobam.sh \
 
 #Execute mapping and samTObam
 if [ $mapping == "YES" ]; then
-
  	#In HPC
 	if [ "$use_sge" = "1" ]; then	
 		mapping_qsub=$( qsub $mapping_args -t 1-$sample_count -N $JOBNAME.MAPPING_BWA  $mapping_cmd)
@@ -112,8 +111,7 @@ if [ $mapping == "YES" ]; then
 			execute_mapping=$($mapping_cmd $count)
       			samtobam=$($samtobam_cmd $count)
      		done
-	fi
-fi
+	fi                                                                                                           fi
 
 picard_cmd="$SCRIPTS_DIR/picard_duplicates.sh \
 	$output_dir/Alignment/BAM \

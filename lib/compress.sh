@@ -9,8 +9,8 @@ if [ $# -eq 0 ];then
         exit
 fi
 
-# Test whether the script is being executed with sge or not.
 
+# Test whether the script is being executed with sge or not.
 if [ -z $SGE_TASK_ID ]; then
         use_sge=0
 else

@@ -110,16 +110,12 @@ compress_file_cmd="$SCRIPTS_DIR/compress.sh \
 #In HPC
 
 if [ "$use_sge" = "1" ]; then
-
 	#FASTQ pretrimming
-
 	fastqc_pre=$( qsub $SGE_ARGS -pe openmp $threads -t 1-$sample_count -N $JOBNAME.FASTQ_PRE $fastqc_pretrimming_cmd)
-	jobid_fastqc_pre=$( echo $fastqc_pre | cut -d ' ' -f3 | cut -d '.' -f1 )
+    jobid_fastqc_pre=$( echo $fastqc_pre | cut -d ' ' -f3 | cut -d '.' -f1 )
 	echo -e "FASTQC_PRE:$jobid_fastqc_pre\n" >> $output_dir/logs/jobids.txt 
 	if [ $trimming == "YES" ]; then
-
 		#FASTQ postrimming and compress files
-
 		fastqc_arg="${SGE_ARGS} -pe openmp $threads -hold_jid $jobid_trimmomatic"
 		fastqc_post=$( qsub $fastqc_arg -t 1-$sample_count -N $JOBNAME.FASTQ_POST $fastqc_postrimming_cmd)
 		jobid_fastqc_post=$( echo $fastqc_post | cut -d ' ' -f3 | cut -d '.' -f1 ) 
@@ -139,9 +135,7 @@ else
 	#FASTQ pretrimming
     	fastqc_pre=$($fastqc_pretrimming_cmd $count)
 		if [ $trimming == "YES" ]; then
-
 			#FASTQ postrimming and compress files
-
 			fastqc_post=$($fastqc_postrimming_cmd $count)
 			compress_file=$($compress_file_cmd $count)
 		fi

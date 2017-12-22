@@ -23,18 +23,6 @@ else
 fi
 
 
-CONFIG_FILE=$1
-
-#Execute processing_config.sh
-if [ -z $SCRIPTS_DIR ]; then
-        SCRIPTS_DIR=$( cat $CONFIG_FILE | grep -w 'SCRIPTS_DIR' | cut -d '=' -f2 )
-        source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
-
-else
-        source $SCRIPTS_DIR/processing_config.sh --"$CONFIG_FILE"
-fi
-
-
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
 # Treat unset variables and parameters other than the special parameters ‘@’ or ‘*’ as an error when performing parameter expansion. An error message will be written to the standard error, and a non-interactive shell will exit
@@ -42,16 +30,12 @@ set -u
 #Print commands and their arguments as they are executed.
 set -x
 
-
-CONFIG_FILE=$1
-
 #Folder creation
 
 mkdir -p $output_dir/CFSAN/samples
 echo "Directory for CFSAN created"
 
 # Get jobid compress files step
-
 jobid_compress=$(cat $output_dir/logs/jobids.txt | grep -w "COMPRESS_FILE" | cut -d ':' -f2 )
 
 #Check if trimmomatic was executed for input files
@@ -60,12 +44,6 @@ if [ -d $output_dir/QC/trimmomatic ]; then
 	if [ "$use_sge" = "1" ]; then
 		cfsan_arg="${SGE_ARGS} -pe openmp $threads -hold_jid ${jobid_compress}"
 	fi
-else
-  	dir=$output_dir/raw
-fi
-
-
-if [ $trimming == "YES" ]; then
 	fastq_files_R1_list=$compress_paired_R1_list
         fastq_files_R2_list=$compress_paired_R2_list
 

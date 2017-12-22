@@ -9,11 +9,11 @@ if [ $# -eq 0 ]; then
 fi
 
 # Test whether the script is being executed with sge or not.
-if [ -z $SGE_TASK_ID ]; then                                                                                                                                                                                                       
- 	use_sge=0                                                                                                                                                                                                                      
-else                                                                                                                                                                                                                               
- 	use_sge=1                                                                                                                                                                                                                      
-fi                                                                                                                   
+if [ -z $SGE_TASK_ID ]; then
+ 	use_sge=0
+else
+	use_sge=1
+fi                                                                                                             
 
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
@@ -36,8 +36,7 @@ if [ "$use_sge" = "1" ]; then
  	sample_count=$SGE_TASK_ID                                                  
 else                                                                               
  	sample_count=$9                                                               
-fi                                                                                    
-                               
+fi                                                                                                                                                                        
 sample=$( echo $samples | tr ":" "\n" | head -$sample_count | tail -1)       
 fastq_R1=$( echo $fastq_R1_list | tr ":" "\n" | head -$sample_count | tail -1)   
 fastq_R2=$( echo $fastq_R2_list | tr ":" "\n" | head -$sample_count | tail -1)   

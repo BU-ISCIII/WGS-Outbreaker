@@ -21,7 +21,6 @@ set -e
 set -u
 #Print commands and their arguments as they are executed
 set -x                                                                                                                    
-
 ## VARIABLES
                                                                                                  
 threads=$1
@@ -58,5 +57,4 @@ echo -e "Running Trimmomatic for $sample....\n"
 mkdir -p $output_dir/QC/trimmomatic/$sample                                                                                                                                                                                         
 
 java -jar $trimmomatic_path/trimmomatic-$trimmomatic_version.jar PE -phred33 $input_dir/$fastq_R1 $input_dir/$fastq_R2 $output_dir/QC/trimmomatic/$sample/$trimmedFastqArray_paired_R1 $output_dir/QC/trimmomatic/$sample/$trimmedFastqArray_unpaired_R1 $output_dir/QC/trimmomatic/$sample/$trimmedFastqArray_paired_R2 $output_dir/QC/trimmomatic/$sample/$trimmedFastqArray_unpaired_R2 $trim_args
-
 echo -e "Trimmomatic for $sample finished \n\n"

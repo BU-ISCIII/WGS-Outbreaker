@@ -43,4 +43,3 @@ coverage_sample=$( echo $coverage_list | tr ":" "\n" | head -$sample_count | tai
 coverage_graph_sample=$( echo $coverage_graph_list | tr ":" "\n" | head -$sample_count | tail -1)
 
 bedtools genomecov -ibam $dir/$sample/$duplicateBamArray -g $ref_path > $output_dir/$coverage_sample
-

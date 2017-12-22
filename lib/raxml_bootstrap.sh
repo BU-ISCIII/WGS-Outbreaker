@@ -21,5 +21,6 @@ dir=$1
 output_dir=$2
 snp_msa=$3
 model=$4
+boots=$5
 
-raxmlHPC-MPI-AVX -m $model -V -b 12345 -w $output_dir -n RAXML_TREE_BOOTSTRAP -p 12345 -s $dir/$snp_msa -N 100
+raxmlHPC-MPI-AVX -m $model -V -b 12345 -w $output_dir -n RAXML_TREE_BOOTSTRAP -p 12345 -s $dir/$snp_msa -N $boots

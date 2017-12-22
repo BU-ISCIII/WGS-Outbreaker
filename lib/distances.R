@@ -26,7 +26,6 @@ myfasta <- read.FASTA(fasta_file)
 setwd(output)
 
 #calculate distace matrix
-
 dis_matrix <- as.data.frame(dist.dna(myfasta, model = "N", as.matrix = TRUE))
 
 dis_matrix$names <- row.names(dis_matrix)
@@ -37,7 +36,6 @@ write.table(dis_matrix, file= distance, col.names= TRUE, row.names = FALSE, sep 
 
 #TABLE PAIRWISE SNP DISMATCHES
 #calculate distance pairs matrix
-
 dis_pair <- dist.dna(myfasta, model = "N", as.matrix = TRUE)
 
 matrix_pair <- as.data.frame(as.table(dis_pair))

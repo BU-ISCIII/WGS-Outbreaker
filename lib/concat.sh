@@ -9,7 +9,6 @@ if [ $# -eq 0 ];then
 fi
 
 #Test whether the script is being used with sge or not.
-
 if [ -z $SGE_TASK_ID ]; then
 	use_sge=0
 else

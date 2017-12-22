@@ -27,7 +27,7 @@ export JAVA_RAM=$( cat $CONFIG_FILE | grep -w 'JAVA_RAM' | cut -d '=' -f2 )
 
 # RunInfo
 email=$( cat $CONFIG_FILE | grep -w 'MAIL' | cut -d '=' -f2 )
-JOBNAME="outbrekWGS_pipeline_v2.0"
+JOBNAME="WGS-Outbreaker_v2.0"
 date_run=$( cat $CONFIG_FILE | grep -w 'DATE_RUN' | cut -d '=' -f2 )
 platform=$( cat $CONFIG_FILE | grep -w 'PLATFORM' | cut -d '=' -f2 )
 model=$( cat $CONFIG_FILE | grep -w 'MODEL' | cut -d '=' -f2 )
@@ -35,10 +35,11 @@ library=$( cat $CONFIG_FILE | grep -w 'LIBRARY' | cut -d '=' -f2 )
 sequencing_center=$( cat $CONFIG_FILE | grep -w 'SEQUENCING_CENTER' | cut -d '=' -f2 )
 run_platform=$( cat $CONFIG_FILE | grep -w 'RUN_PLATFORM' | cut -d '=' -f2 )
 
-#Memory variables
+#HPC variables
 use_sge=$( cat $CONFIG_FILE | grep -w 'USE_SGE' | cut -d '=' -f2 )
 vmem=$( cat $CONFIG_FILE | grep -w 'H_VMEM' | cut -d '=' -f2)
 threads=$( cat $CONFIG_FILE | grep -w 'THREADS' | cut -d '=' -f2 )
+queue=$( cat $CONFIG_FILE | grep -w 'QUEUE' | cut -d '=' -f2 )
 
 #Working directories
 samples=$( cat $CONFIG_FILE | grep -w 'SAMPLES' | cut -d '=' -f2 )
@@ -98,25 +99,25 @@ window_size=$( cat $CONFIG_FILE | grep -w 'WINDOW_SIZE' | cut -d '=' -f2)
 depth=$( cat $CONFIG_FILE | grep -w 'DEPTH_COVERAGE' | cut -d '=' -f2)
 
 # Raxml
+boots=$( cat $CONFIG_FILE | grep -w 'BOOTSTRAP' | cut -d '=' -f2)
 model_raxml=$( cat $CONFIG_FILE | grep -w 'MODEL_RAXML' | cut -d '=' -f2)
 
 # paths
 picard_path=$( cat $CONFIG_FILE | grep -w 'PICARD_PATH' | cut -d '=' -f2 )
 gatk_path=$( cat $CONFIG_FILE | grep -w 'GATK_PATH' | cut -d '=' -f2 )
 kmerfinder_path=$( cat $CONFIG_FILE | grep -w 'KMERFINDER_PATH' | cut -d '=' -f2 )
-srst2_delim=$( cat $CONFIG_FILE | grep -w 'SRST2_DELIMITER' | cut -d '=' -f2)
-model_raxml=$( cat $CONFIG_FILE | grep -w 'MODEL_RAXML' | cut -d '=' -f2)
-max_snp=$( cat $CONFIG_FILE | grep -w 'MAX_SNP' | cut -d '=' -f2)
-window_size=$( cat $CONFIG_FILE | grep -w 'WINDOW_SIZE' | cut -d '=' -f2)
-depth=$( cat $CONFIG_FILE | grep -w 'DEPTH_COVERAGE' | cut -d '=' -f2)
 
 
 ## SGE args
 if [ "$use_sge" = "1" ]; then
         mkdir -p $output_dir/logs
-        SGE_ARGS="-V -j y -b y -wd $output_dir/logs -m a -M $email -q all.q"
-fi
 
+        if [ -z "$queue" ]; then
+        SGE_ARGS="-V -j y -b y -wd $output_dir/logs -m a -M $email -q all.q"
+        else
+        SGE_ARGS="-V -j y -b y -wd $output_dir/logs -m a -M $email $queue"
+        fi
+fi
 
 ## Extract fastq and names for samples.
 sample_count=$(echo $samples | tr ":" "\n" | wc -l)
@@ -208,7 +209,6 @@ done
 #VCF FILES
 
 #Merge GCVFs
-
 vcfArray_list=snp_indels.vcf
 
 #selectVariants
@@ -234,7 +234,6 @@ cfsan_snpma_fasta=snpma.fasta
 cfsan_snpma_fil_fasta=snpma_preserved.fasta
 
 #VCF TO MSA FILES
-
 
 tsv_filsnp_file=snp_PassCluster.tsv
 msa_filsnp_file=snp_PassCluster.fasta

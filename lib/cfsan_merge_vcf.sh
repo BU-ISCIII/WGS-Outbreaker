@@ -9,6 +9,7 @@ if [ $# -eq 0 ];then
         exit
 fi
 
+
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
 # Treat unset variables and parameters other than the special parameters ‘@’ or ‘*’ as an error when performing parameter expansion. An error message will be written to the standard error, and a non-interactive shell will exit
@@ -20,5 +21,5 @@ set -x
 
 dir=$1
 
-cfsan_snp_pipeline merge_vcfs -n consensus.vcf -o $dir/snpma.fasta $dir/sampleDirectories.txt.OrigVCF.filtered
-cfsan_snp_pipeline merge_vcfs -n consensus_preserved.vcf -o $dir/snpma_preserved.fasta $dir/sampleDirectories.txt.PresVCF.filtered
+cfsan_snp_pipeline merge_vcfs -n consensus.vcf -o $dir/snpma.vcf $dir/sampleDirectories.txt.OrigVCF.filtered
+cfsan_snp_pipeline merge_vcfs -n consensus_preserved.vcf -o $dir/snpma_preserved.vcf $dir/sampleDirectories.txt.PresVCF.filtered
