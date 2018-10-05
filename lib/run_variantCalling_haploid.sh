@@ -35,14 +35,15 @@ echo -e "Creating $output_dir/variant_calling"
 mkdir -p $output_dir/variant_calling
 
 # Get jobids if duplicate filter was executed or not
-if [ "$use_sge" = "1" -a $duplicate_filter == "YES" ]; then
- 	jobid=$(cat $output_dir/logs/jobids.txt | grep -w "PICARD_DUPLICATES" | cut -d ':' -f2 )
- 	calling_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid"
-else
- 	jobid=$(cat $output_dir/logs/jobids.txt | grep -w "TRIMMOMATIC" | cut -d ':' -f2 )
- 	calling_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid"
+if [ "$use_sge" = "1" ];then
+	if [$duplicate_filter == "YES" ]; then
+		jobid=$(cat $output_dir/logs/jobids.txt | grep -w "PICARD_DUPLICATES" | cut -d ':' -f2 )
+		calling_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid"
+	else
+		jobid=$(cat $output_dir/logs/jobids.txt | grep -w "TRIMMOMATIC" | cut -d ':' -f2 )
+		calling_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid"
+	fi
 fi
-
 # Set input names
 if [ $duplicate_filter == "YES" ]; then
 	input_list=$duplicateBamArray_list
@@ -70,7 +71,7 @@ joint_vcf_cmd="$SCRIPTS_DIR/gatk_jointvcf.sh \
 
 # Execute GATK without known snps
 if [ $know_snps == "NO" ];then
-	
+
 	calling_cmd="$SCRIPTS_DIR/gatk_haploid.sh \
 	$threads \
 	$output_dir/Alignment/BAM  \
@@ -81,29 +82,28 @@ if [ $know_snps == "NO" ];then
 	$ref_path \
 	$gatk_path \
 	$haplotypeGVCF_list"
-	
+
 
 	if [ $variant_calling == "YES" ]; then
 		#In HPC
-                if [ "$use_sge" = "1" ]; then
-                calling=$( qsub $calling_args -t 1-$sample_count -N $JOBNAME.GATK_CALLING $calling_cmd)
-                jobid_calling=$( echo $calling | cut -d ' ' -f3 | cut -d '.' -f1 )
-                echo -e "GATK_CALLING:$jobid_calling \n" >> $output_dir/logs/jobids.txt
-        	
-		jointvcf_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid_calling"
-		jointvcf=$( qsub $jointvcf_args -N $JOBNAME.GATK_JOINT.VCF $joint_vcf_cmd)
-                jobid_jointvcf=$( echo $jointvcf | cut -d ' ' -f3 | cut -d '.' -f1 )
-                echo -e "GATK_JOINT.VCF:$jobid_jointvcf \n" >> $output_dir/logs/jobids.txt        
-		
+    	if [ "$use_sge" = "1" ]; then
+			calling=$( qsub $calling_args -t 1-$sample_count -N $JOBNAME.GATK_CALLING $calling_cmd)
+			jobid_calling=$( echo $calling | cut -d ' ' -f3 | cut -d '.' -f1 )
+			echo -e "GATK_CALLING:$jobid_calling \n" >> $output_dir/logs/jobids.txt
+
+			jointvcf_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid_calling"
+			jointvcf=$( qsub $jointvcf_args -N $JOBNAME.GATK_JOINT.VCF $joint_vcf_cmd)
+			jobid_jointvcf=$( echo $jointvcf | cut -d ' ' -f3 | cut -d '.' -f1 )
+			echo -e "GATK_JOINT.VCF:$jobid_jointvcf \n" >> $output_dir/logs/jobids.txt
 		# Or local
 		else
-		for count in `seq 1 $sample_count`
+			for count in `seq 1 $sample_count`
                 do
-                        echo "Running variant calling on sample $count"
-                        calling=$($calling_cmd $count)
-			jointvcf=$(joint_vcf_cmd $count)
+					echo "Running variant calling on sample $count"
+					calling=$($calling_cmd $count)
+					jointvcf=$($joint_vcf_cmd $count)
                 done
-                fi
+         fi
 	fi
 
 # Execute GATK with known snps
@@ -120,7 +120,7 @@ else
         $recalibratedBamArray_list \
         $ref_path \
         $gatk_path"
-	
+
   	calling_cmd="$SCRIPTS_DIR/gatk_haploid.sh \
 	$threads \
 	$output_dir/variant_calling/variants_gatk/recalibration \
@@ -140,20 +140,20 @@ else
 
 	if [ $variant_calling == "YES" ]; then
 		#In HPC
-                if [ "$use_sge" = "1" ]; then
+		if [ "$use_sge" = "1" ]; then
                 precalling=$( qsub $precalling_args -t 1-$sample_count -N $JOBNAME.GATK_PRE-CALLING $precalling_cmd)
                 jobid_precalling=$( echo $precalling | cut -d ' ' -f3 | cut -d '.' -f1 )
-                
-		calling_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid_precalling"
+
+				calling_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid_precalling"
                 calling=$( qsub $calling_args -t 1-$sample_count -N $JOBNAME.GATK_CALLING $calling_cmd)
                 jobid_calling=$( echo $calling | cut -d ' ' -f3 | cut -d '.' -f1 )
                 echo -e "GATK_CALLING:$jobid_precalling - $jobid_calling \n" >> $output_dir/logs/jobids.txt
-        
-		jointvcf_arg=calling_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid_calling"
+
+				jointvcf_arg=calling_args="${SGE_ARGS} -pe openmp $threads -l h_vmem=$vmem -hold_jid $jobid_calling"
                 jointvcf=$( qsub $calling_args -N $JOBNAME.GATK_JOINT.VCF $joint_vcf_cmd)
                 jobid_jointvcf=$( echo $jointvcf | cut -d ' ' -f3 | cut -d '.' -f1 )
                 echo -e "GATK_JOINT.VCF:$jobid_jointvcf \n" >> $output_dir/logs/jobids.txt
-        
+
 		#Or local
 		else
                 for count in `seq 1 $sample_count`
@@ -215,9 +215,9 @@ if [ $vcf_to_msa == "YES" ]; then
 		echo "Running variant calling on sample"
 		run_vcf_to_tsv_filsnp=$($vcf_to_tsv_filsnp_cmd)
 		run_tsv_to_msa_filsnp=$($tsv_to_msa_filsnp_cmd)
-	
+
 		run_vcf_to_tsv_passnp=$($vcf_to_tsv_passnp_cmd)
-        	run_tsv_to_msa_passnp=$($tsv_to_msa_passnp_cmd)
+       	run_tsv_to_msa_passnp=$($tsv_to_msa_passnp_cmd)
 
 	fi
 fi
