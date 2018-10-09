@@ -33,20 +33,22 @@ set -x
 mkdir -p $output_dir/RAXML
 echo "Directory for RAXML created"
 
-# Get jobids from CFSAN and GATK steps
-jobid_cfsan_matrix_distance=$(cat $output_dir/logs/jobids.txt | grep -w "CFSAN_MATRIX_DISTANCE" | cut -d ':' -f2 )
-jobid_tsv_to_msa_filsnp=$(cat $output_dir/logs/jobids.txt | grep -w "TSV_TO_MSAfilsnp" | cut -d ':' -f2 )
-jobid_tsv_to_msa_passnp=$(cat $output_dir/logs/jobids.txt | grep -w "TSV_TO_MSApassnp" | cut -d ':' -f2 )
 
-#SGE ARGs for RAxML
-SGE_ARGS_raxml="-V -j y -b y -wd $output_dir/logs -m a -M $email -q all.q"
+if [ "$use_sge" = "1" ]; then
+	# Get jobids from CFSAN and GATK steps
+	jobid_cfsan_matrix_distance=$(cat $output_dir/logs/jobids.txt | grep -w "CFSAN_MATRIX_DISTANCE" | cut -d ':' -f2 )
+	jobid_tsv_to_msa_filsnp=$(cat $output_dir/logs/jobids.txt | grep -w "TSV_TO_MSAfilsnp" | cut -d ':' -f2 )
+	jobid_tsv_to_msa_passnp=$(cat $output_dir/logs/jobids.txt | grep -w "TSV_TO_MSApassnp" | cut -d ':' -f2 )
 
+	#SGE ARGs for RAxML
+	SGE_ARGS_raxml="-V -j y -b y -wd $output_dir/logs -m a -M $email -q all.q"
+fi
 # Execute raxml if CFSAN was executed
 if [ $cfsan == "YES" ]; then
 	mkdir -p $output_dir/RAXML/CFSAN/preser
 	mkdir -p $output_dir/RAXML/CFSAN/all_snp
 	dir_cfsan=$output_dir/CFSAN
-	
+
 	run_raxmlinfe_cfsan_allsnp_cmd="$SCRIPTS_DIR/raxml_inference.sh \
                 $dir_cfsan \
                 $output_dir/RAXML/CFSAN/all_snp \
@@ -88,7 +90,7 @@ if [ $cfsan == "YES" ]; then
 	if [ "$use_sge" = "1" ]; then
 		#In HPC
 		raxml_cfsan_args="${SGE_ARGS_raxml} -hold_jid ${jobid_cfsan_matrix_distance} -pe orte 100 mpirun"
-	
+
 #CFSAN all snp
 
 	        raxmlinfe_cfsan_allsnp_qsub=$( qsub -N $JOBNAME.RAXMLinfe_CFSANallsnp $raxml_cfsan_args $run_raxmlinfe_cfsan_allsnp_cmd)
@@ -124,7 +126,7 @@ if [ $cfsan == "YES" ]; then
         	raxmlannot_cfsan_preser_qsub=$( qsub -N $JOBNAME.RAXMLannot_CFSANpreser $raxmlannot_cfsanpreser_args $run_raxmlannot_cfsan_preser_cmd)
         	jobid_raxmlannot_cfsan_preser=$(echo $raxmlannot_cfsan_preser_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
         	echo -e "RAXMLannot_CFSANpreser:$jobid_raxmlannot_cfsan_preser\n" >> $output_dir/logs/jobids.txt
-	
+
 	# Or local
         else
 
@@ -134,7 +136,7 @@ if [ $cfsan == "YES" ]; then
 
 		run_raxmlinfe_cfsan_preser=$($run_raxmlinfe_cfsan_preser_cmd)
 		run_raxmlboot_cfsan_preser=$($run_raxmlboot_cfsan_preser_cmd)
-		run_raxmlannot_cfsan_preser=$($run_raxmlannot_cfsan_preser_cmd)        	
+		run_raxmlannot_cfsan_preser=$($run_raxmlannot_cfsan_preser_cmd)
 	fi
 fi
 
@@ -144,7 +146,7 @@ if [ $variant_calling == "YES" ]; then
         mkdir -p $output_dir/RAXML/GATK/all_snp
         dir_gatk=$output_dir/variant_calling/variants_gatk/variants
 
-	run_raxmlinfe_gatk_filsnp_cmd="$SCRIPTS_DIR/raxml_inference.sh \
+		run_raxmlinfe_gatk_filsnp_cmd="$SCRIPTS_DIR/raxml_inference.sh \
                 $dir_gatk \
                 $output_dir/RAXML/GATK/all_snp \
                 $msa_filsnp_file \
@@ -178,13 +180,13 @@ if [ $variant_calling == "YES" ]; then
 
         run_raxmlannot_gatk_preser_cmd="$SCRIPTS_DIR/raxml_annot.sh \
                 $output_dir/RAXML/GATK/preser \
-                $model_raxml"	
+                $model_raxml"
 
 	#In HPC
 	if [ "$use_sge" = "1" ]; then
 	        raxml_gatk_args_filsnp="${SGE_ARGS_raxml} -hold_jid ${jobid_tsv_to_msa_filsnp} -pe orte 100 mpirun"
 		raxml_gatk_args_passnp="${SGE_ARGS_raxml} -hold_jid ${jobid_tsv_to_msa_passnp} -pe orte 100 mpirun"
-	
+
 #GATK fil snp
         	raxmlinfe_gatk_filsnp_qsub=$( qsub -N $JOBNAME.RAXMLinfe_GATKallsnp $raxml_gatk_args_filsnp $run_raxmlinfe_gatk_filsnp_cmd)
         	jobid_raxmlinfe_gatk_filsnp=$(echo $raxmlinfe_gatk_filsnp_qsub | cut -d ' ' -f3 | cut -d '.' -f1 )
@@ -219,9 +221,9 @@ if [ $variant_calling == "YES" ]; then
 	#Or local
         else
 
-		run_raxmlinfe_gatk_allsnp=$($run_raxmlinfe_gatk_allsnp_cmd)
-                run_raxmlboot_gatk_allsnp=$($run_raxmlboot_gatk_allsnp_cmd)
-                run_raxmlannot_gatk_allsnp=$($run_raxmlannot_gatk_allsnp_cmd)
+				run_raxmlinfe_gatk_filsnp=$($run_raxmlinfe_gatk_filsnp_cmd)
+                run_raxmlboot_gatk_filsnp=$($run_raxmlboot_gatk_filsnp_cmd)
+                run_raxmlannot_gatk_filsnp=$($run_raxmlannot_gatk_filsnp_cmd)
 
                 run_raxmlinfe_gatk_preser=$($run_raxmlinfe_gatk_preser_cmd)
                 run_raxmlboot_gatk_preser=$($run_raxmlboot_gatk_preser_cmd)

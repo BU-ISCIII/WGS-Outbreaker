@@ -101,8 +101,8 @@ if [ $know_snps == "NO" ];then
                 do
 					echo "Running variant calling on sample $count"
 					calling=$($calling_cmd $count)
-					jointvcf=$($joint_vcf_cmd $count)
                 done
+				jointvcf=$($joint_vcf_cmd $count)
          fi
 	fi
 
