@@ -59,9 +59,9 @@ java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
       -V $output_dir/variants/$vcfArray_list \
       -o $output_dir/variants/$vcfsnpsArray_list \
       -selectType SNP \
-      -nt $threads \
       -S LENIENT \
       -log $output_dir/$vcfArray_list-selectSNP.log
+#-nt $threads \
 
 # Filter snp variants
 java -Djava.io.tmpdir=$TEMP $JAVA_RAM -jar $gatk_path/GenomeAnalysisTK.jar \
