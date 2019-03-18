@@ -8,6 +8,12 @@ if [ $# -eq 0 ];then
         exit
 fi
 
+if [ -z $JOB_ID ]; then
+	use_sge=0
+else
+	use_sge=1
+fi
+
 # Exit immediately if a pipeline, which may consist of a single simple command, a list, or a compound command returns a non-zero status
 set -e
 # Treat unset variables and parameters other than the special parameters ‘@’ or ‘*’ as an error when performing parameter expansion. An error message will be written to the standard error, and a non-interactive shell will exit
@@ -23,4 +29,8 @@ snp_msa=$3
 model=$4
 boots=$5
 
-raxmlHPC-MPI-AVX -m $model -V -b 12345 -w $output_dir -n RAXML_TREE_BOOTSTRAP -p 12345 -s $dir/$snp_msa -N $boots
+if [ "$use_sge" = "1" ]; then
+	raxmlHPC-MPI-AVX -m $model -V -b 12345 -w $output_dir -n RAXML_TREE_BOOTSTRAP -p 12345 -s $dir/$snp_msa -N $boots
+else
+	raxmlHPC-AVX -m $model -V -b 12345 -w $output_dir -n RAXML_TREE_BOOTSTRAP -p 12345 -s $dir/$snp_msa -N $boots
+fi
