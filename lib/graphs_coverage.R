@@ -2,7 +2,7 @@
 
 ## Author: S. Monzon &  A.Hernandez
 ## version v2.0
-## Usage: graphs_coverage.R  
+## Usage: graphs_coverage.R
 
 #load libraries
 library(ggplot2)
@@ -27,8 +27,9 @@ for (f in files){
  	df=read.table(f, sep="\t")
 	colnames(df) <- c("chr","covThreshold","fractionAtThisCoverage","ChrLength","diffFracBelowThreshold")
  	cov <- ddply(df,.(chr),summarize,covThreshold=covThreshold,fracAboveThreshold=1-cumsum(diffFracBelowThreshold))
-
-	cov_graph <- rbind(cov_graph,cbind(cov, sample= gsub("^(AA-[0-9a-zA-Z]+).*$", "\\1", f)))
+	sample <- gsub("^([0-9a-zA-Z-_]+).*$", "\\1", f,perl=T)
+	print(sample)
+	cov_graph <- rbind(cov_graph,cbind(cov, sample= sample))
 	cov_subset <- subset(cov,covThreshold<maxCov & chr == "genome")
 
 
